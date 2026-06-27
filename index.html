@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ToolHub AI – 200+ Free AI Tools for Everyone</title>
+<meta name="description" content="Remove backgrounds, upscale images, convert PDFs, generate AI art and much more. 200+ free AI tools in one platform.">
+<meta name="keywords" content="AI tools, remove background, image upscaler, PDF tools, AI image generator, free online tools">
+<meta property="og:title" content="ToolHub AI – 200+ Free AI Tools">
+<meta property="og:description" content="The all-in-one AI toolkit. Fast, free, no registration needed.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --blue:#4F46E5;--purple:#8B5CF6;--cyan:#06B6D4;--green:#22C55E;
+  --red:#EF4444;--amber:#F59E0B;--dark:#0F172A;--dark2:#1E293B;
+  --gray:#111827;--gray2:#374151;--gray3:#6B7280;--gray4:#9CA3AF;
+  --border:#E5E7EB;--bg:#F9FAFB;--white:#fff;
+  --grad:linear-gradient(135deg,#4F46E5 0%,#8B5CF6 100%);
+  --grad2:linear-gradient(135deg,#06B6D4 0%,#4F46E5 100%);
+  --grad3:linear-gradient(135deg,#8B5CF6 0%,#EC4899 100%);
+  --shadow:0 4px 24px rgba(79,70,229,0.12);
+  --shadow2:0 2px 12px rgba(0,0,0,0.06);
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:#fff;color:#111827;overflow-x:hidden;line-height:1.6}
+a{text-decoration:none;color:inherit}
+img{max-width:100%}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:#f1f5f9}
+::-webkit-scrollbar-thumb{background:var(--blue);border-radius:3px}
+
+/* ===== NAVBAR ===== */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:1000;
+  height:64px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 3rem;
+  background:rgba(255,255,255,0.85);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-bottom:0.5px solid rgba(0,0,0,0.07);
+  transition:all .3s ease;
+}
+.nav-logo{display:flex;align-items:center;gap:9px;font-family:'Sora',sans-serif;font-weight:800;font-size:19px;color:#0F172A}
+.logo-icon{
+  width:32px;height:32px;background:var(--grad);border-radius:9px;
+  display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;font-weight:800;
+  box-shadow:0 2px 8px rgba(79,70,229,0.35);
+}
+.logo-span{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.nav-links{display:flex;align-items:center;gap:2px}
+.nav-links a{
+  padding:7px 13px;font-size:13.5px;color:#374151;border-radius:8px;
+  transition:all .2s;font-weight:500;cursor:pointer;
+}
+.nav-links a:hover{background:#F3F4F6;color:#111}
+.nav-right{display:flex;align-items:center;gap:10px}
+.nav-login{padding:7px 16px;font-size:13px;color:#374151;border:1px solid #E5E7EB;border-radius:9px;cursor:pointer;background:#fff;font-weight:500;transition:all .2s}
+.nav-login:hover{border-color:#4F46E5;color:#4F46E5}
+.nav-cta{
+  padding:8px 18px;font-size:13px;font-weight:600;color:#fff;
+  background:var(--grad);border:none;border-radius:9px;cursor:pointer;
+  box-shadow:0 3px 12px rgba(79,70,229,0.3);transition:all .2s;
+}
+.nav-cta:hover{transform:translateY(-1px);box-shadow:0 5px 18px rgba(79,70,229,0.4)}
+
+/* ===== HERO ===== */
+.hero{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  position:relative;overflow:hidden;padding:100px 2rem 4rem;
+  text-align:center;
+}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 900px 600px at 50% -100px,rgba(79,70,229,0.09),transparent 70%)}
+.hero-orb1{
+  position:absolute;width:700px;height:700px;border-radius:50%;
+  background:radial-gradient(circle,rgba(79,70,229,0.07),transparent 70%);
+  top:-300px;left:50%;transform:translateX(-50%);
+  animation:orbFloat 8s ease-in-out infinite;
+}
+.hero-orb2{
+  position:absolute;width:400px;height:400px;border-radius:50%;
+  background:radial-gradient(circle,rgba(139,92,246,0.06),transparent 70%);
+  bottom:0;right:-100px;
+  animation:orbFloat 10s ease-in-out infinite reverse;
+}
+@keyframes orbFloat{0%,100%{transform:translateX(-50%) scale(1)}50%{transform:translateX(-50%) scale(1.06)}}
+.hero-inner{position:relative;z-index:1;max-width:800px;margin:0 auto}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:7px;
+  background:rgba(79,70,229,0.08);border:1px solid rgba(79,70,229,0.18);
+  border-radius:100px;padding:7px 16px;font-size:12.5px;color:#4F46E5;font-weight:600;
+  margin-bottom:2rem;letter-spacing:.01em;
+  animation:fadeUp .6s ease both;
+}
+.badge-dot{width:7px;height:7px;background:#22C55E;border-radius:50%;box-shadow:0 0 0 2px rgba(34,197,94,0.25);animation:pulseDot 2s infinite}
+@keyframes pulseDot{0%,100%{box-shadow:0 0 0 2px rgba(34,197,94,0.25)}50%{box-shadow:0 0 0 5px rgba(34,197,94,0.1)}}
+h1.hero-title{
+  font-family:'Sora',sans-serif;
+  font-size:clamp(2.6rem,6vw,4rem);
+  font-weight:800;line-height:1.12;letter-spacing:-0.025em;
+  color:#0F172A;margin-bottom:1.4rem;
+  animation:fadeUp .6s ease .1s both;
+}
+.hero-title .grad-text{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{
+  font-size:1.1rem;color:#6B7280;line-height:1.75;
+  max-width:560px;margin:0 auto 2.5rem;
+  animation:fadeUp .6s ease .2s both;
+}
+.hero-actions{
+  display:flex;align-items:center;gap:12px;justify-content:center;flex-wrap:wrap;
+  margin-bottom:2rem;animation:fadeUp .6s ease .3s both;
+}
+.btn-hero{
+  background:var(--grad);color:#fff;padding:15px 30px;border-radius:13px;
+  font-size:15.5px;font-weight:600;border:none;cursor:pointer;
+  box-shadow:0 6px 24px rgba(79,70,229,0.32);transition:all .25s;
+  display:flex;align-items:center;gap:8px;
+}
+.btn-hero:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(79,70,229,0.42)}
+.btn-hero2{
+  background:#fff;color:#374151;padding:14px 28px;border-radius:13px;
+  font-size:15.5px;font-weight:500;border:1.5px solid #E5E7EB;cursor:pointer;transition:all .25s;
+  display:flex;align-items:center;gap:8px;
+}
+.btn-hero2:hover{border-color:#4F46E5;color:#4F46E5;background:rgba(79,70,229,0.02)}
+.hero-tags{
+  display:flex;flex-wrap:wrap;gap:8px;justify-content:center;
+  animation:fadeUp .6s ease .4s both;
+}
+.hero-tag{
+  background:#F9FAFB;border:1px solid #E5E7EB;border-radius:100px;
+  padding:5px 13px;font-size:12.5px;color:#6B7280;cursor:pointer;transition:all .2s;
+}
+.hero-tag:hover{background:#EEF2FF;border-color:#4F46E5;color:#4F46E5}
+.drop-area{
+  max-width:580px;margin:2.5rem auto 0;
+  border:1.5px dashed rgba(79,70,229,0.28);border-radius:22px;
+  padding:2.25rem;background:rgba(79,70,229,0.025);
+  cursor:pointer;transition:all .3s;position:relative;overflow:hidden;
+  animation:fadeUp .6s ease .5s both;
+}
+.drop-area:hover{border-color:rgba(79,70,229,0.55);background:rgba(79,70,229,0.05);transform:translateY(-2px)}
+.drop-icon-wrap{width:52px;height:52px;background:var(--grad);border-radius:15px;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 16px rgba(79,70,229,0.28)}
+.drop-title{font-weight:600;font-size:15px;color:#111827;margin-bottom:4px}
+.drop-sub{font-size:13px;color:#9CA3AF}
+.drop-formats{display:flex;gap:6px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+.fmt-badge{background:#fff;border:1px solid #E5E7EB;border-radius:6px;padding:3px 10px;font-size:11px;color:#6B7280;font-weight:500}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+/* ===== TRUST BAR ===== */
+.trust-bar{
+  background:#FAFAFA;border-top:0.5px solid #F3F4F6;border-bottom:0.5px solid #F3F4F6;
+  padding:1.4rem 2rem;
+}
+.trust-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:center;gap:3.5rem;flex-wrap:wrap}
+.trust-item{text-align:center}
+.trust-num{font-family:'Sora',sans-serif;font-size:1.5rem;font-weight:800;color:#0F172A;line-height:1}
+.trust-lbl{font-size:11.5px;color:#9CA3AF;margin-top:3px;font-weight:500}
+.trust-divider{width:1px;height:32px;background:#E5E7EB}
+
+/* ===== SECTIONS COMMON ===== */
+section{padding:5.5rem 2rem}
+.sec-inner{max-width:1100px;margin:0 auto}
+.sec-eyebrow{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(79,70,229,0.07);color:#4F46E5;
+  font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  padding:5px 13px;border-radius:100px;margin-bottom:1.1rem;
+}
+.sec-title{
+  font-family:'Sora',sans-serif;font-size:clamp(1.7rem,3.5vw,2.4rem);
+  font-weight:800;color:#0F172A;margin-bottom:.7rem;letter-spacing:-0.015em;line-height:1.2;
+}
+.sec-sub{color:#6B7280;font-size:1rem;line-height:1.75;max-width:500px;margin-bottom:2.75rem}
+.center{text-align:center}.center .sec-sub{margin-left:auto;margin-right:auto}
+
+/* ===== TOOLS GRID ===== */
+.tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:13px}
+.tool-card{
+  background:#fff;border:0.5px solid #EAEAEA;border-radius:16px;
+  padding:1.2rem 1rem;cursor:pointer;transition:all .22s;text-align:center;
+  position:relative;overflow:hidden;
+}
+.tool-card::after{
+  content:'';position:absolute;inset:0;border-radius:16px;
+  background:var(--grad);opacity:0;transition:opacity .22s;pointer-events:none;
+}
+.tool-card:hover{transform:translateY(-5px);box-shadow:0 14px 36px rgba(79,70,229,0.13);border-color:rgba(79,70,229,0.22)}
+.tool-card:hover::after{opacity:0.04}
+.tc-icon{
+  width:46px;height:46px;border-radius:13px;margin:0 auto 10px;
+  display:flex;align-items:center;justify-content:center;font-size:21px;
+  transition:transform .22s;
+}
+.tool-card:hover .tc-icon{transform:scale(1.12) rotate(-4deg)}
+.tc-name{font-size:13px;font-weight:600;color:#111827;line-height:1.3;margin-bottom:5px}
+.tc-badge{
+  display:inline-block;font-size:10px;padding:2px 9px;
+  border-radius:100px;font-weight:600;
+}
+.badge-hot{background:rgba(239,68,68,0.09);color:#DC2626}
+.badge-new{background:rgba(34,197,94,0.09);color:#15803D}
+.badge-ai{background:rgba(79,70,229,0.09);color:#4F46E5}
+.badge-pro{background:rgba(245,158,11,0.09);color:#B45309}
+
+/* ===== CATEGORY CARDS ===== */
+.cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.cat-card{
+  background:#fff;border:0.5px solid #EAEAEA;border-radius:14px;
+  padding:1rem 1.1rem;cursor:pointer;transition:all .2s;
+  display:flex;align-items:center;gap:11px;
+}
+.cat-card:hover{border-color:#4F46E5;background:rgba(79,70,229,0.025);transform:translateX(4px)}
+.cat-ico{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.cat-name{font-size:13.5px;font-weight:600;color:#111827}
+.cat-cnt{font-size:11.5px;color:#9CA3AF;margin-top:1px}
+
+/* ===== AI PHOTO SHOWCASE ===== */
+.photo-tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}
+.photo-tool-card{
+  background:#fff;border:0.5px solid #EAEAEA;border-radius:18px;
+  padding:1.5rem 1.25rem;cursor:pointer;transition:all .25s;text-align:center;
+  position:relative;overflow:hidden;
+}
+.photo-tool-card:hover{transform:translateY(-6px);box-shadow:0 16px 40px rgba(79,70,229,0.14);border-color:rgba(79,70,229,0.25)}
+.ptc-icon{
+  width:56px;height:56px;border-radius:16px;margin:0 auto 13px;
+  display:flex;align-items:center;justify-content:center;font-size:26px;
+  transition:transform .25s;
+}
+.photo-tool-card:hover .ptc-icon{transform:scale(1.1) rotate(-5deg)}
+.ptc-name{font-size:14px;font-weight:700;color:#111827;margin-bottom:5px}
+.ptc-desc{font-size:12px;color:#9CA3AF;line-height:1.5}
+.ptc-try{
+  display:inline-flex;align-items:center;gap:4px;margin-top:10px;
+  font-size:12px;color:#4F46E5;font-weight:600;transition:gap .2s;
+}
+.photo-tool-card:hover .ptc-try{gap:7px}
+
+/* ===== HOW IT WORKS ===== */
+.how-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2.5rem}
+.how-step{text-align:center;padding:2rem 1.5rem;border:0.5px solid #EAEAEA;border-radius:20px;background:#fff;transition:all .25s}
+.how-step:hover{box-shadow:0 12px 30px rgba(0,0,0,0.06);transform:translateY(-4px)}
+.how-num{
+  width:56px;height:56px;border-radius:16px;margin:0 auto 1.2rem;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--grad);color:#fff;font-family:'Sora',sans-serif;font-size:24px;font-weight:800;
+  box-shadow:0 4px 16px rgba(79,70,229,0.28);
+}
+.how-title{font-family:'Sora',sans-serif;font-weight:700;font-size:1.05rem;color:#0F172A;margin-bottom:.45rem}
+.how-desc{font-size:13px;color:#6B7280;line-height:1.65}
+.how-connector{display:flex;align-items:center;justify-content:center;margin-top:1.5rem}
+.conn-line{flex:1;height:1px;background:linear-gradient(to right,transparent,#E5E7EB,transparent)}
+
+/* ===== BEFORE/AFTER ===== */
+.ba-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.ba-card{border:0.5px solid #EAEAEA;border-radius:18px;overflow:hidden;cursor:pointer;transition:all .25s;background:#fff}
+.ba-card:hover{transform:translateY(-4px);box-shadow:0 14px 36px rgba(0,0,0,0.1)}
+.ba-images{display:grid;grid-template-columns:1fr 1fr;position:relative;height:160px;background:#F3F4F6}
+.ba-label-wrap{display:flex;justify-content:space-between;padding:3px 10px}
+.ba-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#9CA3AF}
+.ba-divider{position:absolute;top:0;bottom:0;left:50%;width:2px;background:#fff;z-index:2}
+.ba-divider::after{content:'↔';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border:1px solid #E5E7EB;border-radius:100px;padding:2px 6px;font-size:11px;color:#6B7280;white-space:nowrap}
+.ba-side{display:flex;align-items:center;justify-content:center;font-size:3rem}
+.ba-info{padding:.85rem 1rem}
+.ba-title{font-size:13.5px;font-weight:700;color:#111827;margin-bottom:3px}
+.ba-desc{font-size:12px;color:#9CA3AF}
+.ba-cta{font-size:12px;color:#4F46E5;font-weight:600;margin-top:6px;display:flex;align-items:center;gap:3px}
+
+/* ===== FEATURES ===== */
+.feat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.feat-card{
+  padding:1.5rem;border:0.5px solid #EAEAEA;border-radius:18px;background:#fff;
+  transition:all .22s;cursor:default;
+}
+.feat-card:hover{border-color:#4F46E5;box-shadow:var(--shadow);transform:translateY(-3px)}
+.feat-icon{font-size:28px;margin-bottom:.9rem}
+.feat-title{font-family:'Sora',sans-serif;font-weight:700;font-size:.97rem;color:#0F172A;margin-bottom:.4rem}
+.feat-desc{font-size:13px;color:#6B7280;line-height:1.65}
+
+/* ===== PRICING ===== */
+.price-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.price-card{
+  background:#fff;border:0.5px solid #E5E7EB;border-radius:22px;
+  padding:2rem;transition:all .3s;display:flex;flex-direction:column;
+}
+.price-card.featured{
+  border:1.5px solid #4F46E5;
+  box-shadow:0 0 0 4px rgba(79,70,229,0.07),0 12px 40px rgba(79,70,229,0.13);
+  position:relative;background:linear-gradient(180deg,rgba(79,70,229,0.025) 0%,#fff 100%);
+}
+.pop-badge{
+  position:absolute;top:-13px;left:50%;transform:translateX(-50%);
+  background:var(--grad);color:#fff;font-size:11px;font-weight:700;
+  padding:4px 16px;border-radius:100px;white-space:nowrap;
+  box-shadow:0 3px 10px rgba(79,70,229,0.3);
+}
+.price-plan{font-family:'Sora',sans-serif;font-weight:800;font-size:1.15rem;color:#0F172A}
+.price-desc{font-size:13px;color:#9CA3AF;margin-top:3px}
+.price-amt{font-family:'Sora',sans-serif;font-size:2.6rem;font-weight:800;color:#0F172A;margin:1.2rem 0 .2rem;line-height:1}
+.price-amt .curr{font-size:1.3rem;vertical-align:super;margin-right:1px}
+.price-amt .per{font-size:.9rem;color:#9CA3AF;font-weight:400;font-family:'Inter',sans-serif}
+.price-divider{height:1px;background:#F3F4F6;margin:1.3rem 0}
+.price-feats{list-style:none;display:flex;flex-direction:column;gap:.65rem;flex:1}
+.price-feats li{font-size:13px;color:#374151;display:flex;align-items:center;gap:9px;line-height:1.4}
+.price-feats li .ck{color:#22C55E;font-weight:700;font-size:14px;flex-shrink:0}
+.price-feats li.no{color:#9CA3AF}
+.price-feats li.no .ck{color:#E5E7EB}
+.price-btn{
+  margin-top:1.75rem;width:100%;padding:12px;border-radius:12px;
+  font-size:14px;font-weight:600;cursor:pointer;transition:all .22s;border:1.5px solid #E5E7EB;
+  background:#fff;color:#374151;
+}
+.price-btn:hover{border-color:#4F46E5;color:#4F46E5}
+.price-btn.feat-btn{
+  background:var(--grad);color:#fff;border:none;
+  box-shadow:0 5px 18px rgba(79,70,229,0.28);
+}
+.price-btn.feat-btn:hover{transform:translateY(-2px);box-shadow:0 8px 26px rgba(79,70,229,0.38)}
+
+/* ===== TESTIMONIALS ===== */
+.testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}
+.testi-card{
+  background:#FAFAFA;border:0.5px solid #F0F0F0;border-radius:18px;
+  padding:1.6rem;transition:all .22s;
+}
+.testi-card:hover{background:#fff;box-shadow:0 8px 28px rgba(0,0,0,0.07);border-color:#E5E7EB;transform:translateY(-3px)}
+.testi-stars{color:#F59E0B;font-size:14px;margin-bottom:.9rem;letter-spacing:2px}
+.testi-quote{font-size:13.5px;color:#374151;line-height:1.72;margin-bottom:1.1rem;font-style:italic}
+.testi-author{display:flex;align-items:center;gap:10px}
+.testi-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0}
+.testi-name{font-size:13.5px;font-weight:600;color:#111827}
+.testi-role{font-size:11.5px;color:#9CA3AF}
+
+/* ===== FAQ ===== */
+.faq-list{max-width:740px;margin:0 auto}
+.faq-item{border-bottom:0.5px solid #F3F4F6}
+.faq-q{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1.1rem 0;cursor:pointer;font-size:14.5px;font-weight:600;color:#0F172A;
+  transition:color .2s;gap:1rem;
+}
+.faq-q:hover{color:#4F46E5}
+.faq-arrow{font-size:18px;color:#9CA3AF;transition:transform .25s;flex-shrink:0}
+.faq-item.open .faq-arrow{transform:rotate(180deg);color:#4F46E5}
+.faq-a{font-size:13.5px;color:#6B7280;line-height:1.7;max-height:0;overflow:hidden;transition:max-height .35s ease,padding .25s}
+.faq-item.open .faq-a{max-height:200px;padding-bottom:1rem}
+
+/* ===== CTA BANNER ===== */
+.cta-section{
+  background:var(--dark);padding:5.5rem 2rem;text-align:center;
+  position:relative;overflow:hidden;
+}
+.cta-glow{
+  position:absolute;width:600px;height:300px;border-radius:50%;
+  background:radial-gradient(circle,rgba(79,70,229,0.3),transparent 70%);
+  top:50%;left:50%;transform:translate(-50%,-50%);
+}
+.cta-inner{position:relative;max-width:640px;margin:0 auto}
+.cta-title{font-family:'Sora',sans-serif;font-size:clamp(2rem,4.5vw,2.8rem);font-weight:800;color:#fff;margin-bottom:1rem;letter-spacing:-0.02em;line-height:1.2}
+.cta-sub{color:#94A3B8;font-size:1.02rem;line-height:1.75;margin-bottom:2.2rem}
+.cta-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.cta-btn1{
+  background:#fff;color:#0F172A;padding:14px 28px;border-radius:12px;
+  font-size:15px;font-weight:600;border:none;cursor:pointer;transition:all .22s;
+}
+.cta-btn1:hover{background:#F8FAFC;transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,255,255,0.15)}
+.cta-btn2{
+  background:rgba(255,255,255,0.08);color:#fff;padding:14px 28px;border-radius:12px;
+  font-size:15px;font-weight:500;border:1px solid rgba(255,255,255,0.15);cursor:pointer;transition:all .22s;
+}
+.cta-btn2:hover{background:rgba(255,255,255,0.13);transform:translateY(-2px)}
+.cta-trust{margin-top:1.5rem;font-size:12.5px;color:#64748B}
+
+/* ===== AD BANNER ===== */
+.ad-banner{
+  background:linear-gradient(135deg,rgba(79,70,229,0.05),rgba(139,92,246,0.05));
+  border:1px solid rgba(79,70,229,0.1);border-radius:14px;
+  padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;
+  gap:1rem;margin-bottom:2rem;flex-wrap:wrap;
+}
+.ad-banner-text{font-size:14px;color:#374151;font-weight:500}
+.ad-banner-text span{color:#4F46E5;font-weight:700}
+.ad-banner-cta{
+  background:var(--grad);color:#fff;padding:8px 18px;border-radius:9px;
+  font-size:13px;font-weight:600;border:none;cursor:pointer;white-space:nowrap;transition:all .2s;
+}
+.ad-banner-cta:hover{transform:scale(1.03)}
+
+/* ===== FOOTER ===== */
+footer{background:#0F172A;padding:4rem 2rem 2rem;border-top:0.5px solid rgba(255,255,255,0.05)}
+.footer-inner{max-width:1100px;margin:0 auto}
+.footer-top{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:2.5rem;margin-bottom:3rem}
+.footer-brand{}
+.footer-brand .nav-logo{color:#fff;margin-bottom:.9rem}
+.footer-brand p{font-size:13px;color:#94A3B8;line-height:1.7;max-width:220px}
+.footer-newsletter{margin-top:1.2rem}
+.newsletter-form{display:flex;gap:8px;margin-top:.6rem}
+.newsletter-input{
+  flex:1;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);
+  border-radius:9px;padding:9px 13px;font-size:13px;color:#fff;outline:none;
+  transition:border-color .2s;font-family:'Inter',sans-serif;
+}
+.newsletter-input::placeholder{color:#64748B}
+.newsletter-input:focus{border-color:rgba(79,70,229,0.5)}
+.newsletter-btn{
+  background:var(--blue);color:#fff;border:none;border-radius:9px;
+  padding:9px 14px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .2s;
+}
+.newsletter-btn:hover{background:#4338CA}
+.footer-col h4{font-size:13px;font-weight:700;color:#E2E8F0;margin-bottom:1rem}
+.footer-col a{display:block;font-size:13px;color:#94A3B8;margin-bottom:.55rem;cursor:pointer;transition:color .2s}
+.footer-col a:hover{color:#fff}
+.footer-bottom{
+  border-top:0.5px solid rgba(255,255,255,0.06);padding-top:1.75rem;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;
+}
+.footer-bottom-left{font-size:12.5px;color:#64748B}
+.footer-badges{display:flex;gap:8px;flex-wrap:wrap}
+.footer-badge{
+  display:flex;align-items:center;gap:5px;
+  background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);
+  border-radius:7px;padding:4px 10px;font-size:11px;color:#94A3B8;
+}
+.social-row{display:flex;gap:8px}
+.soc-btn{
+  width:32px;height:32px;border:1px solid rgba(255,255,255,0.1);border-radius:9px;
+  display:flex;align-items:center;justify-content:center;color:#94A3B8;font-size:14px;
+  cursor:pointer;transition:all .2s;font-weight:700;
+}
+.soc-btn:hover{border-color:rgba(255,255,255,0.3);color:#fff;background:rgba(255,255,255,0.06)}
+
+/* ===== STICKY UPLOAD BAR ===== */
+.sticky-upload{
+  position:fixed;bottom:20px;right:20px;z-index:900;
+  background:var(--grad);color:#fff;
+  border-radius:50px;padding:12px 22px;
+  display:flex;align-items:center;gap:8px;
+  font-size:14px;font-weight:600;cursor:pointer;
+  box-shadow:0 8px 30px rgba(79,70,229,0.4);
+  transition:all .25s;
+  animation:fadeUp .5s ease 1s both;
+}
+.sticky-upload:hover{transform:translateY(-3px);box-shadow:0 12px 36px rgba(79,70,229,0.5)}
+
+/* ===== MONETIZATION BANNER ===== */
+.mono-bar{
+  background:linear-gradient(135deg,#0F172A 0%,#1E293B 100%);
+  padding:1.2rem 2rem;text-align:center;
+  border-bottom:1px solid rgba(79,70,229,0.2);
+}
+.mono-bar p{color:#94A3B8;font-size:13px}
+.mono-bar strong{color:#fff}
+.mono-bar a{color:#8B5CF6;font-weight:600;cursor:pointer}
+
+/* ===== UTILS ===== */
+.section-alt{background:#FAFAFA}
+.mt-auto{margin-top:auto}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:center}
+.pill{display:inline-flex;align-items:center;gap:5px;background:#F3F4F6;border-radius:100px;padding:4px 12px;font-size:12px;color:#374151;font-weight:500}
+.pill-green{background:rgba(34,197,94,0.1);color:#15803D}
+.pill-blue{background:rgba(79,70,229,0.1);color:#3730A3}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:900px){
+  nav{padding:0 1.25rem}
+  .nav-links{display:none}
+  .how-grid,.ba-grid,.testi-grid,.price-grid{grid-template-columns:1fr}
+  .footer-top{grid-template-columns:1fr 1fr}
+  .grid-2{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  section{padding:3.5rem 1.25rem}
+  h1.hero-title{font-size:2rem}
+  .footer-top{grid-template-columns:1fr}
+  .trust-inner{gap:1.75rem}
+  .trust-divider{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ANNOUNCEMENT BAR -->
+<div class="mono-bar">
+  <p>🚀 <strong>Black Friday Sale:</strong> Pro plan 60% off — <a onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})">Grab the deal →</a></p>
+</div>
+
+<!-- NAVBAR -->
+<nav id="navbar">
+  <div class="nav-logo">
+    <div class="logo-icon">T</div>
+    ToolHub<span class="logo-span">AI</span>
+  </div>
+  <div class="nav-links">
+    <a onclick="scrollTo('tools')">AI Tools</a>
+    <a onclick="scrollTo('photo')">Photo</a>
+    <a onclick="scrollTo('categories')">Categories</a>
+    <a onclick="scrollTo('pricing')">Pricing</a>
+    <a onclick="scrollTo('faq')">FAQ</a>
+    <a>API</a>
+    <a>Blog</a>
+  </div>
+  <div class="nav-right">
+    <button class="nav-login">Log in</button>
+    <button class="nav-cta" onclick="document.getElementById('hero').scrollIntoView({behavior:'smooth'})">Get Started Free →</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-orb1"></div>
+  <div class="hero-orb2"></div>
+  <div class="hero-inner">
+    <div class="hero-badge">
+      <span class="badge-dot"></span>
+      200+ AI Tools · Completely Free · No Registration
+    </div>
+    <h1 class="hero-title">
+      Edit, Enhance &amp;<br>
+      <span class="grad-text">Transform with AI</span>
+    </h1>
+    <p class="hero-sub">Remove backgrounds, upscale images, convert PDFs, create AI art and much more — all in one powerful platform. Fast, free, and privacy-first.</p>
+    <div class="hero-actions">
+      <button class="btn-hero" onclick="document.getElementById('tools').scrollIntoView({behavior:'smooth'})">
+        🚀 Explore All Tools
+      </button>
+      <button class="btn-hero2" onclick="document.getElementById('how').scrollIntoView({behavior:'smooth'})">
+        ▶ See How It Works
+      </button>
+    </div>
+    <div class="hero-tags">
+      <span class="hero-tag">🎭 Remove Background</span>
+      <span class="hero-tag">✨ Image Upscaler</span>
+      <span class="hero-tag">📄 PDF to Word</span>
+      <span class="hero-tag">🤖 AI Headshot</span>
+      <span class="hero-tag">🎨 AI Art Generator</span>
+      <span class="hero-tag">📱 QR Code Maker</span>
+    </div>
+    <div class="drop-area" id="dropZone" onclick="handleUpload()">
+      <div class="drop-icon-wrap">📁</div>
+      <div class="drop-title">Drop your file here or click to upload</div>
+      <div class="drop-sub">No registration required · Files deleted after 1 hour · SSL secured</div>
+      <div class="drop-formats">
+        <span class="fmt-badge">PNG</span>
+        <span class="fmt-badge">JPG</span>
+        <span class="fmt-badge">WEBP</span>
+        <span class="fmt-badge">PDF</span>
+        <span class="fmt-badge">MP4</span>
+        <span class="fmt-badge">HEIC</span>
+        <span class="fmt-badge">SVG</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST BAR -->
+<div class="trust-bar">
+  <div class="trust-inner">
+    <div class="trust-item"><div class="trust-num">2M+</div><div class="trust-lbl">Active Users</div></div>
+    <div class="trust-divider"></div>
+    <div class="trust-item"><div class="trust-num">4.9 ★</div><div class="trust-lbl">App Store Rating</div></div>
+    <div class="trust-divider"></div>
+    <div class="trust-item"><div class="trust-num">50M+</div><div class="trust-lbl">Files Processed</div></div>
+    <div class="trust-divider"></div>
+    <div class="trust-item"><div class="trust-num">150+</div><div class="trust-lbl">Countries</div></div>
+    <div class="trust-divider"></div>
+    <div class="trust-item"><div class="trust-num">99.9%</div><div class="trust-lbl">Uptime SLA</div></div>
+    <div class="trust-divider"></div>
+    <div class="trust-item"><div class="trust-num">0s</div><div class="trust-lbl">Avg. Wait Time</div></div>
+  </div>
+</div>
+
+<!-- AD BANNER (AdSense placeholder) -->
+<div style="padding:1.25rem 2rem;background:#fff;border-bottom:0.5px solid #F3F4F6">
+  <div class="sec-inner">
+    <div class="ad-banner">
+      <div class="ad-banner-text">⚡ <span>Pro Plan Special:</span> Unlimited tools, 4K export, no watermarks — starting at just <span>$9/month</span></div>
+      <button class="ad-banner-cta" onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})">Upgrade Now →</button>
+    </div>
+  </div>
+</div>
+
+<!-- POPULAR TOOLS -->
+<section id="tools">
+  <div class="sec-inner">
+    <div class="sec-eyebrow">🔥 Most Popular</div>
+    <h2 class="sec-title">Top AI Tools Right Now</h2>
+    <p class="sec-sub">Used by millions every day — fast results, no skill required.</p>
+    <div class="tools-grid">
+      <div class="tool-card"><div class="tc-icon" style="background:linear-gradient(135deg,#DBEAFE,#93C5FD)">🎭</div><div class="tc-name">Remove Background</div><span class="tc-badge badge-hot">🔥 #1</span></div>
+      <div class="tool-card"><div class="tc-icon" style="background:linear-gradient(135deg,#EDE9FE,#C4B5FD)">✨</div><div class="tc-name">Image Upscaler</div><span class="tc-badge badge-hot">Hot</span></div>
+      <div class="tool-card"><div class="tc-icon" style="background:linear-gradient(135deg,#D1FAE5,#6EE7B7)">🪄</div><div class="tc-name">Magic Eraser</div><span class="tc-badge badge-new">New</span></div>
+      <div class="tool-card"><div class="tc-icon" style="background:linear-gradient(135deg,#FCE7F3,#F9A8D4)">💎</div><div class="tc-name">Face Retouch</div><span class="tc-badge badge-ai">AI</span></div>
+      <div class="tool-card"><div class="tc-icon" style="background:linear-gradient(135deg,#FEF3C7,#FCD34D)">🔆</div><div class="tc-name">AI Enhancer</div><span class="tc-badge badge-ai">AI</span></div>
+      <div class="tool-card"><div class="tc-icon" style="background:linear-gradient(135deg,#E0F2FE,#7DD3FC)">🎨</div><div class="tc-name">Colorize Photo</div><span class="tc-badge badge-new">New</span></div>
+      <div class="tool-card"><div class="tc-icon" style="background:linear-gradient(135deg,#F0FDF4,#86EFAC)">🔬</div><div class="tc-name">Sharpen Image</div><span class="tc-badge badge-ai">AI</span></div>
+      <div class="tool-card"><div class="tc-icon" style="background:linear-gradient(135deg,#FFF7ED,#FDBA74)">🕰️</div><div class="tc-name">Restore Old Photo</div><span class="tc-badge badge-ai">AI</span></div>
+      <div class="tool-card"><div class="tc-icon" style="background:linear-gradient(135deg,#EFF6FF,#93C5FD)">📄</div><div class="tc-name">PDF to Word</div><span class="tc-badge badge-hot">Hot</span></div>
+      <div class="tool-card"><div class="tc-icon" style="background:linear-gradient(135deg,#F5F3FF,#C4B5FD)">🎯</div><div class="tc-name">AI Headshot</div><span class="tc-badge badge-pro">Pro</span></div>
+      <div class="tool-card"><div class="tc-icon" style="background:linear-gradient(135deg,#ECFDF5,#6EE7B7)">📱</div><div class="tc-name">QR Code Generator</div><span class="tc-badge badge-new">Free</span></div>
+      <div class="tool-card"><div class="tc-icon" style="background:linear-gradient(135deg,#FEF2F2,#FCA5A5)">🗜️</div><div class="tc-name">Image Compressor</div><span class="tc-badge badge-hot">Hot</span></div>
+      <div class="tool-card"><div class="tc-icon" style="background:linear-gradient(135deg,#F0F9FF,#7DD3FC)">🔄</div><div class="tc-name">HEIC to JPG</div><span class="tc-badge badge-ai">Fast</span></div>
+      <div class="tool-card"><div class="tc-icon" style="background:linear-gradient(135deg,#FFFBEB,#FDE68A)">📊</div><div class="tc-name">OCR – Image to Text</div><span class="tc-badge badge-ai">AI</span></div>
+      <div class="tool-card"><div class="tc-icon" style="background:linear-gradient(135deg,#F3E8FF,#D8B4FE)">🖼️</div><div class="tc-name">AI Image Generator</div><span class="tc-badge badge-new">New</span></div>
+      <div class="tool-card"><div class="tc-icon" style="background:linear-gradient(135deg,#FFF1F2,#FDA4AF)">🏷️</div><div class="tc-name">AI Logo Maker</div><span class="tc-badge badge-pro">Pro</span></div>
+      <div class="tool-card"><div class="tc-icon" style="background:linear-gradient(135deg,#F0FDF4,#A7F3D0)">📝</div><div class="tc-name">AI Resume Builder</div><span class="tc-badge badge-hot">Hot</span></div>
+      <div class="tool-card"><div class="tc-icon" style="background:linear-gradient(135deg,#EFF6FF,#BFDBFE)">🔗</div><div class="tc-name">Barcode Generator</div><span class="tc-badge badge-ai">Free</span></div>
+      <div class="tool-card"><div class="tc-icon" style="background:linear-gradient(135deg,#FDF2F8,#F0ABFC)">🌈</div><div class="tc-name">Color Palette AI</div><span class="tc-badge badge-new">New</span></div>
+      <div class="tool-card"><div class="tc-icon" style="background:linear-gradient(135deg,#F8FAFC,#CBD5E1)">🔑</div><div class="tc-name">Password Generator</div><span class="tc-badge badge-ai">Free</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- AI PHOTO TOOLS SPOTLIGHT -->
+<section class="section-alt" id="photo">
+  <div class="sec-inner">
+    <div class="sec-eyebrow">📸 AI Photo Studio</div>
+    <h2 class="sec-title">Professional Photo Editing with AI</h2>
+    <p class="sec-sub">Studio-quality results in seconds. No Photoshop skills needed — just upload and let AI do the work.</p>
+    <div class="photo-tools-grid">
+      <div class="photo-tool-card">
+        <div class="ptc-icon" style="background:linear-gradient(135deg,#DBEAFE,#93C5FD)">🎭</div>
+        <div class="ptc-name">Remove Background</div>
+        <div class="ptc-desc">Precise AI cutout in under 3 seconds. Perfect edges every time.</div>
+        <div class="ptc-try">Try Free →</div>
+      </div>
+      <div class="photo-tool-card">
+        <div class="ptc-icon" style="background:linear-gradient(135deg,#EDE9FE,#C4B5FD)">🗑️</div>
+        <div class="ptc-name">Object Remover</div>
+        <div class="ptc-desc">Paint over anything. AI fills it seamlessly with matching background.</div>
+        <div class="ptc-try">Try Free →</div>
+      </div>
+      <div class="photo-tool-card">
+        <div class="ptc-icon" style="background:linear-gradient(135deg,#D1FAE5,#6EE7B7)">🪄</div>
+        <div class="ptc-name">Magic Eraser</div>
+        <div class="ptc-desc">One click removes unwanted objects, people, or watermarks.</div>
+        <div class="ptc-try">Try Free →</div>
+      </div>
+      <div class="photo-tool-card">
+        <div class="ptc-icon" style="background:linear-gradient(135deg,#FCE7F3,#F9A8D4)">💄</div>
+        <div class="ptc-name">Face Retouch</div>
+        <div class="ptc-desc">Smooth skin, brighten eyes, whiten teeth. Natural-looking results.</div>
+        <div class="ptc-try">Try Free →</div>
+      </div>
+      <div class="photo-tool-card">
+        <div class="ptc-icon" style="background:linear-gradient(135deg,#EDE9FE,#A5B4FC)">📐</div>
+        <div class="ptc-name">AI Upscaler</div>
+        <div class="ptc-desc">2x to 8x upscale without blur. Sharper than the original.</div>
+        <div class="ptc-try">Try Free →</div>
+      </div>
+      <div class="photo-tool-card">
+        <div class="ptc-icon" style="background:linear-gradient(135deg,#FEF3C7,#FCD34D)">✨</div>
+        <div class="ptc-name">AI Enhancer</div>
+        <div class="ptc-desc">Fix lighting, colors, and contrast automatically. One click.</div>
+        <div class="ptc-try">Try Free →</div>
+      </div>
+      <div class="photo-tool-card">
+        <div class="ptc-icon" style="background:linear-gradient(135deg,#FFF7ED,#FDBA74)">🕰️</div>
+        <div class="ptc-name">Photo Restore</div>
+        <div class="ptc-desc">Bring old, damaged, or faded photos back to life with AI.</div>
+        <div class="ptc-try">Try Free →</div>
+      </div>
+      <div class="photo-tool-card">
+        <div class="ptc-icon" style="background:linear-gradient(135deg,#E0F2FE,#7DD3FC)">🎨</div>
+        <div class="ptc-name">Colorize</div>
+        <div class="ptc-desc">Add realistic colors to black & white photos automatically.</div>
+        <div class="ptc-try">Try Free →</div>
+      </div>
+      <div class="photo-tool-card">
+        <div class="ptc-icon" style="background:linear-gradient(135deg,#F0FDF4,#86EFAC)">🔭</div>
+        <div class="ptc-name">Sharpen</div>
+        <div class="ptc-desc">Fix blurry, out-of-focus photos with AI sharpening technology.</div>
+        <div class="ptc-try">Try Free →</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CATEGORIES -->
+<section id="categories">
+  <div class="sec-inner">
+    <div class="sec-eyebrow">📁 All Categories</div>
+    <h2 class="sec-title">Everything You Need, In One Place</h2>
+    <p class="sec-sub">200+ tools across 10 categories. The only platform you'll ever need.</p>
+    <div class="cat-grid">
+      <div class="cat-card"><div class="cat-ico" style="background:#EDE9FE">🤖</div><div><div class="cat-name">AI Photo Tools</div><div class="cat-cnt">28 tools</div></div></div>
+      <div class="cat-card"><div class="cat-ico" style="background:#DBEAFE">🖼️</div><div><div class="cat-name">Image Tools</div><div class="cat-cnt">32 tools</div></div></div>
+      <div class="cat-card"><div class="cat-ico" style="background:#FEF3C7">📄</div><div><div class="cat-name">PDF Tools</div><div class="cat-cnt">18 tools</div></div></div>
+      <div class="cat-card"><div class="cat-ico" style="background:#D1FAE5">🎬</div><div><div class="cat-name">Video Tools</div><div class="cat-cnt">24 tools</div></div></div>
+      <div class="cat-card"><div class="cat-ico" style="background:#FFF1F2">🎵</div><div><div class="cat-name">Audio Tools</div><div class="cat-cnt">14 tools</div></div></div>
+      <div class="cat-card"><div class="cat-ico" style="background:#F0FDF4">📝</div><div><div class="cat-name">Text Tools</div><div class="cat-cnt">22 tools</div></div></div>
+      <div class="cat-card"><div class="cat-ico" style="background:#FCE7F3">🎨</div><div><div class="cat-name">Design Tools</div><div class="cat-cnt">20 tools</div></div></div>
+      <div class="cat-card"><div class="cat-ico" style="background:#FFF7ED">💼</div><div><div class="cat-name">Business Tools</div><div class="cat-cnt">26 tools</div></div></div>
+      <div class="cat-card"><div class="cat-ico" style="background:#EFF6FF">📱</div><div><div class="cat-name">Social Media Tools</div><div class="cat-cnt">16 tools</div></div></div>
+      <div class="cat-card"><div class="cat-ico" style="background:#ECFDF5">⚙️</div><div><div class="cat-name">Developer Tools</div><div class="cat-cnt">18 tools</div></div></div>
+      <div class="cat-card"><div class="cat-ico" style="background:#F5F3FF">🔄</div><div><div class="cat-name">Converter Tools</div><div class="cat-cnt">30 tools</div></div></div>
+      <div class="cat-card"><div class="cat-ico" style="background:#F0F9FF">🔢</div><div><div class="cat-name">Calculator Tools</div><div class="cat-cnt">12 tools</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section-alt" id="how">
+  <div class="sec-inner">
+    <div class="center">
+      <div class="sec-eyebrow">⚡ Simple Process</div>
+      <h2 class="sec-title">How It Works</h2>
+      <p class="sec-sub">From upload to download in under 10 seconds. No learning curve.</p>
+    </div>
+    <div class="how-grid">
+      <div class="how-step">
+        <div class="how-num">1</div>
+        <div class="how-title">Upload Your File</div>
+        <div class="how-desc">Drag & drop, paste a URL, or click to browse. Supports 50+ file formats up to 50MB. No account needed.</div>
+      </div>
+      <div class="how-step">
+        <div class="how-num">2</div>
+        <div class="how-title">AI Processes Instantly</div>
+        <div class="how-desc">Our advanced AI models — trained on billions of images — do the heavy lifting. Average processing time: 2–4 seconds.</div>
+      </div>
+      <div class="how-step">
+        <div class="how-num">3</div>
+        <div class="how-title">Download & Share</div>
+        <div class="how-desc">Download in your preferred format. Share directly to social media. Your files are auto-deleted after 1 hour for privacy.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BEFORE/AFTER SHOWCASE -->
+<section>
+  <div class="sec-inner">
+    <div class="sec-eyebrow">🔄 Before / After</div>
+    <h2 class="sec-title">See the AI Difference</h2>
+    <p class="sec-sub">Real results from real users — no filters, no tricks, just AI.</p>
+    <div class="ba-grid">
+      <div class="ba-card">
+        <div class="ba-images">
+          <div class="ba-side" style="background:#F3F4F6">🌄</div>
+          <div class="ba-side" style="background:#EEF2FF">✨</div>
+          <div class="ba-divider"></div>
+        </div>
+        <div class="ba-label-wrap"><span class="ba-label">Before</span><span class="ba-label">After</span></div>
+        <div class="ba-info">
+          <div class="ba-title">Background Removal</div>
+          <div class="ba-desc">Complex hair & edges — perfect in 3 seconds</div>
+          <div class="ba-cta">Try it free →</div>
+        </div>
+      </div>
+      <div class="ba-card">
+        <div class="ba-images">
+          <div class="ba-side" style="background:#F3F4F6;font-size:2rem;filter:blur(2px)">📷</div>
+          <div class="ba-side" style="background:#EEF2FF">🖼️</div>
+          <div class="ba-divider"></div>
+        </div>
+        <div class="ba-label-wrap"><span class="ba-label">Before</span><span class="ba-label">After</span></div>
+        <div class="ba-info">
+          <div class="ba-title">AI Upscaler 4x</div>
+          <div class="ba-desc">Low-res to crystal-clear 4K quality</div>
+          <div class="ba-cta">Try it free →</div>
+        </div>
+      </div>
+      <div class="ba-card">
+        <div class="ba-images">
+          <div class="ba-side" style="background:#F5F5F4;filter:grayscale(1)">👴</div>
+          <div class="ba-side" style="background:#FEF3C7">😊</div>
+          <div class="ba-divider"></div>
+        </div>
+        <div class="ba-label-wrap"><span class="ba-label">Before</span><span class="ba-label">After</span></div>
+        <div class="ba-info">
+          <div class="ba-title">Photo Restore + Colorize</div>
+          <div class="ba-desc">Old damaged photos brought back to life</div>
+          <div class="ba-cta">Try it free →</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="section-alt">
+  <div class="sec-inner">
+    <div class="center">
+      <div class="sec-eyebrow">💡 Why ToolHub AI</div>
+      <h2 class="sec-title">Built for Speed, Privacy & Quality</h2>
+      <p class="sec-sub">Everything we build is designed around one goal: save you time.</p>
+    </div>
+    <div class="feat-grid">
+      <div class="feat-card"><div class="feat-icon">⚡</div><div class="feat-title">Lightning Fast Processing</div><div class="feat-desc">Average processing time under 4 seconds. GPU-accelerated AI models run on global edge servers for instant results.</div></div>
+      <div class="feat-card"><div class="feat-icon">🔒</div><div class="feat-title">Privacy First</div><div class="feat-desc">Your files are never stored permanently. All uploads are automatically deleted after 1 hour. We never train on your data.</div></div>
+      <div class="feat-card"><div class="feat-icon">🌍</div><div class="feat-title">No Registration Required</div><div class="feat-desc">Start using any tool instantly — no account, no credit card, no email. Just upload and download.</div></div>
+      <div class="feat-card"><div class="feat-icon">📱</div><div class="feat-title">Works on Any Device</div><div class="feat-desc">Fully optimized for mobile, tablet, and desktop. Works on iOS, Android, and all modern browsers.</div></div>
+      <div class="feat-card"><div class="feat-icon">🔄</div><div class="feat-title">Batch Processing</div><div class="feat-desc">Pro users can process up to 100 files at once. Save hours of manual work with intelligent batch workflows.</div></div>
+      <div class="feat-card"><div class="feat-icon">🛡️</div><div class="feat-title">Enterprise-Grade API</div><div class="feat-desc">Integrate any tool into your own app or workflow with our clean REST API. 99.9% uptime SLA guaranteed.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="sec-inner">
+    <div class="center">
+      <div class="sec-eyebrow">💎 Pricing</div>
+      <h2 class="sec-title">Simple, Transparent Pricing</h2>
+      <p class="sec-sub">Start free. Upgrade when you need more power. Cancel anytime.</p>
+    </div>
+    <div class="price-grid">
+      <div class="price-card">
+        <div class="price-plan">Free</div>
+        <div class="price-desc">For personal use</div>
+        <div class="price-amt"><span class="curr">$</span>0<span class="per">/month</span></div>
+        <div class="price-divider"></div>
+        <ul class="price-feats">
+          <li><span class="ck">✓</span> 20 uses per day</li>
+          <li><span class="ck">✓</span> Standard quality output</li>
+          <li><span class="ck">✓</span> 50+ basic tools</li>
+          <li><span class="ck">✓</span> Max 10MB per file</li>
+          <li class="no"><span class="ck">✕</span> HD / 4K export</li>
+          <li class="no"><span class="ck">✕</span> Batch processing</li>
+          <li class="no"><span class="ck">✕</span> No watermark</li>
+          <li class="no"><span class="ck">✕</span> API access</li>
+        </ul>
+        <button class="price-btn">Start for Free</button>
+      </div>
+      <div class="price-card featured">
+        <div class="pop-badge">⭐ Most Popular</div>
+        <div class="price-plan">Pro</div>
+        <div class="price-desc">For power users & creators</div>
+        <div class="price-amt"><span class="curr">$</span>9<span class="per">/month</span></div>
+        <div class="price-divider"></div>
+        <ul class="price-feats">
+          <li><span class="ck">✓</span> <strong>Unlimited</strong> daily uses</li>
+          <li><span class="ck">✓</span> HD & 4K export</li>
+          <li><span class="ck">✓</span> All 200+ tools unlocked</li>
+          <li><span class="ck">✓</span> Max 100MB per file</li>
+          <li><span class="ck">✓</span> Batch processing (50 files)</li>
+          <li><span class="ck">✓</span> Zero watermarks</li>
+          <li><span class="ck">✓</span> Priority processing queue</li>
+          <li><span class="ck">✓</span> File history (30 days)</li>
+        </ul>
+        <button class="price-btn feat-btn">Start 7-Day Free Trial</button>
+      </div>
+      <div class="price-card">
+        <div class="price-plan">Business</div>
+        <div class="price-desc">For teams & agencies</div>
+        <div class="price-amt"><span class="curr">$</span>29<span class="per">/month</span></div>
+        <div class="price-divider"></div>
+        <ul class="price-feats">
+          <li><span class="ck">✓</span> Everything in Pro</li>
+          <li><span class="ck">✓</span> REST API access</li>
+          <li><span class="ck">✓</span> 50GB cloud storage</li>
+          <li><span class="ck">✓</span> Batch: 200 files at once</li>
+          <li><span class="ck">✓</span> White-label exports</li>
+          <li><span class="ck">✓</span> Team workspace (5 seats)</li>
+          <li><span class="ck">✓</span> Dedicated account manager</li>
+          <li><span class="ck">✓</span> SLA 99.9% uptime</li>
+        </ul>
+        <button class="price-btn">Contact Sales</button>
+      </div>
+    </div>
+    <p style="text-align:center;margin-top:1.5rem;font-size:13px;color:#9CA3AF">✅ No credit card required for free trial · Cancel anytime · 30-day money-back guarantee</p>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="section-alt">
+  <div class="sec-inner">
+    <div class="center">
+      <div class="sec-eyebrow">💬 Reviews</div>
+      <h2 class="sec-title">Loved by 2M+ Creators</h2>
+      <p class="sec-sub">Real reviews from real users — verified on Trustpilot & App Store.</p>
+    </div>
+    <div class="testi-grid">
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <div class="testi-quote">"The background removal is hands-down the best I've tried. Even complex hair works perfectly. Saves me 3 hours per week easily."</div>
+        <div class="testi-author">
+          <div class="testi-av" style="background:linear-gradient(135deg,#4F46E5,#8B5CF6)">SK</div>
+          <div><div class="testi-name">Sarah K.</div><div class="testi-role">Freelance Designer · 🇺🇸</div></div>
+        </div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <div class="testi-quote">"PDF tools are incredible — merge, split, OCR, convert. I cancelled three different subscriptions after finding ToolHub AI."</div>
+        <div class="testi-author">
+          <div class="testi-av" style="background:linear-gradient(135deg,#06B6D4,#4F46E5)">MR</div>
+          <div><div class="testi-name">Marcus R.</div><div class="testi-role">Marketing Manager · 🇬🇧</div></div>
+        </div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <div class="testi-quote">"Generated a professional headshot for LinkedIn and got 5x more recruiter messages the next week. Absolutely mind-blowing AI."</div>
+        <div class="testi-author">
+          <div class="testi-av" style="background:linear-gradient(135deg,#22C55E,#06B6D4)">AL</div>
+          <div><div class="testi-name">Aisha L.</div><div class="testi-role">Software Engineer · 🇩🇪</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+  <div class="sec-inner">
+    <div class="center">
+      <div class="sec-eyebrow">❓ FAQ</div>
+      <h2 class="sec-title">Frequently Asked Questions</h2>
+      <p class="sec-sub">Everything you need to know about ToolHub AI.</p>
+    </div>
+    <div class="faq-list">
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Is ToolHub AI really free? <span class="faq-arrow">⌄</span></div>
+        <div class="faq-a">Yes! All core tools are completely free with no registration required. Free users get 20 uses per day across all tools. Pro and Business plans unlock unlimited usage, HD export, batch processing, and more.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Are my uploaded files private and secure? <span class="faq-arrow">⌄</span></div>
+        <div class="faq-a">Absolutely. All uploads are encrypted with SSL/TLS. Files are stored temporarily on secure servers and automatically deleted after 1 hour. We never share your files with third parties and never use them to train our AI models.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">What file formats are supported? <span class="faq-arrow">⌄</span></div>
+        <div class="faq-a">We support 50+ file formats including PNG, JPG, WEBP, HEIC, GIF, SVG, PDF, DOCX, XLSX, PPTX, MP4, MOV, MP3, WAV, and many more. Maximum file size is 10MB for free users and 100MB for Pro users.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Do I need to create an account? <span class="faq-arrow">⌄</span></div>
+        <div class="faq-a">No account is required for free tools. Just upload your file and download the result. Creating an account unlocks file history, favorites, and lets you upgrade to Pro for unlimited access.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Do you offer an API for developers? <span class="faq-arrow">⌄</span></div>
+        <div class="faq-a">Yes! Our Business plan includes full REST API access with comprehensive documentation. You can integrate background removal, upscaling, PDF tools, and 50+ other tools directly into your applications. API keys, rate limits, and webhooks are all supported.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Can I cancel my subscription anytime? <span class="faq-arrow">⌄</span></div>
+        <div class="faq-a">Yes, cancel anytime with no questions asked. If you cancel, you keep Pro access until the end of your billing period. We also offer a 30-day money-back guarantee — no questions asked.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">What makes ToolHub AI different from competitors? <span class="faq-arrow">⌄</span></div>
+        <div class="faq-a">Three things: (1) All tools in one place — no need for 10 different subscriptions. (2) Speed — our GPU-accelerated AI processes files in under 4 seconds on average. (3) Privacy — files are auto-deleted after 1 hour, unlike many competitors who store your data indefinitely.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<div class="cta-section">
+  <div class="cta-glow"></div>
+  <div class="cta-inner">
+    <h2 class="cta-title">Start Creating with AI Today</h2>
+    <p class="cta-sub">Join 2 million+ users. Free forever for core tools. No credit card, no registration, no limits.</p>
+    <div class="cta-btns">
+      <button class="cta-btn1" onclick="document.getElementById('tools').scrollIntoView({behavior:'smooth'})">🚀 Explore All 200+ Tools</button>
+      <button class="cta-btn2" onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})">💎 View Pricing</button>
+    </div>
+    <div class="cta-trust" style="margin-top:1.5rem;font-size:12.5px;color:#64748B">
+      🔒 SSL Secured &nbsp;·&nbsp; 🗑️ Files auto-deleted &nbsp;·&nbsp; ✅ No registration &nbsp;·&nbsp; 💳 No credit card
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="nav-logo" style="color:#fff;margin-bottom:.9rem">
+          <div class="logo-icon">T</div>
+          ToolHub<span class="logo-span">AI</span>
+        </div>
+        <p>The all-in-one AI toolkit. 200+ free tools for photos, PDFs, video, text and more. Fast, private, no registration.</p>
+        <div class="footer-newsletter">
+          <div style="font-size:12.5px;color:#94A3B8;font-weight:600;text-transform:uppercase;letter-spacing:.06em">Newsletter</div>
+          <div class="newsletter-form">
+            <input type="email" class="newsletter-input" placeholder="your@email.com">
+            <button class="newsletter-btn">Join</button>
+          </div>
+        </div>
+        <div class="social-row" style="margin-top:1.25rem">
+          <div class="soc-btn">𝕏</div>
+          <div class="soc-btn">in</div>
+          <div class="soc-btn">▶</div>
+          <div class="soc-btn">◉</div>
+          <div class="soc-btn">f</div>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>AI Tools</h4>
+        <a>Remove Background</a>
+        <a>Image Upscaler</a>
+        <a>AI Headshot</a>
+        <a>Face Retouch</a>
+        <a>Object Remover</a>
+        <a>Magic Eraser</a>
+        <a>Colorize Photo</a>
+        <a>Restore Photo</a>
+      </div>
+      <div class="footer-col">
+        <h4>More Tools</h4>
+        <a>PDF to Word</a>
+        <a>PDF Merge</a>
+        <a>OCR Tool</a>
+        <a>Image Compressor</a>
+        <a>HEIC to JPG</a>
+        <a>QR Code Generator</a>
+        <a>AI Logo Maker</a>
+        <a>AI Resume Builder</a>
+      </div>
+      <div class="footer-col">
+        <h4>Resources</h4>
+        <a>Blog</a>
+        <a>Help Center</a>
+        <a>API Docs</a>
+        <a>Changelog</a>
+        <a>Status Page</a>
+        <a>Sitemap</a>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a>About Us</a>
+        <a>Pricing</a>
+        <a>Affiliate Program</a>
+        <a>Contact</a>
+        <a>Privacy Policy</a>
+        <a>Terms of Service</a>
+        <a>Cookie Policy</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-bottom-left">© 2025 ToolHub AI. All rights reserved.</div>
+      <div class="footer-badges">
+        <span class="footer-badge">🔒 SSL Secured</span>
+        <span class="footer-badge">🗑️ Auto-delete in 1hr</span>
+        <span class="footer-badge">🌍 150+ Countries</span>
+        <span class="footer-badge">✅ GDPR Compliant</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- STICKY UPLOAD -->
+<div class="sticky-upload" onclick="handleUpload()">
+  📁 Upload File
+</div>
+
+<script>
+// Smooth scroll helper
+function scrollTo(id){
+  document.getElementById(id).scrollIntoView({behavior:'smooth'});
+}
+
+// FAQ accordion
+function toggleFaq(el){
+  const item=el.parentElement;
+  const isOpen=item.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(i=>i.classList.remove('open'));
+  if(!isOpen) item.classList.add('open');
+}
+
+// Upload handler
+function handleUpload(){
+  alert('🚀 File upload ready!\n\nConnect this to your backend API:\n- Remove Background\n- Image Upscaler\n- PDF Tools\n- And 200+ more tools');
+}
+
+// Sticky upload hide on scroll-up / show on scroll-down
+let lastY=0;
+window.addEventListener('scroll',()=>{
+  const y=window.scrollY;
+  const su=document.querySelector('.sticky-upload');
+  if(y>300){su.style.opacity='1';su.style.transform='translateY(0)'}
+  else{su.style.opacity='0';su.style.transform='translateY(20px)'}
+  lastY=y;
+},{passive:true});
+
+// Photo tool cards
+document.querySelectorAll('.photo-tool-card').forEach(c=>{
+  c.style.cursor='pointer';
+  c.addEventListener('click',()=>{
+    const name=c.querySelector('.ptc-name').textContent;
+    alert('🛠️ Opening: '+name+'\n\nConnect to your AI API to activate this tool.');
+  });
+});
+
+// Count-up animation on trust bar
+function countUp(el,target,suffix=''){
+  let start=0;const duration=1800;const step=duration/60;
+  const inc=target/60;
+  const timer=setInterval(()=>{
+    start+=inc;
+    if(start>=target){start=target;clearInterval(timer)}
+    el.textContent=Math.floor(start).toLocaleString()+suffix;
+  },step);
+}
+const observer=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      const nums=document.querySelectorAll('.trust-num');
+      countUp(nums[0],2000000,'+');
+      clearTimeout(nums[0]._t);
+      nums[0]._t=setTimeout(()=>nums[0].textContent='2M+',2000);
+    }
+  });
+},{threshold:.3});
+const tb=document.querySelector('.trust-bar');
+if(tb) observer.observe(tb);
+
+// Smooth reveal on scroll
+const revealEls=document.querySelectorAll('.tool-card,.cat-card,.photo-tool-card,.feat-card,.how-step,.price-card,.testi-card,.ba-card');
+const ro=new IntersectionObserver(entries=>{
+  entries.forEach((e,i)=>{
+    if(e.isIntersecting){
+      setTimeout(()=>{
+        e.target.style.opacity='1';
+        e.target.style.transform='translateY(0)';
+      },i*30);
+      ro.unobserve(e.target);
+    }
+  });
+},{threshold:.1,rootMargin:'0px 0px -40px 0px'});
+revealEls.forEach(el=>{
+  el.style.opacity='0';
+  el.style.transform='translateY(18px)';
+  el.style.transition='opacity .4s ease,transform .4s ease';
+  ro.observe(el);
+});
+</script>
+</body>
+</html>
