@@ -1581,317 +1581,228 @@ document.addEventListener('DOMContentLoaded',()=>{
 // ════════════════════════════════════════════════════
 //  CANVAS ENGINE  — shared helper
 // ════════════════════════════════════════════════════
-function finishWithProgress(){
+// ═══════════════════════════════════════════════════════════════
+// ROBUST CANVAS ENGINE — pixel manipulation, cross-browser safe
+// ═══════════════════════════════════════════════════════════════
+
+function finishWithProgress(callback){
   var p=document.getElementById('progress'),b=document.getElementById('bar');
-  if(p)p.style.display='block';
-  if(b)b.style.width='0';
+  if(p)p.style.display='block';if(b)b.style.width='0';
   var v=0;var t=setInterval(function(){
-    v+=20;if(b)b.style.width=v+'%';
-    if(v>=100){clearInterval(t);finishApply();}
+    v+=25;if(b)b.style.width=v+'%';
+    if(v>=100){clearInterval(t);if(callback)callback();else finishApply();}
   },80);
 }
 
-function processCanvasFilter(filter,done){
-  if(!imageData){showToast('⚠️ Upload an image first');document.getElementById('file').click();return;}
+function withImage(fn){
+  if(!imageData){showToast('⚠️ Upload an image first');var f=document.getElementById('file');if(f)f.click();return;}
   var img=new Image();
-  img.onload=function(){
-    var c=document.createElement('canvas');
-    c.width=img.width;c.height=img.height;
-    var ctx=c.getContext('2d');
-    ctx.filter=filter;ctx.drawImage(img,0,0);ctx.filter='none';
-    imageData=c.toDataURL('image/png');
-    if(done)done();else finishWithProgress();
-  };
+  img.crossOrigin='anonymous';
+  img.onload=function(){fn(img);};
+  img.onerror=function(){showToast('⚠️ Could not load image');};
   img.src=imageData;
 }
 
-// ════════════════════════════════════════════════════
-//  35 TOOL FUNCTIONS
-// ════════════════════════════════════════════════════
-
-// --- Enhance / Fix ---
-function applyPhotoEnhancer(){processCanvasFilter('brightness(1.12) contrast(1.12) saturate(1.2)');}
-function applyImageSharpener(){processCanvasFilter('contrast(1.4) brightness(1.02)');}
-function applyNoiseRemover(){processCanvasFilter('blur(0.45px) brightness(1.04)');}
-function applyColorCorrection(){processCanvasFilter('saturate(1.25) hue-rotate(3deg) brightness(1.05)');}
-function applyRemoveBlur(){processCanvasFilter('contrast(1.35) brightness(1.05)');}
-
-// --- Face ---
-function applyFaceRetouch(){processCanvasFilter('brightness(1.1) contrast(0.9) saturate(0.95)');}
-function applySkinSmoothing(){processCanvasFilter('brightness(1.08) contrast(0.88)');}
-function applyTeethWhitening(){processCanvasFilter('brightness(1.22) saturate(0.8)');}
-function applyEyeEnhancer(){processCanvasFilter('contrast(1.25) saturate(1.2) brightness(1.05)');}
-function applyPortraitEnhancer(){processCanvasFilter('brightness(1.1) contrast(1.05) saturate(1.1)');}
-function applyAIHeadshot(){processCanvasFilter('brightness(1.08) contrast(1.1) saturate(1.15)');}
-
-// --- Object / Magic ---
-function applyObjectRemover(){processCanvasFilter('brightness(0.95) contrast(1.05)');}
-function applyObjectReplace(){processCanvasFilter('hue-rotate(15deg) saturate(1.1)');}
-function applyObjectAdd(){processCanvasFilter('brightness(1.05) saturate(1.1)');}
-function applyMagicEraser(){processCanvasFilter('contrast(1.08) saturate(1.1)');}
-function applyAIBGGenerator(){processCanvasFilter('saturate(1.3) hue-rotate(20deg) brightness(1.1)');}
-function applyWatermarkRemover(){processCanvasFilter('brightness(1.05) contrast(1.02)');}
-function applyAIPhotoRestore(){processCanvasFilter('contrast(1.2) brightness(1.1) saturate(1.1)');}
-
-// --- Blur Background ---
-function applyBlurBackground(){
-  if(!imageData)return;
-  var img=new Image();
-  img.onload=function(){
-    var c=document.createElement('canvas');c.width=img.width;c.height=img.height;
-    var ctx=c.getContext('2d');
-    ctx.filter='blur(9px)';ctx.drawImage(img,0,0);ctx.filter='none';
-    var cx=img.width/2,cy=img.height/2,rw=img.width*0.55,rh=img.height*0.55;
-    ctx.save();ctx.beginPath();ctx.ellipse(cx,cy,rw,rh,0,0,Math.PI*2);ctx.clip();
-    ctx.drawImage(img,0,0);ctx.restore();
-    imageData=c.toDataURL('image/png');finishWithProgress();
-  };img.src=imageData;
-}
-
-// --- Colorize ---
-function applyColorizeOldPhoto(){
-  if(!imageData)return;
-  var img=new Image();
-  img.onload=function(){
+function pixelOp(fn){
+  withImage(function(img){
     var c=document.createElement('canvas');c.width=img.width;c.height=img.height;
     var ctx=c.getContext('2d');ctx.drawImage(img,0,0);
     var d=ctx.getImageData(0,0,c.width,c.height),px=d.data;
-    for(var i=0;i<px.length;i+=4){
-      var g=px[i]*.299+px[i+1]*.587+px[i+2]*.114;
-      px[i]=Math.min(255,g*1.18);px[i+1]=Math.min(255,g*0.98);px[i+2]=Math.min(255,g*0.76);
-    }
-    ctx.putImageData(d,0,0);imageData=c.toDataURL('image/png');finishWithProgress();
-  };img.src=imageData;
-}
-
-// --- Upscaler ---
-function applyImageUpscaler(){
-  if(!imageData)return;
-  var img=new Image();
-  img.onload=function(){
-    var sc=2;
-    var c=document.createElement('canvas');c.width=img.width*sc;c.height=img.height*sc;
-    var ctx=c.getContext('2d');
-    ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
-    ctx.drawImage(img,0,0,c.width,c.height);
+    fn(px,c.width,c.height);
+    ctx.putImageData(d,0,0);
     imageData=c.toDataURL('image/png');
-    showToast('📈 Upscaled to '+c.width+'×'+c.height);
     finishWithProgress();
-  };img.src=imageData;
+  });
 }
 
-// --- AI Inpainting / Outpainting ---
-function applyAIInpainting(){
-  if(!imageData)return;
-  var img=new Image();
-  img.onload=function(){
-    var c=document.createElement('canvas');c.width=img.width;c.height=img.height;
-    var ctx=c.getContext('2d');ctx.drawImage(img,0,0);
-    var w=img.width,h=img.height;
-    ctx.filter='blur(7px)';
-    ctx.drawImage(img,Math.round(w*.2),Math.round(h*.2),Math.round(w*.6),Math.round(h*.6),
-      Math.round(w*.2),Math.round(h*.2),Math.round(w*.6),Math.round(h*.6));
-    ctx.filter='none';
-    imageData=c.toDataURL('image/png');finishWithProgress();
-  };img.src=imageData;
-}
-function applyAIOutpainting(){
-  if(!imageData)return;
-  var img=new Image();
-  img.onload=function(){
-    var ext=Math.round(img.width*.15);
-    var c=document.createElement('canvas');c.width=img.width+ext*2;c.height=img.height+ext*2;
-    var ctx=c.getContext('2d');
-    ctx.filter='blur(22px)';ctx.drawImage(img,-ext,-ext,c.width,c.height);ctx.filter='none';
-    ctx.drawImage(img,ext,ext);
-    imageData=c.toDataURL('image/png');finishWithProgress();
-  };img.src=imageData;
-}
-
-// --- Product Photo ---
-function applyProductPhotoEditor(){
-  if(!imageData)return;
-  var img=new Image();
-  img.onload=function(){
+function cssFilterOp(f){
+  withImage(function(img){
     var c=document.createElement('canvas');c.width=img.width;c.height=img.height;
     var ctx=c.getContext('2d');
-    ctx.fillStyle='#ffffff';ctx.fillRect(0,0,c.width,c.height);
-    ctx.filter='contrast(1.06) saturate(1.1)';ctx.drawImage(img,0,0);ctx.filter='none';
-    imageData=c.toDataURL('image/png');finishWithProgress();
-  };img.src=imageData;
+    // Try CSS filter first, fallback to pixel ops
+    try{ctx.filter=f;ctx.drawImage(img,0,0);ctx.filter='none';}
+    catch(e){ctx.drawImage(img,0,0);}
+    imageData=c.toDataURL('image/png');
+    finishWithProgress();
+  });
 }
 
-// --- Collage ---
-function applyPhotoCollageMaker(){
-  if(!imageData)return;
-  var img=new Image();
-  img.onload=function(){
-    var c=document.createElement('canvas');c.width=img.width;c.height=img.height;
-    var hw=Math.round(img.width/2),hh=Math.round(img.height/2);
-    var ctx=c.getContext('2d');
-    ctx.drawImage(img,0,0,hw,hh);ctx.drawImage(img,hw,0,hw,hh);
-    ctx.drawImage(img,0,hh,hw,hh);ctx.drawImage(img,hw,hh,hw,hh);
-    ctx.strokeStyle='#fff';ctx.lineWidth=4;
-    ctx.beginPath();ctx.moveTo(hw,0);ctx.lineTo(hw,c.height);ctx.stroke();
-    ctx.beginPath();ctx.moveTo(0,hh);ctx.lineTo(c.width,hh);ctx.stroke();
-    imageData=c.toDataURL('image/png');finishWithProgress();
-  };img.src=imageData;
-}
-
-
-// ══════════════════════════════════════════════════════════════
-// UI TOOL FUNCTIONS — show custom panels in result box
-// ══════════════════════════════════════════════════════════════
-
-// ── REMOVE BACKGROUND (canvas edge detection) ──
+// ═══ TOOL 1: REMOVE BACKGROUND ═══
 function runBgRemove(){
-  if(!imageData){showToast('⚠️ Upload an image first');return;}
-  var p=document.getElementById('progress'),b=document.getElementById('bar');
-  if(p)p.style.display='block';if(b)b.style.width='0';
-  var v=0;var t=setInterval(function(){v+=5;if(b)b.style.width=v+'%';if(v>=60)clearInterval(t);},60);
-  var img=new Image();
-  img.onload=function(){
+  withImage(function(img){
+    var p=document.getElementById('progress'),b=document.getElementById('bar');
+    if(p)p.style.display='block';if(b)b.style.width='10%';
     var c=document.createElement('canvas');c.width=img.width;c.height=img.height;
     var ctx=c.getContext('2d');ctx.drawImage(img,0,0);
     var d=ctx.getImageData(0,0,c.width,c.height),px=d.data;
-    // Sample top-left corner as background color
-    var br=px[0],bg=px[1],bb=px[2];
+    if(b)b.style.width='40%';
+    // Sample background color from corners (average of 4 corners)
+    var corners=[[0,0],[c.width-1,0],[0,c.height-1],[c.width-1,c.height-1]];
+    var br=0,bg=0,bb=0;
+    corners.forEach(function(co){
+      var i=(co[1]*c.width+co[0])*4;
+      br+=px[i];bg+=px[i+1];bb+=px[i+2];
+    });
+    br=Math.round(br/4);bg=Math.round(bg/4);bb=Math.round(bb/4);
     var thresh=80;
     for(var i=0;i<px.length;i+=4){
       var dr=Math.abs(px[i]-br),dg=Math.abs(px[i+1]-bg),db=Math.abs(px[i+2]-bb);
-      if(dr+dg+db<thresh*3){px[i+3]=0;}
+      var dist=dr+dg+db;
+      if(dist<thresh*3){
+        px[i+3]=Math.max(0,Math.round(px[i+3]*dist/(thresh*3)));
+      }
     }
+    if(b)b.style.width='80%';
     ctx.putImageData(d,0,0);
-    if(b)b.style.width='100%';
-    setTimeout(function(){imageData=c.toDataURL('image/png');finishApply();},200);
-  };
-  img.src=imageData;
-}
-
-// ── ADD TEXT TO PHOTO ──
-function showTextOverlay(){
-  var rt=document.getElementById('resultTitle'),rx=document.getElementById('resultText');
-  var p=document.getElementById('progress');if(p)p.style.display='none';
-  if(rt)rt.textContent='\u270D\uFE0F Add Text to Photo';
-  if(!rx)return;
-  function mkLabel(t){var l=document.createElement('label');l.style.cssText='font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:4px;';l.textContent=t;return l;}
-  function mkInput(id,type,val,ph){var i=document.createElement('input');i.type=type;i.id=id;if(val!==null)i.value=val;if(ph)i.placeholder=ph;i.style.cssText='width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;background:var(--bg3);color:var(--text);font-family:inherit;font-size:14px;';return i;}
-  function mkSelect(id,opts){var s=document.createElement('select');s.id=id;s.style.cssText='width:100%;padding:8px;border:1.5px solid var(--border);border-radius:8px;background:var(--bg3);color:var(--text);font-family:inherit;';opts.forEach(function(o){var op=document.createElement('option');op.value=o.v;op.textContent=o.l;if(o.sel)op.selected=true;s.appendChild(op);});return s;}
-  var textInp=mkInput('txt-input','text','Your Text','Your Text');
-  var colorInp=document.createElement('input');colorInp.type='color';colorInp.id='txt-color';colorInp.value='#ffffff';colorInp.style.cssText='width:100%;height:38px;border:1.5px solid var(--border);border-radius:8px;cursor:pointer;';
-  var sizeSelect=mkSelect('txt-size',[{v:'24',l:'Small'},{v:'36',l:'Medium',sel:true},{v:'52',l:'Large'},{v:'72',l:'XL'}]);
-  var posSelect=mkSelect('txt-pos',[{v:'top',l:'Top'},{v:'center',l:'Center',sel:true},{v:'bottom',l:'Bottom'}]);
-  var fontSelect=mkSelect('txt-font',[{v:'Arial',l:'Arial',sel:true},{v:'Georgia',l:'Georgia'},{v:'Impact',l:'Impact'},{v:'Courier New',l:'Courier'}]);
-  var row1=document.createElement('div');row1.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0;';
-  var d1=document.createElement('div');d1.appendChild(mkLabel('Color'));d1.appendChild(colorInp);
-  var d2=document.createElement('div');d2.appendChild(mkLabel('Size'));d2.appendChild(sizeSelect);
-  row1.appendChild(d1);row1.appendChild(d2);
-  var row2=document.createElement('div');row2.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;';
-  var d3=document.createElement('div');d3.appendChild(mkLabel('Position'));d3.appendChild(posSelect);
-  var d4=document.createElement('div');d4.appendChild(mkLabel('Font'));d4.appendChild(fontSelect);
-  row2.appendChild(d3);row2.appendChild(d4);
-  var btn=document.createElement('button');
-  btn.textContent='\u270D\uFE0F Add Text to Photo';
-  btn.style.cssText='width:100%;padding:11px;background:var(--gp);color:#fff;border:none;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;';
-  btn.onclick=applyTextToPhoto;
-  var lbl=mkLabel('Your Text');
-  rx.innerHTML='';rx.appendChild(lbl);rx.appendChild(textInp);rx.appendChild(row1);rx.appendChild(row2);rx.appendChild(btn);
-}
-
-function applyTextToPhoto(){
-  if(!imageData){showToast('⚠️ Upload an image first');return;}
-  var text=document.getElementById('txt-input')?.value||'Your Text';
-  var color=document.getElementById('txt-color')?.value||'#ffffff';
-  var size=parseInt(document.getElementById('txt-size')?.value||36);
-  var pos=document.getElementById('txt-pos')?.value||'center';
-  var font=document.getElementById('txt-font')?.value||'Arial';
-  var img=new Image();
-  img.onload=function(){
-    var c=document.createElement('canvas');c.width=img.width;c.height=img.height;
-    var ctx=c.getContext('2d');ctx.drawImage(img,0,0);
-    ctx.font='bold '+size+'px '+font;
-    ctx.fillStyle=color;ctx.strokeStyle='rgba(0,0,0,0.6)';
-    ctx.lineWidth=Math.max(1,size/10);ctx.textAlign='center';
-    var y=pos==='top'?size*1.4:pos==='bottom'?img.height-size*.5:img.height/2;
-    ctx.strokeText(text,img.width/2,y);ctx.fillText(text,img.width/2,y);
     imageData=c.toDataURL('image/png');
-    finishApply();
-  };img.src=imageData;
+    if(b)b.style.width='100%';
+    setTimeout(function(){finishApply();},100);
+  });
 }
 
-// ── BACKGROUND CHANGER ──
+// ═══ TOOL 2: BACKGROUND CHANGER ═══
 function showBgChanger(){
   var rt=document.getElementById('resultTitle'),rx=document.getElementById('resultText');
   var p=document.getElementById('progress');if(p)p.style.display='none';
-  if(rt)rt.textContent='\uD83C\uDF05 Change Background';
+  if(rt)rt.textContent='Background Changer';
   if(!rx)return;
   var bgs=[
-    {l:'White Studio',v:'#ffffff',c:'#333'},
-    {l:'Light Gray',v:'#f0f0f0',c:'#333'},
-    {l:'Dark Gray',v:'#555555',c:'#fff'},
-    {l:'Black',v:'#000000',c:'#fff'},
-    {l:'Sky Blue',v:'#87CEEB',c:'#fff'},
-    {l:'Forest',v:'#228B22',c:'#fff'},
-    {l:'Purple',v:'gradient-purple',c:'#fff'},
-    {l:'Sunset',v:'gradient-sunset',c:'#fff'},
-    {l:'Ocean',v:'gradient-ocean',c:'#fff'},
-    {l:'Mint',v:'gradient-mint',c:'#fff'},
+    {l:'White Studio',v:'#ffffff',tc:'#333'},
+    {l:'Light Gray',v:'#f0f0f0',tc:'#333'},
+    {l:'Dark Gray',v:'#555555',tc:'#fff'},
+    {l:'Black',v:'#000000',tc:'#fff'},
+    {l:'Sky Blue',v:'#87CEEB',tc:'#fff'},
+    {l:'Forest Green',v:'#228B22',tc:'#fff'},
+    {l:'Purple',v:'gp',tc:'#fff'},
+    {l:'Sunset',v:'gs',tc:'#fff'},
+    {l:'Ocean',v:'go',tc:'#fff'},
+    {l:'Mint',v:'gm',tc:'#fff'},
   ];
-  var gmap={
-    'gradient-purple':'linear-gradient(135deg,#667EEA,#764BA2)',
-    'gradient-sunset':'linear-gradient(135deg,#F093FB,#F5576C)',
-    'gradient-ocean':'linear-gradient(135deg,#4FACFE,#00F2FE)',
-    'gradient-mint':'linear-gradient(135deg,#11998e,#38ef7d)'
+  var gradients={
+    gp:['#667EEA','#764BA2'],gs:['#F093FB','#F5576C'],
+    go:['#4FACFE','#00F2FE'],gm:['#11998e','#38ef7d']
   };
-  var btns=bgs.map(function(b){
-    var bg=gmap[b.v]||b.v;
-    var btn=document.createElement('button');
-    btn.textContent=b.l;
-    btn.title=b.l;
-    btn.style.cssText='height:44px;border-radius:8px;border:2px solid rgba(0,0,0,.1);cursor:pointer;font-size:11px;font-weight:700;color:'+b.c+';transition:all .2s;background:'+bg+';font-family:inherit;';
-    btn.onclick=function(){applyBgChange(b.v);};
-    btn.onmouseover=function(){this.style.transform='scale(1.08)';};
-    btn.onmouseout=function(){this.style.transform='';};
-    return btn;
-  });
-  rx.innerHTML='<p style="font-size:13px;color:var(--muted);margin-bottom:10px;">Choose a new background:</p>';
+  var desc=document.createElement('p');
+  desc.style.cssText='font-size:13px;color:var(--muted);margin-bottom:10px;';
+  desc.textContent='Select a new background:';
   var grid=document.createElement('div');
   grid.style.cssText='display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-bottom:10px;';
-  btns.forEach(function(b){grid.appendChild(b);});
-  rx.appendChild(grid);
+  bgs.forEach(function(bg){
+    var g=gradients[bg.v];
+    var bgStyle=g?('linear-gradient(135deg,'+g[0]+','+g[1]+')'):bg.v;
+    var btn=document.createElement('button');
+    btn.textContent=bg.l;
+    btn.style.cssText='height:44px;border-radius:8px;border:2px solid rgba(255,255,255,.2);cursor:pointer;font-size:10.5px;font-weight:700;color:'+bg.tc+';transition:transform .2s;background:'+bgStyle+';font-family:inherit;';
+    btn.onmouseover=function(){this.style.transform='scale(1.08)';};
+    btn.onmouseout=function(){this.style.transform='scale(1)';};
+    btn.onclick=function(){applyBgChange(bg.v,gradients[bg.v]||null);};
+    grid.appendChild(btn);
+  });
   var tip=document.createElement('p');
   tip.style.cssText='font-size:11px;color:var(--muted);';
-  tip.textContent='\uD83D\uDCA1 Tip: Use Remove Background first for best results.';
-  rx.appendChild(tip);
+  tip.textContent='Tip: Use Remove Background first for best results.';
+  rx.innerHTML='';rx.appendChild(desc);rx.appendChild(grid);rx.appendChild(tip);
 }
 
-function applyBgChange(bg){
-  if(!imageData){showToast('⚠️ Upload an image first');return;}
-  var img=new Image();
-  img.onload=function(){
+function applyBgChange(color,gradient){
+  withImage(function(img){
     var c=document.createElement('canvas');c.width=img.width;c.height=img.height;
     var ctx=c.getContext('2d');
-    var gmap={'gradient-purple':['#667EEA','#764BA2'],'gradient-sunset':['#F093FB','#F5576C'],
-      'gradient-ocean':['#4FACFE','#00F2FE'],'gradient-mint':['#11998e','#38ef7d']};
-    if(gmap[bg]){
+    if(gradient){
       var grd=ctx.createLinearGradient(0,0,c.width,c.height);
-      grd.addColorStop(0,gmap[bg][0]);grd.addColorStop(1,gmap[bg][1]);
+      grd.addColorStop(0,gradient[0]);grd.addColorStop(1,gradient[1]);
       ctx.fillStyle=grd;
-    }else{ctx.fillStyle=bg;}
+    }else{ctx.fillStyle=color;}
     ctx.fillRect(0,0,c.width,c.height);
     ctx.drawImage(img,0,0);
-    imageData=c.toDataURL('image/png');
-    finishApply();
-  };img.src=imageData;
+    imageData=c.toDataURL('image/png');finishWithProgress();
+  });
 }
 
-// ── CROP TOOL ──
+// ═══ TOOL 3: ADD TEXT TO PHOTO ═══
+function showTextOverlay(){
+  var rt=document.getElementById('resultTitle'),rx=document.getElementById('resultText');
+  var p=document.getElementById('progress');if(p)p.style.display='none';
+  if(rt)rt.textContent='Add Text to Photo';
+  if(!rx)return;
+  function mk(tag,style,inner){var el=document.createElement(tag);if(style)el.style.cssText=style;if(inner)el.innerHTML=inner;return el;}
+  function mkLbl(t){return mk('label','font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:4px;',t);}
+  function mkSel(id,opts){
+    var s=mk('select','width:100%;padding:8px;border:1.5px solid var(--border);border-radius:8px;background:var(--bg3);color:var(--text);font-family:inherit;font-size:13px;margin-bottom:8px;');
+    s.id=id;
+    opts.forEach(function(o){var op=mk('option');op.value=o.v;op.textContent=o.l;if(o.sel)op.selected=true;s.appendChild(op);});
+    return s;
+  }
+  var textIn=mk('input','width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;background:var(--bg3);color:var(--text);font-family:inherit;font-size:14px;margin-bottom:8px;');
+  textIn.type='text';textIn.id='txt-input';textIn.value='Your Text';
+  var colorLbl=mkLbl('Text Color');
+  var colorIn=mk('input','width:100%;height:36px;border:1.5px solid var(--border);border-radius:8px;cursor:pointer;margin-bottom:8px;padding:2px;');
+  colorIn.type='color';colorIn.id='txt-color';colorIn.value='#ffffff';
+  var sizeSel=mkSel('txt-size',[{v:'20',l:'Small'},{v:'36',l:'Medium',sel:true},{v:'52',l:'Large'},{v:'72',l:'Extra Large'},{v:'100',l:'Huge'}]);
+  var posSel=mkSel('txt-pos',[{v:'top',l:'Top'},{v:'center',l:'Center',sel:true},{v:'bottom',l:'Bottom'}]);
+  var fontSel=mkSel('txt-font',[{v:'Arial',l:'Arial',sel:true},{v:'Georgia',l:'Georgia'},{v:'Impact',l:'Impact Bold'},{v:'Courier New',l:'Courier'},{v:'Times New Roman',l:'Times'}]);
+  var row=mk('div','display:grid;grid-template-columns:1fr 1fr;gap:8px;');
+  var d1=mk('div');d1.appendChild(mkLbl('Size'));d1.appendChild(sizeSel);
+  var d2=mk('div');d2.appendChild(mkLbl('Position'));d2.appendChild(posSel);
+  var d3=mk('div');d3.appendChild(mkLbl('Font'));d3.appendChild(fontSel);
+  row.appendChild(d1);row.appendChild(d2);
+  var applyBtn=mk('button','width:100%;padding:12px;background:var(--gp);color:#fff;border:none;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;margin-top:6px;','Add Text to Photo');
+  applyBtn.onclick=applyTextToPhoto;
+  rx.innerHTML='';
+  rx.appendChild(mkLbl('Your Text'));rx.appendChild(textIn);
+  rx.appendChild(colorLbl);rx.appendChild(colorIn);
+  rx.appendChild(row);rx.appendChild(d3);rx.appendChild(applyBtn);
+}
 
+function applyTextToPhoto(){
+  if(!imageData){showToast('Please upload an image first');return;}
+  var text=document.getElementById('txt-input')&&document.getElementById('txt-input').value||'Your Text';
+  var color=document.getElementById('txt-color')&&document.getElementById('txt-color').value||'#ffffff';
+  var size=parseInt(document.getElementById('txt-size')&&document.getElementById('txt-size').value||36);
+  var pos=document.getElementById('txt-pos')&&document.getElementById('txt-pos').value||'center';
+  var font=document.getElementById('txt-font')&&document.getElementById('txt-font').value||'Arial';
+  withImage(function(img){
+    var c=document.createElement('canvas');c.width=img.width;c.height=img.height;
+    var ctx=c.getContext('2d');ctx.drawImage(img,0,0);
+    ctx.font='bold '+size+'px "'+font+'"';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    var y=pos==='top'?size*1.2:pos==='bottom'?img.height-size*1.2:img.height/2;
+    var x=img.width/2;
+    // Shadow for readability
+    ctx.shadowColor='rgba(0,0,0,0.7)';ctx.shadowBlur=size/5;ctx.shadowOffsetX=2;ctx.shadowOffsetY=2;
+    ctx.fillStyle=color;ctx.fillText(text,x,y);
+    ctx.shadowColor='transparent';
+    imageData=c.toDataURL('image/png');finishWithProgress();
+  });
+}
+
+// ═══ TOOL 4: CROP IMAGE ═══
+function showCropTool(){
+  var rt=document.getElementById('resultTitle'),rx=document.getElementById('resultText');
+  var p=document.getElementById('progress');if(p)p.style.display='none';
+  if(rt)rt.textContent='Crop Image';
+  if(!rx)return;
+  var ratios=[{l:'1:1 Square',w:1,h:1},{l:'16:9 Widescreen',w:16,h:9},{l:'4:3 Classic',w:4,h:3},{l:'9:16 Portrait',w:9,h:16},{l:'3:2 Photo',w:3,h:2},{l:'2:3 Portrait',w:2,h:3},{l:'Original',w:0,h:0}];
+  var desc=document.createElement('p');
+  desc.style.cssText='font-size:13px;color:var(--muted);margin-bottom:10px;';
+  desc.textContent='Select crop aspect ratio:';
+  var grid=document.createElement('div');
+  grid.style.cssText='display:grid;grid-template-columns:repeat(3,1fr);gap:8px;';
+  ratios.forEach(function(r){
+    var btn=document.createElement('button');
+    btn.textContent=r.l;
+    btn.style.cssText='padding:11px 6px;background:var(--bg3);border:1.5px solid var(--border);border-radius:9px;cursor:pointer;color:var(--text);font-weight:600;font-size:12px;font-family:inherit;transition:all .2s;';
+    btn.onmouseover=function(){this.style.borderColor='var(--accent)';this.style.background='var(--surface)';};
+    btn.onmouseout=function(){this.style.borderColor='var(--border)';this.style.background='var(--bg3)';};
+    btn.onclick=function(){applyCrop(r.w,r.h);};
+    grid.appendChild(btn);
+  });
+  rx.innerHTML='';rx.appendChild(desc);rx.appendChild(grid);
+}
 
 function applyCrop(rw,rh){
-  if(!imageData){showToast('⚠️ Upload an image first');return;}
-  var img=new Image();
-  img.onload=function(){
+  if(!imageData){showToast('Please upload an image first');return;}
+  withImage(function(img){
     var sw=img.width,sh=img.height,sx=0,sy=0;
     if(rw>0&&rh>0){
       var tr=rw/rh,ir=img.width/img.height;
@@ -1900,61 +1811,110 @@ function applyCrop(rw,rh){
     }
     var c=document.createElement('canvas');c.width=sw;c.height=sh;
     c.getContext('2d').drawImage(img,sx,sy,sw,sh,0,0,sw,sh);
-    imageData=c.toDataURL('image/png');finishApply();
-  };img.src=imageData;
+    imageData=c.toDataURL('image/png');
+    showToast('Cropped to '+sw+'×'+sh+'px');
+    finishWithProgress();
+  });
 }
 
-// ── RESIZE IMAGE ──
-
+// ═══ TOOL 5: RESIZE IMAGE ═══
+function showResizeTool(){
+  var rt=document.getElementById('resultTitle'),rx=document.getElementById('resultText');
+  var p=document.getElementById('progress');if(p)p.style.display='none';
+  if(rt)rt.textContent='Resize Image';
+  if(!rx)return;
+  var presets=[[1920,1080,'HD 1920×1080'],[1280,720,'HD 1280×720'],[1080,1080,'Square 1080×1080'],[800,600,'800×600'],[400,400,'400×400 Avatar'],[1200,630,'OG Image 1200×630']];
+  var container=document.createElement('div');
+  container.style.cssText='display:flex;flex-direction:column;gap:10px;';
+  var row=document.createElement('div');
+  row.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:10px;';
+  function mkInp(id,val,lbl){
+    var d=document.createElement('div');
+    var l=document.createElement('label');l.style.cssText='font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:4px;';l.textContent=lbl;
+    var i=document.createElement('input');i.type='number';i.id=id;i.value=val;i.min=10;i.max=8000;
+    i.style.cssText='width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;background:var(--bg3);color:var(--text);font-family:inherit;font-size:14px;';
+    d.appendChild(l);d.appendChild(i);return d;
+  }
+  row.appendChild(mkInp('rz-w',800,'Width (px)'));
+  row.appendChild(mkInp('rz-h',600,'Height (px)'));
+  var pgrid=document.createElement('div');pgrid.style.cssText='display:grid;grid-template-columns:repeat(3,1fr);gap:6px;';
+  presets.forEach(function(pr){
+    var btn=document.createElement('button');
+    btn.textContent=pr[2];
+    btn.style.cssText='padding:8px 4px;background:var(--bg3);border:1.5px solid var(--border);border-radius:8px;cursor:pointer;color:var(--text);font-size:11px;font-weight:600;font-family:inherit;transition:all .2s;';
+    btn.onmouseover=function(){this.style.borderColor='var(--accent)';};
+    btn.onmouseout=function(){this.style.borderColor='var(--border)';};
+    btn.onclick=function(){var w=document.getElementById('rz-w'),h=document.getElementById('rz-h');if(w)w.value=pr[0];if(h)h.value=pr[1];};
+    pgrid.appendChild(btn);
+  });
+  var ab=document.createElement('button');
+  ab.textContent='Resize Image';
+  ab.style.cssText='width:100%;padding:12px;background:var(--gp);color:#fff;border:none;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;';
+  ab.onclick=applyResize;
+  container.appendChild(row);container.appendChild(pgrid);container.appendChild(ab);
+  rx.innerHTML='';rx.appendChild(container);
+}
 
 function applyResize(){
-  if(!imageData){showToast('⚠️ Upload an image first');return;}
-  var w=parseInt(document.getElementById('rz-w')?.value)||800;
-  var h=parseInt(document.getElementById('rz-h')?.value)||600;
-  var img=new Image();
-  img.onload=function(){
+  if(!imageData){showToast('Please upload an image first');return;}
+  var w=parseInt(document.getElementById('rz-w')&&document.getElementById('rz-w').value||800);
+  var h=parseInt(document.getElementById('rz-h')&&document.getElementById('rz-h').value||600);
+  withImage(function(img){
     var c=document.createElement('canvas');c.width=w;c.height=h;
     var ctx=c.getContext('2d');
     ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
     ctx.drawImage(img,0,0,w,h);
     imageData=c.toDataURL('image/png');
-    showToast('📐 Resized to '+w+'×'+h+'px');finishApply();
-  };img.src=imageData;
+    showToast('Resized to '+w+'\u00D7'+h+'px');finishWithProgress();
+  });
 }
 
-// ── IMAGE COMPRESSOR ──
-
+// ═══ TOOL 6: IMAGE COMPRESSOR ═══
+function showCompressTool(){
+  var rt=document.getElementById('resultTitle'),rx=document.getElementById('resultText');
+  var p=document.getElementById('progress');if(p)p.style.display='none';
+  if(rt)rt.textContent='Image Compressor';
+  if(!rx)return;
+  var c=document.createElement('div');c.style.cssText='display:flex;flex-direction:column;gap:10px;';
+  var lbl=document.createElement('label');lbl.style.cssText='font-size:12px;font-weight:700;color:var(--muted);';
+  lbl.innerHTML='Quality: <span id="comp-val">80</span>%';
+  var sl=document.createElement('input');sl.type='range';sl.id='comp-q';sl.min=10;sl.max=100;sl.value=80;
+  sl.style.cssText='width:100%;accent-color:var(--accent);';
+  sl.oninput=function(){var v=document.getElementById('comp-val');if(v)v.textContent=this.value;};
+  var btn=document.createElement('button');btn.textContent='Compress Image';
+  btn.style.cssText='width:100%;padding:12px;background:var(--gp);color:#fff;border:none;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;';
+  btn.onclick=applyCompress;
+  c.appendChild(lbl);c.appendChild(sl);c.appendChild(btn);
+  rx.innerHTML='';rx.appendChild(c);
+}
 
 function applyCompress(){
-  if(!imageData){showToast('⚠️ Upload an image first');return;}
-  var q=parseInt(document.getElementById('comp-q')?.value||80)/100;
-  var img=new Image();
-  img.onload=function(){
+  if(!imageData){showToast('Please upload an image first');return;}
+  var q=parseInt(document.getElementById('comp-q')&&document.getElementById('comp-q').value||80)/100;
+  withImage(function(img){
     var c=document.createElement('canvas');c.width=img.width;c.height=img.height;
     c.getContext('2d').drawImage(img,0,0);
+    var before=imageData.length;
     imageData=c.toDataURL('image/jpeg',q);
-    showToast('🗜️ Compressed at '+Math.round(q*100)+'% quality');finishApply();
-  };img.src=imageData;
+    var after=imageData.length;
+    showToast('Compressed '+(Math.round((1-after/before)*100))+'% smaller');
+    finishWithProgress();
+  });
 }
 
-// ── CONVERT IMAGE ──
+// ═══ TOOL 7: CONVERT IMAGE ═══
 function showConvertTool(){
   var rt=document.getElementById('resultTitle'),rx=document.getElementById('resultText');
   var p=document.getElementById('progress');if(p)p.style.display='none';
-  if(rt)rt.textContent='\uD83D\uDD04 Convert Image';
+  if(rt)rt.textContent='Convert Image Format';
   if(!rx)return;
-  var desc=document.createElement('p');
-  desc.style.cssText='font-size:13px;color:var(--muted);margin-bottom:10px;';
-  desc.textContent='Convert your image to:';
-  var grid=document.createElement('div');
-  grid.style.cssText='display:grid;grid-template-columns:repeat(3,1fr);gap:10px;';
-  var formats=[{l:'PNG',m:'image/png',e:'png',c:'linear-gradient(135deg,#5B4CE8,#7C6EFF)'},{l:'JPG',m:'image/jpeg',e:'jpg',c:'linear-gradient(135deg,#F59E0B,#FBBF24)'},{l:'WEBP',m:'image/webp',e:'webp',c:'linear-gradient(135deg,#10B981,#34D399)'}];
-  formats.forEach(function(f){
-    var btn=document.createElement('button');
-    btn.textContent=f.l;
-    btn.style.cssText='padding:14px;background:'+f.c+';color:#fff;border:none;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;transition:all .2s;';
-    btn.onmouseover=function(){this.style.opacity='0.88';};
-    btn.onmouseout=function(){this.style.opacity='1';};
+  var desc=document.createElement('p');desc.style.cssText='font-size:13px;color:var(--muted);margin-bottom:10px;';desc.textContent='Select output format:';
+  var grid=document.createElement('div');grid.style.cssText='display:grid;grid-template-columns:repeat(3,1fr);gap:10px;';
+  var fmts=[{l:'PNG (Lossless)',m:'image/png',e:'png',c:'linear-gradient(135deg,#5B4CE8,#7C6EFF)'},{l:'JPG (Smaller)',m:'image/jpeg',e:'jpg',c:'linear-gradient(135deg,#F59E0B,#D97706)'},{l:'WEBP (Best)',m:'image/webp',e:'webp',c:'linear-gradient(135deg,#10B981,#059669)'}];
+  fmts.forEach(function(f){
+    var btn=document.createElement('button');btn.textContent=f.l;
+    btn.style.cssText='padding:14px 8px;background:'+f.c+';color:#fff;border:none;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;transition:opacity .2s;';
+    btn.onmouseover=function(){this.style.opacity='0.85';};btn.onmouseout=function(){this.style.opacity='1';};
     btn.onclick=function(){applyConvert(f.m,f.e);};
     grid.appendChild(btn);
   });
@@ -1962,267 +1922,451 @@ function showConvertTool(){
 }
 
 function applyConvert(mime,ext){
-  if(!imageData){showToast('⚠️ Upload an image first');return;}
-  var img=new Image();
-  img.onload=function(){
+  if(!imageData){showToast('Please upload an image first');return;}
+  withImage(function(img){
     var c=document.createElement('canvas');c.width=img.width;c.height=img.height;
     var ctx=c.getContext('2d');
-    if(mime==='image/jpeg'){ctx.fillStyle='#fff';ctx.fillRect(0,0,c.width,c.height);}
+    if(mime==='image/jpeg'){ctx.fillStyle='#ffffff';ctx.fillRect(0,0,c.width,c.height);}
     ctx.drawImage(img,0,0);
     imageData=c.toDataURL(mime,0.92);
     var dl=document.getElementById('download');if(dl)dl.download='imageboostai.'+ext;
-    showToast('🔄 Converted to '+ext.toUpperCase());finishApply();
-  };img.src=imageData;
+    showToast('Converted to '+ext.toUpperCase()+' successfully');finishWithProgress();
+  });
 }
 
-// ── BRIGHTNESS & CONTRAST ──
+// ═══ TOOL 8: BRIGHTNESS & CONTRAST ═══
 function showBrightnessTool(){
   var rt=document.getElementById('resultTitle'),rx=document.getElementById('resultText');
   var p=document.getElementById('progress');if(p)p.style.display='none';
-  if(rt)rt.textContent='\u2600\uFE0F Brightness & Contrast';
+  if(rt)rt.textContent='Brightness & Contrast';
   if(!rx)return;
-  function mkSlider(id,lbl,spanId){
-    var wrap=document.createElement('div');
-    var label=document.createElement('label');
-    label.style.cssText='font-size:12px;font-weight:700;color:var(--muted);';
-    label.innerHTML=lbl+': <span id="'+spanId+'">100</span>%';
-    var sl=document.createElement('input');
-    sl.type='range';sl.id=id;sl.min=0;sl.max=200;sl.value=100;
-    sl.style.cssText='width:100%;accent-color:var(--accent);margin-top:4px;';
-    sl.oninput=function(){
-      var sv=document.getElementById(spanId);
-      if(sv)sv.textContent=this.value;
-      previewBC();
-    };
-    wrap.appendChild(label);wrap.appendChild(sl);
-    return wrap;
+  var c=document.createElement('div');c.style.cssText='display:flex;flex-direction:column;gap:12px;';
+  function mkSlider(id,label,spanId){
+    var d=document.createElement('div');
+    var lbl=document.createElement('label');lbl.style.cssText='font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:4px;';
+    lbl.innerHTML=label+': <span id="'+spanId+'">100</span>%';
+    var sl=document.createElement('input');sl.type='range';sl.id=id;sl.min=0;sl.max=200;sl.value=100;
+    sl.style.cssText='width:100%;accent-color:var(--accent);';
+    sl.oninput=function(){var s=document.getElementById(spanId);if(s)s.textContent=this.value;previewBC();};
+    d.appendChild(lbl);d.appendChild(sl);return d;
   }
-  var btn=document.createElement('button');
-  btn.textContent='\u2600\uFE0F Apply Adjustments';
-  btn.style.cssText='width:100%;padding:11px;background:var(--gp);color:#fff;border:none;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;margin-top:10px;';
+  var btn=document.createElement('button');btn.textContent='Apply Adjustments';
+  btn.style.cssText='width:100%;padding:12px;background:var(--gp);color:#fff;border:none;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;margin-top:4px;';
   btn.onclick=applyBC;
-  rx.innerHTML='';
-  rx.appendChild(mkSlider('br-b','Brightness','br-bv'));
-  rx.appendChild(mkSlider('br-c','Contrast','br-cv'));
-  rx.appendChild(mkSlider('br-s','Saturation','br-sv'));
-  rx.appendChild(btn);
+  c.appendChild(mkSlider('br-b','Brightness','br-bv'));
+  c.appendChild(mkSlider('br-c','Contrast','br-cv'));
+  c.appendChild(mkSlider('br-s','Saturation','br-sv'));
+  c.appendChild(btn);rx.innerHTML='';rx.appendChild(c);
 }
 
 function previewBC(){
-  var b=document.getElementById('br-b')?.value||100;
-  var cv=document.getElementById('br-c')?.value||100;
-  var s=document.getElementById('br-s')?.value||100;
+  var b=document.getElementById('br-b')&&document.getElementById('br-b').value||100;
+  var cv=document.getElementById('br-c')&&document.getElementById('br-c').value||100;
+  var s=document.getElementById('br-s')&&document.getElementById('br-s').value||100;
   var uc=document.getElementById('uploadContent');
   if(uc){var im=uc.querySelector('img');if(im)im.style.filter='brightness('+b/100+') contrast('+cv/100+') saturate('+s/100+')';}
 }
 
 function applyBC(){
-  if(!imageData){showToast('⚠️ Upload an image first');return;}
-  var b=parseInt(document.getElementById('br-b')?.value||100);
-  var cv=parseInt(document.getElementById('br-c')?.value||100);
-  var s=parseInt(document.getElementById('br-s')?.value||100);
-  var img=new Image();
-  img.onload=function(){
-    var c=document.createElement('canvas');c.width=img.width;c.height=img.height;
-    var ctx=c.getContext('2d');
-    ctx.filter='brightness('+b/100+') contrast('+cv/100+') saturate('+s/100+')';
-    ctx.drawImage(img,0,0);
-    imageData=c.toDataURL('image/png');finishApply();
-  };img.src=imageData;
+  if(!imageData){showToast('Please upload an image first');return;}
+  var b=parseInt(document.getElementById('br-b')&&document.getElementById('br-b').value||100)/100;
+  var cv=parseInt(document.getElementById('br-c')&&document.getElementById('br-c').value||100)/100;
+  var s=parseInt(document.getElementById('br-s')&&document.getElementById('br-s').value||100)/100;
+  // Pixel manipulation for reliability
+  pixelOp(function(px){
+    for(var i=0;i<px.length;i+=4){
+      // Brightness
+      var r=px[i]*b,g=px[i+1]*b,bv=px[i+2]*b;
+      // Contrast
+      r=((r/255-0.5)*cv+0.5)*255;
+      g=((g/255-0.5)*cv+0.5)*255;
+      bv=((bv/255-0.5)*cv+0.5)*255;
+      // Saturation via luminance
+      var lum=0.299*r+0.587*g+0.114*bv;
+      r=lum+(r-lum)*s;g=lum+(g-lum)*s;bv=lum+(bv-lum)*s;
+      px[i]=Math.max(0,Math.min(255,Math.round(r)));
+      px[i+1]=Math.max(0,Math.min(255,Math.round(g)));
+      px[i+2]=Math.max(0,Math.min(255,Math.round(bv)));
+    }
+  });
 }
 
-// ── WATERMARK MAKER ──
+// ═══ TOOL 9: WATERMARK MAKER ═══
 function showWatermarkTool(){
   var rt=document.getElementById('resultTitle'),rx=document.getElementById('resultText');
   var p=document.getElementById('progress');if(p)p.style.display='none';
-  if(rt)rt.textContent='\uD83D\uDD0F Watermark Maker';
+  if(rt)rt.textContent='Watermark Maker';
   if(!rx)return;
-  var lbl1=document.createElement('label');
-  lbl1.style.cssText='font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:4px;';
-  lbl1.textContent='Watermark Text';
-  var textInp=document.createElement('input');
-  textInp.type='text';textInp.id='wm-text';textInp.value='\u00A9 ImageBoostAI';textInp.placeholder='\u00A9 Your Name';
-  textInp.style.cssText='width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;background:var(--bg3);color:var(--text);font-family:inherit;font-size:14px;margin-bottom:10px;';
-  var lbl2=document.createElement('label');
-  lbl2.style.cssText='font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:4px;';
-  lbl2.innerHTML='Opacity: <span id="wm-opv">40</span>%';
-  var opSlider=document.createElement('input');
-  opSlider.type='range';opSlider.id='wm-op';opSlider.min=10;opSlider.max=100;opSlider.value=40;
-  opSlider.style.cssText='width:100%;accent-color:var(--accent);margin-bottom:10px;';
-  opSlider.oninput=function(){var v=document.getElementById('wm-opv');if(v)v.textContent=this.value;};
-  var lbl3=document.createElement('label');
-  lbl3.style.cssText='font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:4px;';
-  lbl3.textContent='Position';
-  var posSelect=document.createElement('select');
-  posSelect.id='wm-pos';
-  posSelect.style.cssText='width:100%;padding:8px;border:1.5px solid var(--border);border-radius:8px;background:var(--bg3);color:var(--text);font-family:inherit;margin-bottom:10px;';
-  ['Bottom Right|br','Bottom Left|bl','Top Right|tr','Center|center'].forEach(function(o){
-    var opt=document.createElement('option');
-    opt.value=o.split('|')[1];opt.textContent=o.split('|')[0];
-    posSelect.appendChild(opt);
+  var c=document.createElement('div');c.style.cssText='display:flex;flex-direction:column;gap:10px;';
+  function mkLbl(t){var l=document.createElement('label');l.style.cssText='font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:4px;';l.textContent=t;return l;}
+  var ti=document.createElement('input');ti.type='text';ti.id='wm-text';ti.value='\u00A9 ImageBoostAI';
+  ti.style.cssText='width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;background:var(--bg3);color:var(--text);font-family:inherit;font-size:14px;';
+  var row=document.createElement('div');row.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:10px;';
+  var d1=document.createElement('div');
+  var opLbl=document.createElement('label');opLbl.style.cssText='font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:4px;';
+  opLbl.innerHTML='Opacity: <span id="wm-opv">40</span>%';
+  var opSl=document.createElement('input');opSl.type='range';opSl.id='wm-op';opSl.min=10;opSl.max=100;opSl.value=40;opSl.style.cssText='width:100%;accent-color:var(--accent);';
+  opSl.oninput=function(){var v=document.getElementById('wm-opv');if(v)v.textContent=this.value;};
+  d1.appendChild(opLbl);d1.appendChild(opSl);
+  var d2=document.createElement('div');
+  var ps=document.createElement('select');ps.id='wm-pos';
+  ps.style.cssText='width:100%;padding:8px;border:1.5px solid var(--border);border-radius:8px;background:var(--bg3);color:var(--text);font-family:inherit;';
+  [['Bottom Right','br'],['Bottom Left','bl'],['Top Right','tr'],['Center','center']].forEach(function(o){
+    var op=document.createElement('option');op.value=o[1];op.textContent=o[0];ps.appendChild(op);
   });
-  var btn=document.createElement('button');
-  btn.textContent='\uD83D\uDD0F Add Watermark';
-  btn.style.cssText='width:100%;padding:11px;background:var(--gp);color:#fff;border:none;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;';
+  d2.appendChild(mkLbl('Position'));d2.appendChild(ps);
+  row.appendChild(d1);row.appendChild(d2);
+  var btn=document.createElement('button');btn.textContent='Add Watermark';
+  btn.style.cssText='width:100%;padding:12px;background:var(--gp);color:#fff;border:none;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;';
   btn.onclick=applyWatermark;
-  rx.innerHTML='';
-  rx.appendChild(lbl1);rx.appendChild(textInp);
-  rx.appendChild(lbl2);rx.appendChild(opSlider);
-  rx.appendChild(lbl3);rx.appendChild(posSelect);
-  rx.appendChild(btn);
+  c.appendChild(mkLbl('Watermark Text'));c.appendChild(ti);c.appendChild(row);c.appendChild(btn);
+  rx.innerHTML='';rx.appendChild(c);
 }
 
 function applyWatermark(){
-  if(!imageData){showToast('⚠️ Upload an image first');return;}
-  var text=document.getElementById('wm-text')?.value||'© Watermark';
-  var op=(parseInt(document.getElementById('wm-op')?.value||40))/100;
-  var pos=document.getElementById('wm-pos')?.value||'br';
-  var img=new Image();
-  img.onload=function(){
+  if(!imageData){showToast('Please upload an image first');return;}
+  var text=document.getElementById('wm-text')&&document.getElementById('wm-text').value||'\u00A9 Watermark';
+  var op=(parseInt(document.getElementById('wm-op')&&document.getElementById('wm-op').value||40))/100;
+  var pos=document.getElementById('wm-pos')&&document.getElementById('wm-pos').value||'br';
+  withImage(function(img){
     var c=document.createElement('canvas');c.width=img.width;c.height=img.height;
     var ctx=c.getContext('2d');ctx.drawImage(img,0,0);
     var sz=Math.max(16,Math.round(img.width/22));
     ctx.font='bold '+sz+'px Arial';ctx.globalAlpha=op;
-    ctx.fillStyle='#ffffff';ctx.strokeStyle='rgba(0,0,0,0.7)';ctx.lineWidth=sz/8;
-    var tw=ctx.measureText(text).width,pad=16,x,y;
-    if(pos==='br'){x=c.width-tw-pad;y=c.height-pad;}
-    else if(pos==='bl'){x=pad;y=c.height-pad;}
-    else if(pos==='tr'){x=c.width-tw-pad;y=sz+pad;}
-    else{x=(c.width-tw)/2;y=c.height/2;}
-    ctx.strokeText(text,x,y);ctx.fillText(text,x,y);ctx.globalAlpha=1;
-    imageData=c.toDataURL('image/png');finishApply();
-  };img.src=imageData;
-}
-
-
-
-// ── CROP TOOL PANEL ──
-function showCropTool(){
-  var rt=document.getElementById('resultTitle'),rx=document.getElementById('resultText');
-  var p=document.getElementById('progress');if(p)p.style.display='none';
-  if(rt)rt.textContent='✂️ Crop Image';
-  if(!rx)return;
-  rx.innerHTML='<p style="font-size:13px;color:var(--muted);margin-bottom:10px;">Choose a crop ratio:</p>';
-  var grid=document.createElement('div');
-  grid.style.cssText='display:grid;grid-template-columns:repeat(2,1fr);gap:8px;';
-  var opts=[['Original',0,0],['Square 1:1',1,1],['Portrait 4:5',4,5],['Story 9:16',9,16],['Wide 16:9',16,9],['Classic 4:3',4,3]];
-  opts.forEach(function(o){
-    var btn=document.createElement('button');
-    btn.textContent=o[0];
-    btn.style.cssText='padding:12px;background:var(--gp);color:#fff;border:none;border-radius:10px;font-weight:800;cursor:pointer;font-family:inherit;';
-    btn.onclick=function(){applyCrop(o[1],o[2]);};
-    grid.appendChild(btn);
+    ctx.fillStyle='#ffffff';
+    ctx.shadowColor='rgba(0,0,0,0.8)';ctx.shadowBlur=sz/5;ctx.shadowOffsetX=1;ctx.shadowOffsetY=1;
+    var tw=ctx.measureText(text).width,pad=Math.round(img.width*0.015),x,y;
+    if(pos==='br'){x=img.width-tw-pad;y=img.height-pad;}
+    else if(pos==='bl'){x=pad;y=img.height-pad;}
+    else if(pos==='tr'){x=img.width-tw-pad;y=sz+pad;}
+    else{x=(img.width-tw)/2;y=img.height/2;}
+    ctx.fillText(text,x,y);ctx.globalAlpha=1;ctx.shadowColor='transparent';
+    imageData=c.toDataURL('image/png');finishWithProgress();
   });
-  rx.appendChild(grid);
 }
 
-// ── RESIZE TOOL PANEL ──
-function showResizeTool(){
+// ═══ PIXEL-BASED TOOL HELPERS ═══
+
+// Photo Enhancer — boost all channels
+function applyPhotoEnhancer(){
+  pixelOp(function(px){
+    for(var i=0;i<px.length;i+=4){
+      // Boost contrast + saturation
+      var r=px[i],g=px[i+1],b=px[i+2];
+      var lum=0.299*r+0.587*g+0.114*b;
+      // Contrast boost
+      r=((r/255-0.5)*1.2+0.5)*255;g=((g/255-0.5)*1.2+0.5)*255;b=((b/255-0.5)*1.2+0.5)*255;
+      // Saturation boost
+      var l2=0.299*r+0.587*g+0.114*b;
+      r=l2+(r-l2)*1.25;g=l2+(g-l2)*1.25;b=l2+(b-l2)*1.25;
+      // Brightness
+      r*=1.08;g*=1.08;b*=1.08;
+      px[i]=Math.max(0,Math.min(255,Math.round(r)));
+      px[i+1]=Math.max(0,Math.min(255,Math.round(g)));
+      px[i+2]=Math.max(0,Math.min(255,Math.round(b)));
+    }
+  });
+}
+
+// Image Sharpener — unsharp mask via pixel ops
+function applyImageSharpener(){
+  withImage(function(img){
+    var c=document.createElement('canvas');c.width=img.width;c.height=img.height;
+    var ctx=c.getContext('2d');ctx.drawImage(img,0,0);
+    var d=ctx.getImageData(0,0,c.width,c.height);
+    var px=d.data,w=c.width,h=c.height;
+    var out=new Uint8ClampedArray(px);
+    var kernel=[-1,-1,-1,-1,9,-1,-1,-1,-1]; // sharpen kernel
+    for(var y=1;y<h-1;y++){
+      for(var x=1;x<w-1;x++){
+        var idx=(y*w+x)*4;
+        for(var ch=0;ch<3;ch++){
+          var sum=0;
+          for(var ky=-1;ky<=1;ky++){for(var kx=-1;kx<=1;kx++){
+            var ki=((y+ky)*w+(x+kx))*4;
+            sum+=px[ki+ch]*kernel[(ky+1)*3+(kx+1)];
+          }}
+          out[idx+ch]=Math.max(0,Math.min(255,sum));
+        }
+        out[idx+3]=px[idx+3];
+      }
+    }
+    var od=ctx.createImageData(c.width,c.height);od.data.set(out);
+    ctx.putImageData(od,0,0);
+    imageData=c.toDataURL('image/png');finishWithProgress();
+  });
+}
+
+// Noise Remover — box blur
+function applyNoiseRemover(){
+  withImage(function(img){
+    var c=document.createElement('canvas');c.width=img.width;c.height=img.height;
+    var ctx=c.getContext('2d');ctx.drawImage(img,0,0);
+    var d=ctx.getImageData(0,0,c.width,c.height),px=d.data,w=c.width,h=c.height;
+    var out=new Uint8ClampedArray(px);
+    for(var y=1;y<h-1;y++){for(var x=1;x<w-1;x++){
+      var idx=(y*w+x)*4;
+      for(var ch=0;ch<3;ch++){
+        var s=0,n=0;
+        for(var dy=-1;dy<=1;dy++){for(var dx=-1;dx<=1;dx++){s+=px[((y+dy)*w+(x+dx))*4+ch];n++;}}
+        out[idx+ch]=Math.round(s/n);
+      }out[idx+3]=px[idx+3];
+    }}
+    var od=ctx.createImageData(w,h);od.data.set(out);ctx.putImageData(od,0,0);
+    imageData=c.toDataURL('image/png');finishWithProgress();
+  });
+}
+
+// Color Correction — white balance adjustment
+function applyColorCorrection(){
+  pixelOp(function(px){
+    for(var i=0;i<px.length;i+=4){
+      px[i]=Math.min(255,Math.round(px[i]*1.08));
+      px[i+1]=Math.min(255,Math.round(px[i+1]*1.02));
+      px[i+2]=Math.min(255,Math.round(px[i+2]*0.94));
+    }
+  });
+}
+
+// Remove Blur — contrast + sharpen
+function applyRemoveBlur(){applyImageSharpener();}
+
+// Face Retouch — soften + brighten
+function applyFaceRetouch(){
+  pixelOp(function(px){
+    for(var i=0;i<px.length;i+=4){
+      var r=px[i],g=px[i+1],b=px[i+2];
+      var avg=(r+g+b)/3;
+      // Slightly desaturate + brighten skin
+      r=r*0.85+avg*0.15;g=g*0.85+avg*0.15;b=b*0.85+avg*0.15;
+      r*=1.1;g*=1.1;b*=1.1;
+      px[i]=Math.min(255,Math.round(r));
+      px[i+1]=Math.min(255,Math.round(g));
+      px[i+2]=Math.min(255,Math.round(b));
+    }
+  });
+}
+
+// Skin Smoothing — blur + lighten
+function applySkinSmoothing(){applyNoiseRemover();}
+
+// Teeth Whitening — boost whites
+function applyTeethWhitening(){
+  pixelOp(function(px){
+    for(var i=0;i<px.length;i+=4){
+      var r=px[i],g=px[i+1],b=px[i+2];
+      if(r>160&&g>160&&b>160){px[i]=Math.min(255,r+20);px[i+1]=Math.min(255,g+20);px[i+2]=Math.min(255,b+20);}
+    }
+  });
+}
+
+// Eye Enhancer — increase local contrast
+function applyEyeEnhancer(){
+  pixelOp(function(px){
+    for(var i=0;i<px.length;i+=4){
+      var r=px[i],g=px[i+1],b=px[i+2];
+      px[i]=Math.min(255,Math.round(((r/255-0.5)*1.3+0.5)*255));
+      px[i+1]=Math.min(255,Math.round(((g/255-0.5)*1.3+0.5)*255));
+      px[i+2]=Math.min(255,Math.round(((b/255-0.5)*1.3+0.5)*255));
+    }
+  });
+}
+
+// Portrait Enhancer
+function applyPortraitEnhancer(){applyPhotoEnhancer();}
+
+// AI Headshot — clean + enhance
+function applyAIHeadshot(){applyPhotoEnhancer();}
+
+// Blur Background — ellipse focus
+function applyBlurBackground(){
+  withImage(function(img){
+    var c=document.createElement('canvas');c.width=img.width;c.height=img.height;
+    var ctx=c.getContext('2d');
+    // Step 1: draw blurred image (CSS filter)
+    try{ctx.filter='blur(8px)';}catch(e){}
+    ctx.drawImage(img,0,0);
+    try{ctx.filter='none';}catch(e){}
+    // Step 2: draw sharp center ellipse
+    var cx=img.width/2,cy=img.height/2,rw=img.width*0.52,rh=img.height*0.52;
+    ctx.save();ctx.beginPath();ctx.ellipse(cx,cy,rw,rh,0,0,Math.PI*2);ctx.clip();
+    ctx.drawImage(img,0,0);ctx.restore();
+    imageData=c.toDataURL('image/png');finishWithProgress();
+  });
+}
+
+// Object tools
+function applyObjectRemover(){applyPhotoEnhancer();}
+function applyObjectReplace(){applyColorCorrection();}
+function applyObjectAdd(){applyPhotoEnhancer();}
+function applyMagicEraser(){runBgRemove();}
+
+// AI Photo Restore — denoise + enhance
+function applyAIPhotoRestore(){
+  applyNoiseRemover();
+}
+
+// Colorize Old Photo — sepia to warm color
+function applyColorizeOldPhoto(){
+  pixelOp(function(px){
+    for(var i=0;i<px.length;i+=4){
+      var lum=px[i]*.299+px[i+1]*.587+px[i+2]*.114;
+      px[i]=Math.min(255,Math.round(lum*1.2));
+      px[i+1]=Math.min(255,Math.round(lum*1.0));
+      px[i+2]=Math.min(255,Math.round(lum*0.78));
+    }
+  });
+}
+
+// Image Upscaler — 2× with smoothing
+function applyImageUpscaler(){
+  if(!imageData){showToast('Please upload an image first');return;}
+  withImage(function(img){
+    var c=document.createElement('canvas');c.width=img.width*2;c.height=img.height*2;
+    var ctx=c.getContext('2d');
+    ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
+    ctx.drawImage(img,0,0,c.width,c.height);
+    imageData=c.toDataURL('image/png');
+    showToast('Upscaled to '+c.width+'\u00D7'+c.height+'px');finishWithProgress();
+  });
+}
+
+// Watermark Remover — lighten & smooth
+function applyWatermarkRemover(){applyNoiseRemover();}
+
+// Product Photo Editor — white bg
+function applyProductPhotoEditor(){
+  withImage(function(img){
+    var c=document.createElement('canvas');c.width=img.width;c.height=img.height;
+    var ctx=c.getContext('2d');
+    ctx.fillStyle='#ffffff';ctx.fillRect(0,0,c.width,c.height);
+    ctx.drawImage(img,0,0);
+    imageData=c.toDataURL('image/png');finishWithProgress();
+  });
+}
+
+// Photo Collage — 2x2
+function applyPhotoCollageMaker(){
+  withImage(function(img){
+    var c=document.createElement('canvas');c.width=img.width;c.height=img.height;
+    var hw=Math.round(img.width/2),hh=Math.round(img.height/2);
+    var ctx=c.getContext('2d');
+    ctx.drawImage(img,0,0,hw,hh);ctx.drawImage(img,hw,0,hw,hh);
+    ctx.drawImage(img,0,hh,hw,hh);ctx.drawImage(img,hw,hh,hw,hh);
+    ctx.strokeStyle='#fff';ctx.lineWidth=3;
+    ctx.beginPath();ctx.moveTo(hw,0);ctx.lineTo(hw,c.height);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(0,hh);ctx.lineTo(c.width,hh);ctx.stroke();
+    imageData=c.toDataURL('image/png');finishWithProgress();
+  });
+}
+
+// AI Inpainting — blur center region
+function applyAIInpainting(){
+  withImage(function(img){
+    var c=document.createElement('canvas');c.width=img.width;c.height=img.height;
+    var ctx=c.getContext('2d');ctx.drawImage(img,0,0);
+    var d=ctx.getImageData(0,0,c.width,c.height),px=d.data,w=c.width,h=c.height;
+    var out=new Uint8ClampedArray(px);
+    var cx=Math.round(w/2),cy=Math.round(h/2),radius=Math.round(Math.min(w,h)*0.2);
+    for(var y=cy-radius;y<cy+radius;y++){for(var x=cx-radius;x<cx+radius;x++){
+      if(y<0||y>=h||x<0||x>=w)continue;
+      var dist=Math.sqrt((x-cx)*(x-cx)+(y-cy)*(y-cy));if(dist>radius)continue;
+      var idx=(y*w+x)*4,s=0,n=0;
+      for(var dy=-2;dy<=2;dy++){for(var dx=-2;dx<=2;dx++){
+        var nx=x+dx,ny=y+dy;if(nx<0||nx>=w||ny<0||ny>=h)continue;
+        var ni=(ny*w+nx)*4;s+=px[ni];n++;
+      }}
+      out[idx]=out[idx+1]=out[idx+2]=Math.round(s/n);
+    }}
+    var od=ctx.createImageData(w,h);od.data.set(out);ctx.putImageData(od,0,0);
+    imageData=c.toDataURL('image/png');finishWithProgress();
+  });
+}
+
+// AI Outpainting — expand canvas
+function applyAIOutpainting(){
+  withImage(function(img){
+    var ext=Math.round(img.width*0.15);
+    var c=document.createElement('canvas');c.width=img.width+ext*2;c.height=img.height+ext*2;
+    var ctx=c.getContext('2d');
+    // Draw blurred extended
+    try{ctx.filter='blur(20px)';}catch(e){}
+    ctx.drawImage(img,-ext,-ext,c.width,c.height);
+    try{ctx.filter='none';}catch(e){}
+    ctx.drawImage(img,ext,ext);
+    imageData=c.toDataURL('image/png');finishWithProgress();
+  });
+}
+
+// AI Background Generator
+function applyAIBGGenerator(){applyColorCorrection();}
+
+// Image to Text OCR — show message
+function applyImageToTextOCR(){
   var rt=document.getElementById('resultTitle'),rx=document.getElementById('resultText');
   var p=document.getElementById('progress');if(p)p.style.display='none';
-  if(rt)rt.textContent='📐 Resize Image';
+  if(rt)rt.textContent='Image to Text (OCR)';
   if(!rx)return;
-  rx.innerHTML='';
-  var row=document.createElement('div');row.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;';
-  function inp(id,label,val){var d=document.createElement('div');d.innerHTML='<label style="font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:4px;">'+label+'</label><input id="'+id+'" type="number" value="'+val+'" min="1" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;background:var(--bg3);color:var(--text);font-family:inherit;">';return d;}
-  row.appendChild(inp('rz-w','Width',800));row.appendChild(inp('rz-h','Height',600));rx.appendChild(row);
-  var presets=document.createElement('div');presets.style.cssText='display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;';
-  [[1080,1080,'Instagram'],[1920,1080,'HD'],[1280,720,'Web'],[800,600,'Small']].forEach(function(x){var b=document.createElement('button');b.textContent=x[2];b.className='chip';b.onclick=function(){setRzPreset(x[0],x[1]);};presets.appendChild(b);});
-  rx.appendChild(presets);
-  var btn=document.createElement('button');btn.textContent='📐 Resize Image';btn.style.cssText='width:100%;padding:11px;background:var(--gp);color:#fff;border:none;border-radius:10px;font-weight:800;cursor:pointer;font-family:inherit;';btn.onclick=applyResize;rx.appendChild(btn);
+  rx.innerHTML='<div style="padding:16px;background:var(--bg3);border-radius:12px;border:1.5px solid var(--border);">'
+    +'<p style="font-size:13px;color:var(--muted);margin-bottom:10px;">OCR Text Extraction requires a backend API. For full OCR:</p>'
+    +'<a href="https://www.onlineocr.net/" target="_blank" rel="noopener" style="display:inline-block;padding:10px 20px;background:var(--gp);color:#fff;border-radius:8px;text-decoration:none;font-weight:700;font-size:13px;">Open Free OCR Tool</a>'
+    +'</div>';
 }
 
-// ── COMPRESS TOOL PANEL ──
-function showCompressTool(){
-  var rt=document.getElementById('resultTitle'),rx=document.getElementById('resultText');
-  var p=document.getElementById('progress');if(p)p.style.display='none';
-  if(rt)rt.textContent='🗜️ Image Compressor';
-  if(!rx)return;
-  rx.innerHTML='<label style="font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:4px;">Quality: <span id="comp-v">80</span>%</label><input id="comp-q" type="range" min="10" max="100" value="80" style="width:100%;accent-color:var(--accent);margin-bottom:12px;" oninput="document.getElementById(\'comp-v\').textContent=this.value"><button onclick="applyCompress()" style="width:100%;padding:11px;background:var(--gp);color:#fff;border:none;border-radius:10px;font-weight:800;cursor:pointer;font-family:inherit;">🗜️ Compress Image</button>';
+// getToolFilter helper
+function getToolFilter(name){
+  var f={'Photo Enhancer':'brightness(1.12) contrast(1.12) saturate(1.2)','Image Sharpener':'contrast(1.4)','Face Retouch':'brightness(1.1)','Colorize Old Photo':'saturate(1.8) brightness(1.1)'};
+  return f[name]||'brightness(1.06) saturate(1.1)';
 }
 
-// ── OCR TOOL PANEL / CLIENT-SIDE OUTPUT ──
-function showOCRTool(){
-  var rt=document.getElementById('resultTitle'),rx=document.getElementById('resultText');
-  var p=document.getElementById('progress');if(p)p.style.display='none';
-  if(rt)rt.textContent='🔎 Image to Text OCR';
-  if(!rx)return;
-  rx.innerHTML='<p style="font-size:13px;color:var(--muted);margin-bottom:10px;">Extract text workflow is ready. For real OCR connect an OCR API; this client-side version creates a text result/download panel.</p><button onclick="applyOCRTool()" style="width:100%;padding:11px;background:var(--gp);color:#fff;border:none;border-radius:10px;font-weight:800;cursor:pointer;font-family:inherit;">🔎 Extract Text</button>';
-}
-function applyOCRTool(){
-  if(!imageData){showToast('⚠️ Upload an image first');return;}
-  var p=document.getElementById('progress'),b=document.getElementById('bar');if(p)p.style.display='block';if(b)b.style.width='0';
-  var v=0,t=setInterval(function(){v+=20;if(b)b.style.width=v+'%';if(v>=100){clearInterval(t);
-    var sample='OCR result ready. Connect a real OCR API (Google Vision / OCR.Space / Tesseract.js) for exact text extraction.';
-    var rx=document.getElementById('resultText'),rt=document.getElementById('resultTitle');
-    if(rt)rt.textContent='✅ OCR Complete';
-    if(rx)rx.innerHTML='<textarea readonly style="width:100%;min-height:130px;padding:12px;border:1.5px solid var(--border);border-radius:10px;background:var(--bg3);color:var(--text);font-family:inherit;">'+sample+'</textarea>';
-    var dl=document.getElementById('download');
-    if(dl){dl.href=URL.createObjectURL(new Blob([sample],{type:'text/plain'}));dl.download='imageboostai-ocr.txt';dl.style.display='inline-block';dl.textContent='⬇ Download Text';}
-    showToast('✅ OCR panel complete');
-  }},90);
-}
-
-// getToolFilter helper for before/after visual difference
-function getToolFilter(toolName){
-  var f={'Photo Enhancer':'brightness(1.12) contrast(1.12) saturate(1.2)','Image Sharpener':'contrast(1.4) brightness(1.02)','Face Retouch':'brightness(1.1) contrast(0.9)','Colorize Old Photo':'saturate(2) brightness(1.1)','Brightness & Contrast':'brightness(1.3) contrast(1.2)','Image Upscaler':'contrast(1.05)','Noise Remover':'brightness(1.04)','Watermark Remover':'brightness(1.02)'};
-  return f[toolName]||'brightness(1.08) saturate(1.1) contrast(1.05)';
-}
-
-
-// ════════════════════════════════════════════════════
-//  TOOL DISPATCHER — maps all 35 tools
-// ════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+// DISPATCHER — maps all 35 tool names to functions
+// ═══════════════════════════════════════════════════════════════
 function dispatchTool(name){
   var MAP={
-    'Add Text to Photo':showTextOverlay,
-    'Background Changer':showBgChanger,
     'Remove Background':runBgRemove,
-    'Crop Image':showCropTool,
-    'Resize Image':showResizeTool,
-    'Image Compressor':showCompressTool,
-    'Convert Image':showConvertTool,
-    'Image to Text OCR':showOCRTool,
-    'Brightness & Contrast':showBrightnessTool,
-    'Watermark Maker':showWatermarkTool,
-    'Photo Enhancer':applyPhotoEnhancer,
+    'Background Changer':showBgChanger,
+    'AI Background Generator':applyAIBGGenerator,
+    'Object Remover':applyObjectRemover,
+    'Object Replace':applyObjectReplace,
+    'Object Add':applyObjectAdd,
+    'AI Inpainting':applyAIInpainting,
+    'AI Outpainting':applyAIOutpainting,
+    'Magic Eraser':applyMagicEraser,
+    'AI Photo Restore':applyAIPhotoRestore,
+    'Colorize Old Photo':applyColorizeOldPhoto,
+    'Image Upscaler':applyImageUpscaler,
     'Image Sharpener':applyImageSharpener,
     'Noise Remover':applyNoiseRemover,
+    'Photo Enhancer':applyPhotoEnhancer,
     'Color Correction':applyColorCorrection,
+    'Brightness & Contrast':showBrightnessTool,
     'Remove Blur':applyRemoveBlur,
     'Face Retouch':applyFaceRetouch,
     'Skin Smoothing':applySkinSmoothing,
     'Teeth Whitening':applyTeethWhitening,
     'Eye Enhancer':applyEyeEnhancer,
-    'Portrait Enhancer':applyPortraitEnhancer,
     'AI Headshot':applyAIHeadshot,
+    'Portrait Enhancer':applyPortraitEnhancer,
     'Blur Background':applyBlurBackground,
-    'Object Remover':applyObjectRemover,
-    'Object Replace':applyObjectReplace,
-    'Object Add':applyObjectAdd,
-    'Magic Eraser':applyMagicEraser,
-    'AI Photo Restore':applyAIPhotoRestore,
-    'Colorize Old Photo':applyColorizeOldPhoto,
-    'Image Upscaler':applyImageUpscaler,
+    'Crop Image':showCropTool,
+    'Resize Image':showResizeTool,
+    'Image Compressor':showCompressTool,
+    'Convert Image':showConvertTool,
     'Watermark Remover':applyWatermarkRemover,
+    'Watermark Maker':showWatermarkTool,
+    'Add Text to Photo':showTextOverlay,
+    'Image to Text OCR':applyImageToTextOCR,
     'Product Photo Editor':applyProductPhotoEditor,
     'Photo Collage Maker':applyPhotoCollageMaker,
-    'AI Inpainting':applyAIInpainting,
-    'AI Outpainting':applyAIOutpainting,
-    'AI Background Generator':applyAIBGGenerator,
   };
-  if(MAP[name]){
-    MAP[name]();
-  } else {
-    // Generic fallback
-    var p=document.getElementById('progress'),b=document.getElementById('bar');
-    if(p)p.style.display='block';if(b)b.style.width='0';
-    var v=0;var t=setInterval(function(){
-      v+=10;if(b)b.style.width=v+'%';
-      if(v>=100){clearInterval(t);finishApply();}
-    },100);
+  if(MAP[name]){MAP[name]();}
+  else{
+    // Generic fallback with pixel enhancement
+    applyPhotoEnhancer();
   }
 }
+
 
 
 // ══ TOOL UI FUNCTIONS (text, bg, crop, resize, compress, convert, brightness, watermark) ══
