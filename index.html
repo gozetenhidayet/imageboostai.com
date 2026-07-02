@@ -232,6 +232,8 @@ nav{position:sticky;top:0;z-index:100;background:var(--nav-bg);backdrop-filter:b
 .nav-pro{padding:8px 16px;font-size:13px;font-weight:700;color:#fff;background:var(--gp);border-radius:10px;border:none;cursor:pointer;box-shadow:0 4px 14px rgba(91,76,232,.3);transition:all .2s;white-space:nowrap;}
 .nav-pro:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(91,76,232,.45);}
 @media(max-width:480px){.nav-links-hide,.lb{display:none;}}
+@media(max-width:480px){.chip-row{display:none;}}
+@media(max-width:600px){.cat-pills{gap:5px;}.cat-pill{padding:7px 12px;font-size:11.5px;}}
 
 /* ══ DEAL BAR ══ */
 .deal-bar{background:linear-gradient(270deg,#5B4CE8,#EC4899,#06B6D4,#5B4CE8);background-size:400%;animation:gradShift 5s ease infinite;color:#fff;text-align:center;padding:.55rem 2.5rem;font-size:12.5px;font-weight:600;position:relative;}
@@ -275,7 +277,10 @@ section{padding:56px 0;}
 .sec-title p{color:var(--muted);font-size:.95rem;margin-top:.6rem;max-width:520px;margin-left:auto;margin-right:auto;}
 
 /* ══ CATEGORY BANNER ══ */
-.cat-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:13px 16px;}
+.cat-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:11px 16px;
+  position:sticky;top:66px;z-index:90;
+  box-shadow:0 2px 12px rgba(91,76,232,.07);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);}
 .cat-bar-in{width:min(1200px,94%);margin:0 auto;display:flex;flex-direction:column;gap:10px;align-items:center;}
 .cat-pills{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;}
 .cat-pill{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:100px;font-size:13px;font-weight:700;cursor:pointer;border:none;color:#fff;transition:all .28s cubic-bezier(.34,1.56,.64,1);box-shadow:0 3px 12px rgba(0,0,0,.12);position:relative;overflow:hidden;}
@@ -312,17 +317,34 @@ section{padding:56px 0;}
 @media(max-width:580px){.tools-grid{grid-template-columns:repeat(2,1fr);}}
 @media(max-width:360px){.tools-grid{grid-template-columns:1fr;}}
 .tool-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--rL);padding:20px 16px;cursor:pointer;transition:all .3s cubic-bezier(.34,1.56,.64,1);text-align:center;position:relative;overflow:hidden;animation:cardIn .5s ease both;}
+/* Card accent top border by category */
+.tool-card[data-cat="bg"]::after{background:linear-gradient(90deg,#06B6D4,#0EA5E9);}
+.tool-card[data-cat="fix"]::after{background:linear-gradient(90deg,#10B981,#34D399);}
+.tool-card[data-cat="face"]::after{background:linear-gradient(90deg,#EC4899,#F472B6);}
+.tool-card[data-cat="convert"]::after{background:linear-gradient(90deg,#F59E0B,#FBBF24);}
+.tool-card[data-cat="design"]::after{background:linear-gradient(90deg,#8B5CF6,#A78BFA);}
 .tool-card::before{content:'';position:absolute;inset:0;background:var(--gp);opacity:0;transition:opacity .3s;border-radius:var(--rL);}
 .tool-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--gp);transform:scaleX(0);transition:transform .3s;transform-origin:left;}
 .tool-card:hover{transform:translateY(-9px) scale(1.02);box-shadow:var(--shadow2);border-color:transparent;}
+.tool-card[data-cat="bg"]:hover{box-shadow:0 20px 50px rgba(6,182,212,.2);}
+.tool-card[data-cat="fix"]:hover{box-shadow:0 20px 50px rgba(16,185,129,.2);}
+.tool-card[data-cat="face"]:hover{box-shadow:0 20px 50px rgba(236,72,153,.2);}
+.tool-card[data-cat="convert"]:hover{box-shadow:0 20px 50px rgba(245,158,11,.2);}
+.tool-card[data-cat="design"]:hover{box-shadow:0 20px 50px rgba(139,92,246,.2);}
 .tool-card:hover::before{opacity:.06;}
 .tool-card:hover::after{transform:scaleX(1);}
 .tool-card:active{transform:translateY(-4px) scale(.99);}
-.tool-ic{width:54px;height:54px;border-radius:15px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 12px;transition:transform .35s cubic-bezier(.34,1.56,.64,1);position:relative;z-index:1;}
+.tool-ic{width:54px;height:54px;border-radius:15px;background:linear-gradient(135deg,#EEF2FF,#E0E7FF);display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 12px;transition:transform .35s cubic-bezier(.34,1.56,.64,1),box-shadow .3s;position:relative;z-index:1;box-shadow:0 2px 10px rgba(91,76,232,.1);}
+.tool-card[data-cat="bg"] .tool-ic{background:linear-gradient(135deg,#E0F7FA,#B2EBF2);box-shadow:0 2px 10px rgba(6,182,212,.15);}
+.tool-card[data-cat="fix"] .tool-ic{background:linear-gradient(135deg,#E8F5E9,#C8E6C9);box-shadow:0 2px 10px rgba(16,185,129,.15);}
+.tool-card[data-cat="face"] .tool-ic{background:linear-gradient(135deg,#FCE4EC,#F8BBD0);box-shadow:0 2px 10px rgba(236,72,153,.15);}
+.tool-card[data-cat="convert"] .tool-ic{background:linear-gradient(135deg,#FFF3E0,#FFE0B2);box-shadow:0 2px 10px rgba(245,158,11,.15);}
+.tool-card[data-cat="design"] .tool-ic{background:linear-gradient(135deg,#EDE7F6,#D1C4E9);box-shadow:0 2px 10px rgba(139,92,246,.15);}
+.tool-card:hover .tool-ic{transform:scale(1.22) rotate(-10deg);box-shadow:0 8px 24px rgba(91,76,232,.2);}
 .tool-card:hover .tool-ic{transform:scale(1.25) rotate(-10deg);}
-.tool-name{font-size:13px;font-weight:800;color:var(--text);margin-bottom:5px;position:relative;z-index:1;transition:color .2s;}
+.tool-name{font-size:13px;font-weight:800;color:var(--text);margin-bottom:5px;position:relative;z-index:1;transition:color .2s;line-height:1.3;}
 .tool-card:hover .tool-name{color:var(--accent);}
-.tool-desc{font-size:11.5px;color:var(--muted);line-height:1.45;position:relative;z-index:1;}
+.tool-desc{font-size:11.5px;color:var(--muted);line-height:1.45;position:relative;z-index:1;margin-top:4px;}
 .fav-btn{position:absolute;right:12px;top:12px;background:var(--bg3);border:1.5px solid var(--border);color:var(--muted);border-radius:50%;width:30px;height:30px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .2s;z-index:2;}
 .fav-btn.on{background:linear-gradient(135deg,#F59E0B,#EC4899);color:#fff;border:none;}
 .tool-badge{position:absolute;top:10px;left:10px;font-size:9.5px;padding:2px 8px;border-radius:100px;font-weight:700;z-index:2;}
@@ -453,14 +475,50 @@ footer{background:var(--text);color:rgba(255,255,255,.85);padding:3.5rem 1rem 1.
 .share-bar span{font-size:12px;color:var(--muted);}
 .share-btn{display:inline-flex;align-items:center;gap:4px;padding:6px 13px;border-radius:100px;font-size:12px;font-weight:600;cursor:pointer;border:none;transition:all .2s;}
 .share-btn:hover{filter:brightness(.9);transform:translateY(-1px);}
-.sb-x{background:#000;color:#fff;}
-.sb-wa{background:#25D366;color:#fff;}
+.sb-email{background:#6366F1;color:#fff;}
 .sb-cp{background:var(--bg3);color:var(--text);border:1.5px solid var(--border);}
 [data-theme="dark"] .sb-cp{background:var(--surface2);}
+
+
+[data-theme="dark"] .tool-card[data-cat="bg"] .tool-ic{background:linear-gradient(135deg,rgba(6,182,212,.25),rgba(14,165,233,.2));}
+[data-theme="dark"] .tool-card[data-cat="fix"] .tool-ic{background:linear-gradient(135deg,rgba(16,185,129,.25),rgba(52,211,153,.2));}
+[data-theme="dark"] .tool-card[data-cat="face"] .tool-ic{background:linear-gradient(135deg,rgba(236,72,153,.25),rgba(244,114,182,.2));}
+[data-theme="dark"] .tool-card[data-cat="convert"] .tool-ic{background:linear-gradient(135deg,rgba(245,158,11,.25),rgba(251,191,36,.2));}
+[data-theme="dark"] .tool-card[data-cat="design"] .tool-ic{background:linear-gradient(135deg,rgba(139,92,246,.25),rgba(167,139,250,.2));}
 
 /* ══ ACCESSIBILITY ══ */
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
 [aria-live="polite"]{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);}
+
+
+
+/* ══ ICON ANIMATIONS ══ */
+@keyframes icon-bounce{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-8px) rotate(8deg)}}
+@keyframes icon-spin{0%,80%,100%{transform:rotate(0deg)}10%,70%{transform:rotate(360deg)}}
+@keyframes icon-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
+@keyframes icon-shake{0%,100%{transform:rotate(0)}20%{transform:rotate(-15deg)}40%{transform:rotate(15deg)}60%{transform:rotate(-10deg)}80%{transform:rotate(10deg)}}
+@keyframes icon-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes icon-pop{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
+
+.tool-card:hover .tool-ic{animation:icon-bounce .7s cubic-bezier(.34,1.56,.64,1);}
+.tool-card[data-cat="bg"]:hover .tool-ic{animation:icon-spin .8s ease;}
+.tool-card[data-cat="fix"]:hover .tool-ic{animation:icon-float .6s ease;}
+.tool-card[data-cat="face"]:hover .tool-ic{animation:icon-pulse .5s ease;}
+.tool-card[data-cat="convert"]:hover .tool-ic{animation:icon-spin .6s ease;}
+.tool-card[data-cat="design"]:hover .tool-ic{animation:icon-shake .5s ease;}
+
+/* ══ SMOOTH TRANSITIONS ══ */
+.tool-card{transition:all .3s cubic-bezier(.34,1.56,.64,1);}
+.tool-card:hover{transform:translateY(-9px) scale(1.025);box-shadow:0 20px 50px rgba(91,76,232,.15);}
+.cat-pill{transition:all .3s cubic-bezier(.34,1.56,.64,1);}
+.btn-primary,.btn-secondary{transition:all .25s cubic-bezier(.34,1.56,.64,1);}
+.upload-zone{transition:all .3s ease;}
+.out-img-wrap{transition:opacity .4s ease,transform .4s ease;}
+.chip{transition:all .22s cubic-bezier(.34,1.56,.64,1);}
+.faq-a{transition:max-height .35s ease,padding .25s ease;}
+.modal-overlay{transition:opacity .25s ease;}
+.modal-box{transition:transform .25s cubic-bezier(.34,1.56,.64,1),opacity .25s ease;}
+.result-box{transition:background .3s ease;}
 
 /* ══ RESPONSIVE ══ */
 @media(max-width:640px){
@@ -471,6 +529,14 @@ footer{background:var(--text);color:rgba(255,255,255,.85);padding:3.5rem 1rem 1.
   .nl-input,.nl-btn{border-radius:12px;}
 }
 </style>
+
+<!-- AdSense Auto Ads — works without specific slot IDs -->
+<script>
+(adsbygoogle=window.adsbygoogle||[]).push({
+  google_ad_client:"ca-pub-3359266836868361",
+  enable_page_level_ads:true
+});
+</script>
 </head>
 <body>
 <!-- ARIA LIVE -->
@@ -478,12 +544,7 @@ footer{background:var(--text);color:rgba(255,255,255,.85);padding:3.5rem 1rem 1.
 <!-- SKIP LINK -->
 <a class="skip-link" href="#tools">Skip to tools</a>
 
-<!-- DEAL BAR -->
-<div class="deal-bar" id="deal-bar">
-  🔥 <strong id="db-text">Pro Features: Batch Processing, HD Export, API Access — Coming Soon!</strong>
-  <a onclick="openModal('contact')" id="db-link"> Join Waitlist →</a>
-  <button class="deal-x" onclick="document.getElementById('deal-bar').remove()" aria-label="Close">✕</button>
-</div>
+
 
 <!-- LANG DETECT BANNER -->
 <div id="lang-banner" role="alert">
@@ -500,9 +561,11 @@ footer{background:var(--text);color:rgba(255,255,255,.85);padding:3.5rem 1rem 1.
       ImageBoost<span class="logo-ai">AI</span>
     </a>
     <div class="nav-links">
-      <a href="#tools" class="nav-links-hide" data-i="nav_tools">AI Tools</a>
-      <a href="#workspace" class="nav-links-hide" data-i="nav_editor">Editor</a>
-      <a href="#faq" class="nav-links-hide">FAQ</a>
+      <a href="#tools" class="nav-links-hide" onclick="filterTools('bg',document.querySelector('.cp-bg'))">🎭 Background</a>
+      <a href="#tools" class="nav-links-hide" onclick="filterTools('fix',document.querySelector('.cp-fix'))">🏛️ Restore</a>
+      <a href="#tools" class="nav-links-hide" onclick="filterTools('face',document.querySelector('.cp-face'))">💄 Face</a>
+      <a href="#tools" class="nav-links-hide" onclick="filterTools('convert',document.querySelector('.cp-convert'))">🔄 Convert</a>
+      <a href="#tools" class="nav-links-hide" onclick="filterTools('design',document.querySelector('.cp-design'))">🎨 Design</a>
       <div class="lw">
         <button class="lb" id="lb" onclick="toggleLangMenu()" aria-label="Select language" aria-expanded="false">
           🌐 <span id="lcode">EN</span>
@@ -526,7 +589,7 @@ footer{background:var(--text);color:rgba(255,255,255,.85);padding:3.5rem 1rem 1.
         </div>
       </div>
       <button class="theme-btn" onclick="toggleTheme()" aria-label="Toggle dark/light mode" id="theme-btn" title="Toggle theme">🌙</button>
-      <button class="nav-pro" onclick="openModal('contact')" data-i="nav_pro">✨ Get Pro</button>
+
     </div>
   </div>
 </nav>
@@ -581,14 +644,26 @@ footer{background:var(--text);color:rgba(255,255,255,.85);padding:3.5rem 1rem 1.
   </div>
 </div>
 
-<!-- AD STRIP -->
-<div class="ad-strip">
-  <div class="ad-strip-in">
-    <div class="ad-s-t">⚡ <strong data-i="ast">Pro Coming Soon:</strong> <span data-i="asd">Batch processing, HD export, API access — join the waitlist</span></div>
-    <button class="ad-s-btn" onclick="openModal('contact')" data-i="asb">Join Waitlist →</button>
-  </div>
-</div>
 
+
+
+<!-- ══════════════════════════════════════════════════════
+  ADSENSE NEDEN GÖZÜKMÜYOR? (Cevap)
+  ═════════════════════════════════════════════════════════
+  Reklamlar 2 nedenden biri olana kadar gösterilmez:
+  
+  1. SİTE ONAY BEKLIYORSA: Google sitenizi incelyor (1-4 hafta).
+     Onay sonrası reklamlar otomatik devreye girer.
+  
+  2. PUB ID EKSİK: ca-pub-3359266836868361 zaten ekli. ✅
+  
+  3. SLOT IDs: 1234567890, 2345678901, 3456789012 bunlar test ID'leri.
+     Gerçek slot ID'leri için AdSense → Ads → By ad unit → oluştur.
+     VEYA: AdSense → Ads → Auto ads aktif edersen slot ID gerektirmez.
+  
+  4. EN KOLAY ÇÖZÜM → AdSense → Ads → Auto ads → Toggle ON
+     Otomatik reklam tüm sayfaya kendi yerleştirir.
+══════════════════════════════════════════════════════ -->
 <!-- TOOLS SECTION -->
 <section id="tools">
 <div class="wrap">
@@ -598,8 +673,8 @@ footer{background:var(--text);color:rgba(255,255,255,.85);padding:3.5rem 1rem 1.
     <p data-i="tools_p">Click any tool to open the editor. Upload your photo and apply instantly.</p>
   </div>
 
-  <!-- TOP AD -->
-  <div style="max-width:728px;margin:0 auto 24px;text-align:center;">
+  <!-- TOP AD — Google Auto Ads handles display after approval -->
+  <div style="max-width:728px;margin:0 auto 20px;text-align:center;min-height:0;">
     <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3359266836868361" data-ad-slot="1234567890" data-ad-format="auto" data-full-width-responsive="true"></ins>
     <script>(adsbygoogle=window.adsbygoogle||[]).push({});</script>
   </div>
@@ -658,9 +733,9 @@ footer{background:var(--text);color:rgba(255,255,255,.85);padding:3.5rem 1rem 1.
         <!-- Share bar (shown after result) -->
         <div class="share-bar" id="share-bar" style="display:none;">
           <span>Share:</span>
-          <a id="share-x" href="#" target="_blank" rel="noopener" class="share-btn sb-x">𝕏 X</a>
-          <a id="share-wa" href="#" target="_blank" rel="noopener" class="share-btn sb-wa">💬 WhatsApp</a>
+          <a id="share-email" href="#" class="share-btn sb-email">✉️ Email</a>
           <button onclick="copyLink()" class="share-btn sb-cp">📋 Copy Link</button>
+          <button onclick="resetEditor();window.scrollTo({top:0,behavior:'smooth'})" class="share-btn" style="background:#EF4444;color:#fff;" title="Close and start over">✕ Close</button>
         </div>
       </div>
     </div>
@@ -870,7 +945,8 @@ function renderTools(list=tools){
   const grid=document.getElementById('toolGrid');
   if(!grid)return;
   grid.innerHTML=list.map((t,i)=>`
-    <div class="tool-card" onclick="openTool('${t[0].replace(/'/g,"\\'")}');trackEvent('tool_click','Tool','${t[0]}')"
+    <div class="tool-card" data-cat="${t[3]}"
+         onclick="openTool('${t[0].replace(/'/g,"\\'")}');trackEvent('tool_click','Tool','${t[0]}')"
          role="listitem" aria-label="${t[0]}: ${t[1]}"
          style="animation-delay:${Math.min(i*.03,.4)}s">
       <button class="fav-btn" onclick="event.stopPropagation();this.classList.toggle('on');showToast(this.classList.contains('on')?'❤️ Added to favorites':'Removed from favorites')" aria-label="Add to favorites">♡</button>
@@ -951,18 +1027,27 @@ function applyTool(){
 function finishApply(){
   const img=document.getElementById('outImg');
   img.src=imageData;
-  document.getElementById('output').style.display='block';
+  const outWrap=document.getElementById('output');
+  outWrap.style.display='block';
+  outWrap.style.opacity='0';
+  outWrap.style.transform='translateY(10px)';
+  outWrap.style.transition='opacity .4s ease,transform .4s ease';
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{outWrap.style.opacity='1';outWrap.style.transform='translateY(0)';}));
   const dl=document.getElementById('download');
   dl.href=imageData;dl.style.display='inline-block';
-  document.getElementById('resultText').textContent='✅ '+selected+' applied. Download ready.';
+  document.getElementById('resultTitle').textContent='✅ Done!';
+  document.getElementById('resultText').textContent=selected+' applied. Your download is ready.';
   addHistory(selected);
-  showToast('✅ Done — download is ready!');
-  document.getElementById('share-bar').style.display='flex';
-  // Update share links
-  const url=encodeURIComponent('https://imageboostai.com/');
-  const txt=encodeURIComponent('I just edited my photo with '+selected+' on ImageBoostAI — free AI photo editing! '+decodeURIComponent(url));
-  document.getElementById('share-x').href='https://x.com/intent/post?text='+txt;
-  document.getElementById('share-wa').href='https://api.whatsapp.com/send?text='+txt;
+  showToast('✅ '+selected+' complete — download ready!');
+  // Share: email link
+  const sb=document.getElementById('share-bar');
+  sb.style.display='flex';
+  const shareEmail=document.getElementById('share-email');
+  if(shareEmail){
+    const subj=encodeURIComponent('Check out ImageBoostAI — Free AI Photo Editor');
+    const body=encodeURIComponent('I used '+selected+' on ImageBoostAI, a free AI photo editing tool. Try it at https://imageboostai.com/');
+    shareEmail.href='mailto:?subject='+subj+'&body='+body;
+  }
   if(typeof gtag!=='undefined')gtag('event','tool_complete',{tool_name:selected});
 }
 function addHistory(name){
