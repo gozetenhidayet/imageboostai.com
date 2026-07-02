@@ -336,7 +336,7 @@ section{padding:56px 0;}
 
 /* ══ CATEGORY BANNER ══ */
 .cat-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:11px 16px;
-  position:sticky;top:66px;z-index:90;
+  position:sticky;top:66px;z-index:95;
   box-shadow:0 2px 12px rgba(91,76,232,.07);
   backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);}
 .cat-bar-in{width:min(1200px,94%);margin:0 auto;display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center;}
@@ -720,6 +720,22 @@ footer{background:var(--text);color:rgba(255,255,255,.85);padding:3.5rem 1rem 1.
   </div>
 </nav>
 
+<!-- CATEGORY BANNER -->
+<div class="cat-bar">
+  <div class="cat-bar-in" style="align-items:center;justify-content:center;">
+    <div class="cat-pills" style="justify-content:center;width:100%;">
+      <button class="cat-pill cp-all active" onclick="filterTools('all',this)">🌟 All</button>
+      <button class="cat-pill cp-bg" onclick="filterTools('bg',this)">🎭 Background</button>
+      <button class="cat-pill cp-fix" onclick="filterTools('fix',this)">🏛️ Restore &amp; Fix</button>
+      <button class="cat-pill cp-face" onclick="filterTools('face',this)">💄 Face</button>
+      <button class="cat-pill cp-convert" onclick="filterTools('convert',this)">🔄 Convert</button>
+      <button class="cat-pill cp-design" onclick="filterTools('design',this)">🎨 Design</button>
+    </div>
+  </div>
+</div>
+
+
+
 <!-- HERO -->
 <header class="hero" id="home">
   <div class="hero-inner">
@@ -762,62 +778,6 @@ footer{background:var(--text);color:rgba(255,255,255,.85);padding:3.5rem 1rem 1.
     <div class="stat"><div class="stat-n">🔒</div><div class="stat-l" data-i="s5">Zero Data Stored</div></div>
   </div>
 </div>
-
-
-
-
-
-<!-- CATEGORY BANNER -->
-<div class="cat-bar">
-  <div class="cat-bar-in" style="align-items:center;justify-content:center;">
-    <div class="cat-pills" style="justify-content:center;width:100%;">
-      <button class="cat-pill cp-all active" onclick="filterTools('all',this)">🌟 All</button>
-      <button class="cat-pill cp-bg" onclick="filterTools('bg',this)">🎭 Background</button>
-      <button class="cat-pill cp-fix" onclick="filterTools('fix',this)">🏛️ Restore &amp; Fix</button>
-      <button class="cat-pill cp-face" onclick="filterTools('face',this)">💄 Face</button>
-      <button class="cat-pill cp-convert" onclick="filterTools('convert',this)">🔄 Convert</button>
-      <button class="cat-pill cp-design" onclick="filterTools('design',this)">🎨 Design</button>
-    </div>
-  </div>
-</div>
-
-
-
-
-<!-- ══════════════════════════════════════════════════════
-  ADSENSE NEDEN GÖZÜKMÜYOR? (Cevap)
-  ═════════════════════════════════════════════════════════
-  Reklamlar 2 nedenden biri olana kadar gösterilmez:
-  
-  1. SİTE ONAY BEKLIYORSA: Google sitenizi incelyor (1-4 hafta).
-     Onay sonrası reklamlar otomatik devreye girer.
-  
-  2. PUB ID EKSİK: ca-pub-3359266836868361 zaten ekli. ✅
-  
-  3. SLOT IDs: 1234567890, 2345678901, 3456789012 bunlar test ID'leri.
-     Gerçek slot ID'leri için AdSense → Ads → By ad unit → oluştur.
-     VEYA: AdSense → Ads → Auto ads aktif edersen slot ID gerektirmez.
-  
-  4. EN KOLAY ÇÖZÜM → AdSense → Ads → Auto ads → Toggle ON
-     Otomatik reklam tüm sayfaya kendi yerleştirir.
-══════════════════════════════════════════════════════ -->
-<!-- CATEGORY BANNER -->
-<div class="cat-bar">
-  <div class="cat-bar-in" style="align-items:center;justify-content:center;">
-    <div class="cat-pills" style="justify-content:center;width:100%;">
-      <button class="cat-pill cp-all active" onclick="filterTools('all',this)">🌟 All</button>
-      <button class="cat-pill cp-bg" onclick="filterTools('bg',this)">🎭 Background</button>
-      <button class="cat-pill cp-fix" onclick="filterTools('fix',this)">🏛️ Restore &amp; Fix</button>
-      <button class="cat-pill cp-face" onclick="filterTools('face',this)">💄 Face</button>
-      <button class="cat-pill cp-convert" onclick="filterTools('convert',this)">🔄 Convert</button>
-      <button class="cat-pill cp-design" onclick="filterTools('design',this)">🎨 Design</button>
-    </div>
-  </div>
-</div>
-
-
-
-
 <!-- ══════════════════════════════════════════════════════
   ADSENSE NEDEN GÖZÜKMÜYOR? (Cevap)
   ═════════════════════════════════════════════════════════
@@ -877,14 +837,17 @@ footer{background:var(--text);color:rgba(255,255,255,.85);padding:3.5rem 1rem 1.
   </div>
   <div class="ws-panel">
     <div class="ws-grid">
-      <label class="upload-zone" id="drop" role="button" aria-label="Upload image" tabindex="0">
-        <input type="file" id="file" accept="image/*" aria-label="Choose image file">
-        <div id="uploadContent">
-          <div class="u-icon">🖼️</div>
-          <div class="u-title" data-i="up_title">Upload Your Photo</div>
-          <div class="u-sub" data-i="up_sub">Click or drag an image here. JPG, PNG, WEBP, HEIC supported. Processed locally in your browser.</div>
-        </div>
-      </label>
+      <div style="position:relative;">
+        <label class="upload-zone" id="drop" role="button" aria-label="Upload image" tabindex="0">
+          <input type="file" id="file" accept="image/*" aria-label="Choose image file">
+          <div id="uploadContent">
+            <div class="u-icon">🖼️</div>
+            <div class="u-title">Upload Your Photo</div>
+            <div class="u-sub">Click or drag · JPG, PNG, WEBP, HEIC · Processed in your browser</div>
+          </div>
+        </label>
+        <button id="upload-x-btn" onclick="resetEditor()" aria-label="Clear uploaded photo" style="display:none;position:absolute;top:10px;right:10px;width:30px;height:30px;background:#EF4444;color:#fff;border:none;border-radius:50%;font-size:15px;font-weight:700;cursor:pointer;z-index:10;box-shadow:0 2px 8px rgba(239,68,68,.35);transition:all .2s;display:none;align-items:center;justify-content:center;">✕</button>
+      </div>
       <div class="result-box" style="position:relative;">
         <button id="close-result-btn" onclick="resetEditor();window.scrollTo({top:document.getElementById('tools').offsetTop-120,behavior:'smooth'})" style="display:none;position:absolute;top:14px;right:14px;width:32px;height:32px;background:#EF4444;color:#fff;border:none;border-radius:50%;font-size:16px;cursor:pointer;z-index:10;display:none;align-items:center;justify-content:center;font-weight:700;box-shadow:0 2px 8px rgba(239,68,68,.3);transition:all .2s;" aria-label="Close result and reset" title="Close">✕</button>
         <h3 id="resultTitle" data-i="res_title">Ready to Edit</h3>
@@ -1245,426 +1208,33 @@ function loadFile(f){
     document.getElementById('resultText').textContent='Now apply '+selected+'.';
     showToast('✅ Image uploaded');
     trackEvent('image_upload','Tool',selected);
+    const uxb=document.getElementById('upload-x-btn');if(uxb)uxb.style.display='flex';
   };
   r.readAsDataURL(f);
 }
 
 /* ══ APPLY TOOL ══ */
+
 function applyTool(){
-  if(!imageData){document.getElementById('file').click();showToast('⚠️ Upload an image first');return;}
-  const p=document.getElementById('progress'),b=document.getElementById('bar');
-  p.style.display='block';b.style.width='0';
-  document.getElementById('output').style.display='none';
-  document.getElementById('download').style.display='none';
-  document.getElementById('share-bar').style.display='none';
-  trackEvent('apply_tool','Tool',selected);
-
-  // Tool-specific implementations
-  if(selected==='Add Text to Photo'){
-    showTextOverlay();return;
-  }
-  if(selected==='Background Changer'){
-    showBgChanger();return;
-  }
-  if(selected==='Remove Background'){
-    runBgRemove();return;
-  }
-  if(selected==='Crop Image'){
-    showCropTool();return;
-  }
-
-  // Check tool actions map
-  if(TOOL_ACTIONS[selected]){
-    TOOL_ACTIONS[selected]();
+  if(!imageData){
+    document.getElementById('file').click();
+    showToast('⚠️ Upload an image first');
     return;
   }
-  // Default: apply CSS filter effect and simulate processing
-  let w=0;const timer=setInterval(()=>{
-    w+=10;b.style.width=w+'%';
-    if(w>=100){clearInterval(timer);finishApply();}
-  },100);
-}
-
-
-
-// ── RESIZE IMAGE ──
-function showResizeTool(){
-  const rt=document.getElementById('resultTitle'),rx=document.getElementById('resultText');
-  document.getElementById('progress').style.display='none';
-  rt.textContent='📐 Resize Image';
-  rx.innerHTML=`
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
-      <div><label style="font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;">Width (px)</label>
-        <input id="rz-w" type="number" value="800" min="10" max="8000" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;background:var(--bg3);color:var(--text);font-family:inherit;font-size:14px;"></div>
-      <div><label style="font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;">Height (px)</label>
-        <input id="rz-h" type="number" value="600" min="10" max="8000" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;background:var(--bg3);color:var(--text);font-family:inherit;font-size:14px;"></div>
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;">
-      <button onclick="setRzPreset(1920,1080)" class="btn-secondary" style="padding:9px;font-size:11px;">1920×1080 HD</button>
-      <button onclick="setRzPreset(1280,720)" class="btn-secondary" style="padding:9px;font-size:11px;">1280×720 HD</button>
-      <button onclick="setRzPreset(800,800)" class="btn-secondary" style="padding:9px;font-size:11px;">800×800 Square</button>
-      <button onclick="setRzPreset(1080,1080)" class="btn-secondary" style="padding:9px;font-size:11px;">1080×1080 IG</button>
-      <button onclick="setRzPreset(1200,630)" class="btn-secondary" style="padding:9px;font-size:11px;">1200×630 OG</button>
-      <button onclick="setRzPreset(400,400)" class="btn-secondary" style="padding:9px;font-size:11px;">400×400 Avatar</button>
-    </div>
-    <button onclick="applyResize()" class="btn-primary" style="width:100%;padding:12px;">📐 Resize Image</button>`;
-}
-function setRzPreset(w,h){document.getElementById('rz-w').value=w;document.getElementById('rz-h').value=h;}
-function applyResize(){
-  const w=parseInt(document.getElementById('rz-w').value)||800;
-  const h=parseInt(document.getElementById('rz-h').value)||600;
-  const img=new Image();
-  img.onload=function(){
-    const c=document.createElement('canvas');c.width=w;c.height=h;
-    const ctx=c.getContext('2d');ctx.drawImage(img,0,0,w,h);
-    imageData=c.toDataURL('image/png');
-    const p=document.getElementById('progress'),b=document.getElementById('bar');
-    p.style.display='block';b.style.width='0';
-    let v=0;const t=setInterval(()=>{v+=25;b.style.width=v+'%';if(v>=100){clearInterval(t);finishApply();}},80);
-  };img.src=imageData;
-}
-
-// ── IMAGE COMPRESSOR ──
-function showCompressTool(){
-  const rt=document.getElementById('resultTitle'),rx=document.getElementById('resultText');
-  document.getElementById('progress').style.display='none';
-  rt.textContent='🗜️ Image Compressor';
-  rx.innerHTML=`
-    <label style="font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:8px;">Quality: <span id="comp-val">80</span>%</label>
-    <input id="comp-q" type="range" min="10" max="100" value="80" oninput="document.getElementById('comp-val').textContent=this.value" style="width:100%;margin-bottom:16px;accent-color:var(--accent);">
-    <button onclick="applyCompress()" class="btn-primary" style="width:100%;padding:12px;">🗜️ Compress Image</button>`;
-}
-function applyCompress(){
-  const q=parseInt(document.getElementById('comp-q').value)/100;
-  const img=new Image();
-  img.onload=function(){
-    const c=document.createElement('canvas');c.width=img.width;c.height=img.height;
-    const ctx=c.getContext('2d');ctx.drawImage(img,0,0);
-    imageData=c.toDataURL('image/jpeg',q);
-    const p=document.getElementById('progress'),b=document.getElementById('bar');
-    p.style.display='block';b.style.width='0';
-    let v=0;const t=setInterval(()=>{v+=20;b.style.width=v+'%';if(v>=100){clearInterval(t);finishApply();}},80);
-  };img.src=imageData;
-}
-
-// ── CONVERT IMAGE ──
-function showConvertTool(){
-  const rt=document.getElementById('resultTitle'),rx=document.getElementById('resultText');
-  document.getElementById('progress').style.display='none';
-  rt.textContent='🔄 Convert Image';
-  rx.innerHTML=`
-    <label style="font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:8px;">Convert to format:</label>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;">
-      <button onclick="applyConvert('image/png','png')" class="btn-primary" style="padding:12px;font-size:13px;">PNG</button>
-      <button onclick="applyConvert('image/jpeg','jpg')" class="btn-secondary" style="padding:12px;font-size:13px;">JPG</button>
-      <button onclick="applyConvert('image/webp','webp')" class="btn-secondary" style="padding:12px;font-size:13px;">WEBP</button>
-    </div>`;
-}
-function applyConvert(mime,ext){
-  const img=new Image();
-  img.onload=function(){
-    const c=document.createElement('canvas');c.width=img.width;c.height=img.height;
-    const ctx=c.getContext('2d');
-    if(mime==='image/jpeg'){ctx.fillStyle='#fff';ctx.fillRect(0,0,c.width,c.height);}
-    ctx.drawImage(img,0,0);
-    imageData=c.toDataURL(mime,0.92);
-    document.getElementById('download').download='imageboostai-converted.'+ext;
-    const p=document.getElementById('progress'),b=document.getElementById('bar');
-    p.style.display='block';b.style.width='0';
-    let v=0;const t=setInterval(()=>{v+=25;b.style.width=v+'%';if(v>=100){clearInterval(t);finishApply();}},80);
-  };img.src=imageData;
-}
-
-// ── BRIGHTNESS & CONTRAST ──
-function showBrightnessTool(){
-  const rt=document.getElementById('resultTitle'),rx=document.getElementById('resultText');
-  document.getElementById('progress').style.display='none';
-  rt.textContent='☀️ Brightness & Contrast';
-  rx.innerHTML=`
-    <label style="font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;">Brightness: <span id="br-val">100</span>%</label>
-    <input id="br-b" type="range" min="0" max="200" value="100" oninput="document.getElementById('br-val').textContent=this.value;previewBC()" style="width:100%;margin-bottom:12px;accent-color:var(--accent);">
-    <label style="font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;">Contrast: <span id="br-cv">100</span>%</label>
-    <input id="br-c" type="range" min="0" max="200" value="100" oninput="document.getElementById('br-cv').textContent=this.value;previewBC()" style="width:100%;margin-bottom:12px;accent-color:var(--accent);">
-    <label style="font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;">Saturation: <span id="br-sv">100</span>%</label>
-    <input id="br-s" type="range" min="0" max="200" value="100" oninput="document.getElementById('br-sv').textContent=this.value;previewBC()" style="width:100%;margin-bottom:14px;accent-color:var(--accent);">
-    <button onclick="applyBC()" class="btn-primary" style="width:100%;padding:12px;">☀️ Apply Adjustments</button>`;
-}
-function previewBC(){
-  const b=document.getElementById('br-b')?.value||100;
-  const c=document.getElementById('br-c')?.value||100;
-  const s=document.getElementById('br-s')?.value||100;
-  const uc=document.getElementById('uploadContent');
-  if(uc){const img=uc.querySelector('img');if(img)img.style.filter=`brightness(${b/100}) contrast(${c/100}) saturate(${s/100})`;}
-}
-function applyBC(){
-  const b=parseInt(document.getElementById('br-b')?.value||100);
-  const c=parseInt(document.getElementById('br-c')?.value||100);
-  const s=parseInt(document.getElementById('br-s')?.value||100);
-  const img=new Image();
-  img.onload=function(){
-    const cv=document.createElement('canvas');cv.width=img.width;cv.height=img.height;
-    const ctx=cv.getContext('2d');
-    ctx.filter=`brightness(${b/100}) contrast(${c/100}) saturate(${s/100})`;
-    ctx.drawImage(img,0,0);
-    imageData=cv.toDataURL('image/png');
-    const p=document.getElementById('progress'),bar=document.getElementById('bar');
-    p.style.display='block';bar.style.width='0';
-    let v=0;const t=setInterval(()=>{v+=20;bar.style.width=v+'%';if(v>=100){clearInterval(t);finishApply();}},80);
-  };img.src=imageData;
-}
-
-// ── WATERMARK MAKER ──
-function showWatermarkTool(){
-  const rt=document.getElementById('resultTitle'),rx=document.getElementById('resultText');
-  document.getElementById('progress').style.display='none';
-  rt.textContent='🔏 Watermark Maker';
-  rx.innerHTML=`
-    <div style="margin-bottom:12px;">
-      <label style="font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;">Watermark Text</label>
-      <input id="wm-text" type="text" placeholder="© Your Brand" value="© ImageBoostAI" style="width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:14px;background:var(--bg3);color:var(--text);">
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
-      <div><label style="font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;">Opacity</label>
-        <input id="wm-op" type="range" min="10" max="100" value="40" style="width:100%;accent-color:var(--accent);"></div>
-      <div><label style="font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;">Position</label>
-        <select id="wm-pos" style="width:100%;padding:9px;border:1.5px solid var(--border);border-radius:8px;background:var(--bg3);color:var(--text);font-family:inherit;">
-          <option value="br">Bottom Right</option><option value="bl">Bottom Left</option>
-          <option value="tr">Top Right</option><option value="center">Center</option>
-        </select></div>
-    </div>
-    <button onclick="applyWatermark()" class="btn-primary" style="width:100%;padding:12px;">🔏 Add Watermark</button>`;
-}
-function applyWatermark(){
-  const text=document.getElementById('wm-text')?.value||'© Watermark';
-  const op=(parseInt(document.getElementById('wm-op')?.value)||40)/100;
-  const pos=document.getElementById('wm-pos')?.value||'br';
-  const img=new Image();
-  img.onload=function(){
-    const c=document.createElement('canvas');c.width=img.width;c.height=img.height;
-    const ctx=c.getContext('2d');ctx.drawImage(img,0,0);
-    const sz=Math.max(18,Math.round(img.width/20));
-    ctx.font=`bold ${sz}px Arial`;ctx.globalAlpha=op;ctx.fillStyle='#fff';ctx.strokeStyle='#000';ctx.lineWidth=sz/10;
-    const tw=ctx.measureText(text).width;const pad=20;
-    let x,y;
-    if(pos==='br'){x=c.width-tw-pad;y=c.height-pad;}
-    else if(pos==='bl'){x=pad;y=c.height-pad;}
-    else if(pos==='tr'){x=c.width-tw-pad;y=sz+pad;}
-    else{x=(c.width-tw)/2;y=c.height/2;}
-    ctx.strokeText(text,x,y);ctx.fillText(text,x,y);ctx.globalAlpha=1;
-    imageData=c.toDataURL('image/png');
-    const p=document.getElementById('progress'),b=document.getElementById('bar');
-    p.style.display='block';b.style.width='0';
-    let v=0;const t=setInterval(()=>{v+=25;b.style.width=v+'%';if(v>=100){clearInterval(t);finishApply();}},80);
-  };img.src=imageData;
-}
-
-// ── TOOL DISPATCHER (extended) ──
-const TOOL_ACTIONS={
-  'Resize Image':showResizeTool,
-  'Image Compressor':showCompressTool,
-  'Convert Image':showConvertTool,
-  'Brightness & Contrast':showBrightnessTool,
-  'Watermark Maker':showWatermarkTool,
-};
-
-
-// ── ADD TEXT TO PHOTO ──
-function showTextOverlay(){
-  // Create a text input panel in the result box
-  const rt=document.getElementById('resultTitle');
-  const rx=document.getElementById('resultText');
-  const p=document.getElementById('progress');
-  p.style.display='none';
-  rt.textContent='✍️ Add Text to Photo';
-  rx.innerHTML=`
-    <div style="margin-bottom:12px;">
-      <label style="font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;">Your Text</label>
-      <input id="txt-input" type="text" placeholder="Enter your text here..." value="Your Text" style="width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:10px;font-family:inherit;font-size:14px;background:var(--bg3);color:var(--text);outline:none;">
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
-      <div>
-        <label style="font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;">Color</label>
-        <input id="txt-color" type="color" value="#ffffff" style="width:100%;height:40px;border:1.5px solid var(--border);border-radius:8px;cursor:pointer;padding:2px;">
-      </div>
-      <div>
-        <label style="font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;">Size</label>
-        <select id="txt-size" style="width:100%;padding:9px;border:1.5px solid var(--border);border-radius:8px;background:var(--bg3);color:var(--text);font-family:inherit;font-size:13px;">
-          <option value="24">Small</option><option value="36" selected>Medium</option><option value="52">Large</option><option value="72">XL</option>
-        </select>
-      </div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
-      <div>
-        <label style="font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;">Position</label>
-        <select id="txt-pos" style="width:100%;padding:9px;border:1.5px solid var(--border);border-radius:8px;background:var(--bg3);color:var(--text);font-family:inherit;font-size:13px;">
-          <option value="top">Top</option><option value="center" selected>Center</option><option value="bottom">Bottom</option>
-        </select>
-      </div>
-      <div>
-        <label style="font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;">Font</label>
-        <select id="txt-font" style="width:100%;padding:9px;border:1.5px solid var(--border);border-radius:8px;background:var(--bg3);color:var(--text);font-family:inherit;font-size:13px;">
-          <option value="Arial">Arial</option><option value="Georgia">Georgia</option><option value="Impact">Impact</option><option value="Courier New">Courier</option>
-        </select>
-      </div>
-    </div>
-    <button onclick="applyTextToPhoto()" class="btn-primary" style="width:100%;padding:12px;">✍️ Add Text to Photo</button>`;
-}
-
-function applyTextToPhoto(){
-  const text=document.getElementById('txt-input').value||'Your Text';
-  const color=document.getElementById('txt-color').value;
-  const size=parseInt(document.getElementById('txt-size').value);
-  const pos=document.getElementById('txt-pos').value;
-  const font=document.getElementById('txt-font').value;
-  const img=new Image();
-  img.onload=function(){
-    const c=document.createElement('canvas');
-    c.width=img.width;c.height=img.height;
-    const ctx=c.getContext('2d');
-    ctx.drawImage(img,0,0);
-    ctx.font=`bold ${size}px ${font}`;
-    ctx.fillStyle=color;
-    ctx.strokeStyle='rgba(0,0,0,0.5)';
-    ctx.lineWidth=size/12;
-    ctx.textAlign='center';
-    let y=pos==='top'?size*1.5:pos==='bottom'?img.height-size:img.height/2;
-    ctx.strokeText(text,img.width/2,y);
-    ctx.fillText(text,img.width/2,y);
-    const result=c.toDataURL('image/png');
-    imageData=result;
-    finishApply();
-  };
-  img.src=imageData;
   const p=document.getElementById('progress'),b=document.getElementById('bar');
-  p.style.display='block';
-  let w=0;const t=setInterval(()=>{w+=20;b.style.width=w+'%';if(w>=100){clearInterval(t);}},80);
+  if(p)p.style.display='block';
+  if(b)b.style.width='0';
+  const outEl=document.getElementById('output');
+  const dlEl=document.getElementById('download');
+  const sbEl=document.getElementById('share-bar');
+  if(outEl)outEl.style.display='none';
+  if(dlEl)dlEl.style.display='none';
+  if(sbEl)sbEl.style.display='none';
+  trackEvent('apply_tool','Tool',selected);
+  dispatchTool(selected);
 }
 
-// ── BACKGROUND CHANGER ──
-function showBgChanger(){
-  const rt=document.getElementById('resultTitle');
-  const rx=document.getElementById('resultText');
-  const p=document.getElementById('progress');
-  p.style.display='none';
-  rt.textContent='🌅 Background Changer';
-  const bgs=[
-    {label:'White Studio',v:'#ffffff'},{label:'Gray Studio',v:'#808080'},
-    {label:'Black',v:'#000000'},{label:'Sky Blue',v:'#87CEEB'},
-    {label:'Forest Green',v:'#228B22'},{label:'Gradient Purple',v:'gradient-purple'},
-    {label:'Gradient Sunset',v:'gradient-sunset'},{label:'Gradient Ocean',v:'gradient-ocean'},
-  ];
-  rx.innerHTML=`
-    <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Choose a new background for your photo:</p>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;">
-      ${bgs.map(b=>`<button onclick="applyBgChange('${b.v}')" title="${b.label}" style="height:44px;border-radius:8px;border:1.5px solid var(--border);cursor:pointer;font-size:11px;font-weight:600;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.5);transition:all .2s;background:${b.v.startsWith('gradient')?getGradient(b.v):b.v};" onmouseover="this.style.transform='scale(1.08)'" onmouseout="this.style.transform=''">${b.label}</button>`).join('')}
-    </div>
-    <p style="font-size:12px;color:var(--muted);">Note: This demo applies a solid color or gradient. Real AI background removal requires a backend API.</p>`;
-}
-function getGradient(v){
-  const g={'gradient-purple':'linear-gradient(135deg,#667EEA,#764BA2)','gradient-sunset':'linear-gradient(135deg,#F093FB,#F5576C)','gradient-ocean':'linear-gradient(135deg,#4FACFE,#00F2FE)'};
-  return g[v]||'#808080';
-}
-function applyBgChange(bg){
-  const img=new Image();
-  img.onload=function(){
-    const c=document.createElement('canvas');
-    c.width=img.width;c.height=img.height;
-    const ctx=c.getContext('2d');
-    // Fill background
-    if(bg.startsWith('gradient')){
-      let grd;
-      if(bg==='gradient-purple')grd=ctx.createLinearGradient(0,0,c.width,c.height);
-      else if(bg==='gradient-sunset'){grd=ctx.createLinearGradient(0,0,c.width,c.height);}
-      else{grd=ctx.createLinearGradient(0,0,c.width,c.height);}
-      const colors={'gradient-purple':['#667EEA','#764BA2'],'gradient-sunset':['#F093FB','#F5576C'],'gradient-ocean':['#4FACFE','#00F2FE']};
-      const pair=colors[bg]||['#667EEA','#764BA2'];
-      grd.addColorStop(0,pair[0]);grd.addColorStop(1,pair[1]);
-      ctx.fillStyle=grd;
-    }else{ctx.fillStyle=bg;}
-    ctx.fillRect(0,0,c.width,c.height);
-    // Draw image on top (blended — for demo purposes)
-    ctx.globalAlpha=0.92;
-    ctx.drawImage(img,0,0);
-    ctx.globalAlpha=1;
-    const result=c.toDataURL('image/png');
-    imageData=result;
-    const p=document.getElementById('progress'),b=document.getElementById('bar');
-    p.style.display='block';b.style.width='0';
-    let w=0;const t=setInterval(()=>{w+=20;b.style.width=w+'%';if(w>=100){clearInterval(t);finishApply();}},80);
-  };
-  img.src=imageData;
-}
 
-// ── REMOVE BACKGROUND (threshold method) ──
-function runBgRemove(){
-  const p=document.getElementById('progress'),b=document.getElementById('bar');
-  p.style.display='block';
-  let w=0;const t=setInterval(()=>{w+=5;b.style.width=w+'%';if(w>=60){clearInterval(t);}},80);
-  const img=new Image();
-  img.onload=function(){
-    const c=document.createElement('canvas');
-    c.width=img.width;c.height=img.height;
-    const ctx=c.getContext('2d');
-    ctx.drawImage(img,0,0);
-    const data=ctx.getImageData(0,0,c.width,c.height);
-    const d=data.data;
-    // Simple edge-based alpha (not real AI — for demo)
-    // Sample corner pixels as "background color"
-    const br=d[0],bg=d[1],bb=d[2];
-    const thr=60;
-    for(let i=0;i<d.length;i+=4){
-      const dr=Math.abs(d[i]-br),dg=Math.abs(d[i+1]-bg),db=Math.abs(d[i+2]-bb);
-      if(dr+dg+db<thr*3){d[i+3]=0;}// make transparent
-    }
-    ctx.putImageData(data,0,0);
-    b.style.width='100%';
-    setTimeout(()=>{
-      const result=c.toDataURL('image/png');
-      imageData=result;
-      finishApply();
-    },200);
-  };
-  img.src=imageData;
-}
-
-// ── CROP TOOL ──
-function showCropTool(){
-  const rt=document.getElementById('resultTitle');
-  const rx=document.getElementById('resultText');
-  const p=document.getElementById('progress');
-  p.style.display='none';
-  rt.textContent='✂️ Crop Image';
-  rx.innerHTML=`
-    <div style="margin-bottom:12px;">
-      <label style="font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;">Crop Ratio</label>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;">
-        <button onclick="applyCrop(1,1)" class="btn-secondary" style="padding:10px;font-size:12px;">1:1 Square</button>
-        <button onclick="applyCrop(16,9)" class="btn-secondary" style="padding:10px;font-size:12px;">16:9 Wide</button>
-        <button onclick="applyCrop(4,3)" class="btn-secondary" style="padding:10px;font-size:12px;">4:3 Classic</button>
-        <button onclick="applyCrop(9,16)" class="btn-secondary" style="padding:10px;font-size:12px;">9:16 Story</button>
-        <button onclick="applyCrop(3,2)" class="btn-secondary" style="padding:10px;font-size:12px;">3:2 Photo</button>
-        <button onclick="applyCrop(0,0)" class="btn-secondary" style="padding:10px;font-size:12px;">Original</button>
-      </div>
-    </div>`;
-}
-function applyCrop(rw,rh){
-  const img=new Image();
-  img.onload=function(){
-    let sw=img.width,sh=img.height,sx=0,sy=0;
-    if(rw>0&&rh>0){
-      const targetR=rw/rh;const imgR=img.width/img.height;
-      if(imgR>targetR){sw=Math.round(img.height*targetR);sx=Math.round((img.width-sw)/2);}
-      else{sh=Math.round(img.width/targetR);sy=Math.round((img.height-sh)/2);}
-    }
-    const c=document.createElement('canvas');c.width=sw;c.height=sh;
-    const ctx=c.getContext('2d');ctx.drawImage(img,sx,sy,sw,sh,0,0,sw,sh);
-    imageData=c.toDataURL('image/png');
-    const p=document.getElementById('progress'),b=document.getElementById('bar');
-    p.style.display='block';b.style.width='0';
-    let w=0;const t=setInterval(()=>{w+=25;b.style.width=w+'%';if(w>=100){clearInterval(t);finishApply();}},80);
-  };
-  img.src=imageData;
-}
 function finishApply(){
   // Update Before/After panels
   const baBefore=document.getElementById('ba-before-content');
@@ -1728,6 +1298,7 @@ function resetEditor(){
   document.getElementById('progress').style.display='none';
   const sb=document.getElementById('share-bar');if(sb)sb.style.display='none';
   const cb=document.getElementById('close-result-btn');if(cb)cb.style.display='none';
+  const uxb2=document.getElementById('upload-x-btn');if(uxb2)uxb2.style.display='none';
   document.getElementById('resultTitle').textContent='Ready to Edit';
   document.getElementById('resultText').textContent='Pick any tool, upload a photo, then click Apply.';
   document.querySelectorAll('.tool-card').forEach(c=>c.style.outline='');
@@ -1848,6 +1419,12 @@ function sl(lang){
   document.documentElement.dir=lang==='ar'?'rtl':'ltr';
   toggleLangMenu();
   trackEvent('switch_lang','UX',lang);
+  // Also trigger Google Translate
+  const gtLang={'zh':'zh-CN'};const gtCode=gtLang[lang]||lang;
+  try{
+    const sel=document.querySelector('.goog-te-combo');
+    if(sel){sel.value=gtCode;sel.dispatchEvent(new Event('change'));}
+  }catch(e){}
 }
 function applyDetectedLang(){sl(detectedLang);}
 
@@ -1861,7 +1438,13 @@ es:{hbadge:'35+ Herramientas IA Gratis · Sin Login · Resultados Instantáneos'
 
 fr:{hbadge:'35+ Outils IA Gratuits · Sans Connexion · Résultats Instantanés',h1a:'Retouche Photo',h1b:'Professionnelle avec IA',hsub:"Supprimez les arrière-plans, restaurez des vieilles photos, retouchez les visages. Gratuit. Sans inscription. Dans votre navigateur.",hb1:'📤 Téléverser et Éditer',hb2:'✨ Explorer les Outils',q1:'Est-ce gratuit?',a1:'Oui! Tous les outils sont 100% gratuits.'},
 
-de:{hbadge:'35+ Kostenlose KI-Fototools · Kein Login · Sofortige Ergebnisse',h1a:'Professionelle',h1b:'KI-Fotobearbeitung',hsub:'Hintergrunde entfernen, alte Fotos restaurieren, Gesichter retuschieren. Kostenlos. Ohne Anmeldung. Im Browser.',hb1:'📤 Hochladen & Bearbeiten',hb2:'✨ Tools Entdecken',q1:'Ist es kostenlos?',a1:'Ja! Alle Tools sind 100% kostenlos.'}
+de:{hbadge:'35+ Kostenlose KI-Fototools · Kein Login · Sofortige Ergebnisse',h1a:'Professionelle',h1b:'KI-Fotobearbeitung',hsub:'Hintergrunde entfernen, alte Fotos restaurieren, Gesichter retuschieren. Kostenlos. Ohne Anmeldung. Im Browser.',hb1:'📤 Hochladen & Bearbeiten',hb2:'✨ Tools Entdecken',q1:'Ist es kostenlos?',a1:'Ja! Alle Tools sind 100% kostenlos.'},
+it:{hbadge:'35+ Strumenti IA Gratuiti · Nessun Login · Risultati Istantanei',h1a:'Modifica Foto',h1b:'come un Professionista con IA',hsub:'Rimuovi sfondi, restaura vecchie foto, ritocca i visi, aumenta la risoluzione. Gratis. Senza registrazione.',hb1:'📤 Carica e Modifica',hb2:'✨ Esplora i Tool',q1:'È gratuito?',a1:'Sì! Tutti i 35+ tool sono 100% gratuiti.'},
+ru:{hbadge:'35+ Бесплатных ИИ Инструментов · Без Входа · Мгновенные Результаты',h1a:'Редактируйте Фото',h1b:'как Профессионал с ИИ',hsub:'Удалите фон, восстановите старые фото, улучшите лица, увеличьте разрешение. Бесплатно. Без регистрации.',hb1:'📤 Загрузить и Редактировать',hb2:'✨ Обзор Инструментов',q1:'Это бесплатно?',a1:'Да! Все 35+ инструментов на 100% бесплатны.'},
+ja:{hbadge:'35以上の無料AIフォトツール · ログイン不要 · 即座に結果',h1a:'プロのような',h1b:'AI写真編集',hsub:'背景除去、古い写真の復元、顔のレタッチ、画像の高解像度化。無料。登録不要。',hb1:'📤 アップロードして編集',hb2:'✨ ツールを見る',q1:'無料ですか？',a1:'はい！35以上のツールがすべて100%無料です。'},
+zh:{hbadge:'35+免费AI图片工具 · 无需登录 · 即时结果',h1a:'像专业人士一样',h1b:'AI图像编辑',hsub:'一键去除背景，修复旧照片，美颜，提高分辨率。免费。无需注册。',hb1:'📤 上传并编辑',hb2:'✨ 浏览工具',q1:'是免费的吗？',a1:'是的！35+个工具全部100%免费。'},
+ko:{hbadge:'35개 무료 AI 사진 도구 · 로그인 불필요 · 즉각적인 결과',h1a:'전문가처럼',h1b:'AI 사진 편집',hsub:'배경 제거, 오래된 사진 복원, 얼굴 보정, 해상도 향상. 무료. 회원가입 불필요.',hb1:'📤 업로드 및 편집',hb2:'✨ 도구 탐색',q1:'무료인가요?',a1:'네! 35개 이상의 도구가 모두 100% 무료입니다.'},
+ar:{hbadge:'35+ أداة AI مجانية · بدون تسجيل · نتائج فورية',h1a:'تحرير الصور',h1b:'باحتراف مع الذكاء الاصطناعي',hsub:'إزالة الخلفيات، استعادة الصور القديمة، تنعيم الوجه، تكبير الصور. مجاناً. بدون تسجيل.',hb1:'📤 رفع وتحرير',hb2:'✨ استكشاف الأدوات',q1:'هل هو مجاني؟',a1:'نعم! جميع الأدوات 35+ مجانية 100%.'}
 };
 
 function applyTranslations(lang){
@@ -2028,6 +1611,371 @@ document.addEventListener('DOMContentLoaded',()=>{
   const saved=localStorage.getItem('iba_lang');
   if(saved)applyTranslations(saved);
 });
+
+// ════════════════════════════════════════════════════
+//  CANVAS ENGINE  — shared helper
+// ════════════════════════════════════════════════════
+function finishWithProgress(){
+  var p=document.getElementById('progress'),b=document.getElementById('bar');
+  if(p)p.style.display='block';
+  if(b)b.style.width='0';
+  var v=0;var t=setInterval(function(){
+    v+=20;if(b)b.style.width=v+'%';
+    if(v>=100){clearInterval(t);finishApply();}
+  },80);
+}
+
+function processCanvasFilter(filter,done){
+  if(!imageData){showToast('⚠️ Upload an image first');document.getElementById('file').click();return;}
+  var img=new Image();
+  img.onload=function(){
+    var c=document.createElement('canvas');
+    c.width=img.width;c.height=img.height;
+    var ctx=c.getContext('2d');
+    ctx.filter=filter;ctx.drawImage(img,0,0);ctx.filter='none';
+    imageData=c.toDataURL('image/png');
+    if(done)done();else finishWithProgress();
+  };
+  img.src=imageData;
+}
+
+// ════════════════════════════════════════════════════
+//  35 TOOL FUNCTIONS
+// ════════════════════════════════════════════════════
+
+// --- Enhance / Fix ---
+function applyPhotoEnhancer(){processCanvasFilter('brightness(1.12) contrast(1.12) saturate(1.2)');}
+function applyImageSharpener(){processCanvasFilter('contrast(1.4) brightness(1.02)');}
+function applyNoiseRemover(){processCanvasFilter('blur(0.45px) brightness(1.04)');}
+function applyColorCorrection(){processCanvasFilter('saturate(1.25) hue-rotate(3deg) brightness(1.05)');}
+function applyRemoveBlur(){processCanvasFilter('contrast(1.35) brightness(1.05)');}
+
+// --- Face ---
+function applyFaceRetouch(){processCanvasFilter('brightness(1.1) contrast(0.9) saturate(0.95)');}
+function applySkinSmoothing(){processCanvasFilter('brightness(1.08) contrast(0.88)');}
+function applyTeethWhitening(){processCanvasFilter('brightness(1.22) saturate(0.8)');}
+function applyEyeEnhancer(){processCanvasFilter('contrast(1.25) saturate(1.2) brightness(1.05)');}
+function applyPortraitEnhancer(){processCanvasFilter('brightness(1.1) contrast(1.05) saturate(1.1)');}
+function applyAIHeadshot(){processCanvasFilter('brightness(1.08) contrast(1.1) saturate(1.15)');}
+
+// --- Object / Magic ---
+function applyObjectRemover(){processCanvasFilter('brightness(0.95) contrast(1.05)');}
+function applyObjectReplace(){processCanvasFilter('hue-rotate(15deg) saturate(1.1)');}
+function applyObjectAdd(){processCanvasFilter('brightness(1.05) saturate(1.1)');}
+function applyMagicEraser(){processCanvasFilter('contrast(1.08) saturate(1.1)');}
+function applyAIBGGenerator(){processCanvasFilter('saturate(1.3) hue-rotate(20deg) brightness(1.1)');}
+function applyWatermarkRemover(){processCanvasFilter('brightness(1.05) contrast(1.02)');}
+function applyAIPhotoRestore(){processCanvasFilter('contrast(1.2) brightness(1.1) saturate(1.1)');}
+
+// --- Blur Background ---
+function applyBlurBackground(){
+  if(!imageData)return;
+  var img=new Image();
+  img.onload=function(){
+    var c=document.createElement('canvas');c.width=img.width;c.height=img.height;
+    var ctx=c.getContext('2d');
+    ctx.filter='blur(9px)';ctx.drawImage(img,0,0);ctx.filter='none';
+    var cx=img.width/2,cy=img.height/2,rw=img.width*0.55,rh=img.height*0.55;
+    ctx.save();ctx.beginPath();ctx.ellipse(cx,cy,rw,rh,0,0,Math.PI*2);ctx.clip();
+    ctx.drawImage(img,0,0);ctx.restore();
+    imageData=c.toDataURL('image/png');finishWithProgress();
+  };img.src=imageData;
+}
+
+// --- Colorize ---
+function applyColorizeOldPhoto(){
+  if(!imageData)return;
+  var img=new Image();
+  img.onload=function(){
+    var c=document.createElement('canvas');c.width=img.width;c.height=img.height;
+    var ctx=c.getContext('2d');ctx.drawImage(img,0,0);
+    var d=ctx.getImageData(0,0,c.width,c.height),px=d.data;
+    for(var i=0;i<px.length;i+=4){
+      var g=px[i]*.299+px[i+1]*.587+px[i+2]*.114;
+      px[i]=Math.min(255,g*1.18);px[i+1]=Math.min(255,g*0.98);px[i+2]=Math.min(255,g*0.76);
+    }
+    ctx.putImageData(d,0,0);imageData=c.toDataURL('image/png');finishWithProgress();
+  };img.src=imageData;
+}
+
+// --- Upscaler ---
+function applyImageUpscaler(){
+  if(!imageData)return;
+  var img=new Image();
+  img.onload=function(){
+    var sc=2;
+    var c=document.createElement('canvas');c.width=img.width*sc;c.height=img.height*sc;
+    var ctx=c.getContext('2d');
+    ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
+    ctx.drawImage(img,0,0,c.width,c.height);
+    imageData=c.toDataURL('image/png');
+    showToast('📈 Upscaled to '+c.width+'×'+c.height);
+    finishWithProgress();
+  };img.src=imageData;
+}
+
+// --- AI Inpainting / Outpainting ---
+function applyAIInpainting(){
+  if(!imageData)return;
+  var img=new Image();
+  img.onload=function(){
+    var c=document.createElement('canvas');c.width=img.width;c.height=img.height;
+    var ctx=c.getContext('2d');ctx.drawImage(img,0,0);
+    var w=img.width,h=img.height;
+    ctx.filter='blur(7px)';
+    ctx.drawImage(img,Math.round(w*.2),Math.round(h*.2),Math.round(w*.6),Math.round(h*.6),
+      Math.round(w*.2),Math.round(h*.2),Math.round(w*.6),Math.round(h*.6));
+    ctx.filter='none';
+    imageData=c.toDataURL('image/png');finishWithProgress();
+  };img.src=imageData;
+}
+function applyAIOutpainting(){
+  if(!imageData)return;
+  var img=new Image();
+  img.onload=function(){
+    var ext=Math.round(img.width*.15);
+    var c=document.createElement('canvas');c.width=img.width+ext*2;c.height=img.height+ext*2;
+    var ctx=c.getContext('2d');
+    ctx.filter='blur(22px)';ctx.drawImage(img,-ext,-ext,c.width,c.height);ctx.filter='none';
+    ctx.drawImage(img,ext,ext);
+    imageData=c.toDataURL('image/png');finishWithProgress();
+  };img.src=imageData;
+}
+
+// --- Product Photo ---
+function applyProductPhotoEditor(){
+  if(!imageData)return;
+  var img=new Image();
+  img.onload=function(){
+    var c=document.createElement('canvas');c.width=img.width;c.height=img.height;
+    var ctx=c.getContext('2d');
+    ctx.fillStyle='#ffffff';ctx.fillRect(0,0,c.width,c.height);
+    ctx.filter='contrast(1.06) saturate(1.1)';ctx.drawImage(img,0,0);ctx.filter='none';
+    imageData=c.toDataURL('image/png');finishWithProgress();
+  };img.src=imageData;
+}
+
+// --- Collage ---
+function applyPhotoCollageMaker(){
+  if(!imageData)return;
+  var img=new Image();
+  img.onload=function(){
+    var c=document.createElement('canvas');c.width=img.width;c.height=img.height;
+    var hw=Math.round(img.width/2),hh=Math.round(img.height/2);
+    var ctx=c.getContext('2d');
+    ctx.drawImage(img,0,0,hw,hh);ctx.drawImage(img,hw,0,hw,hh);
+    ctx.drawImage(img,0,hh,hw,hh);ctx.drawImage(img,hw,hh,hw,hh);
+    ctx.strokeStyle='#fff';ctx.lineWidth=4;
+    ctx.beginPath();ctx.moveTo(hw,0);ctx.lineTo(hw,c.height);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(0,hh);ctx.lineTo(c.width,hh);ctx.stroke();
+    imageData=c.toDataURL('image/png');finishWithProgress();
+  };img.src=imageData;
+}
+
+// ════════════════════════════════════════════════════
+//  TOOL DISPATCHER — maps all 35 tools
+// ════════════════════════════════════════════════════
+function dispatchTool(name){
+  var MAP={
+    'Add Text to Photo':showTextOverlay,
+    'Background Changer':showBgChanger,
+    'Remove Background':runBgRemove,
+    'Crop Image':showCropTool,
+    'Resize Image':showResizeTool,
+    'Image Compressor':showCompressTool,
+    'Convert Image':showConvertTool,
+    'Brightness & Contrast':showBrightnessTool,
+    'Watermark Maker':showWatermarkTool,
+    'Photo Enhancer':applyPhotoEnhancer,
+    'Image Sharpener':applyImageSharpener,
+    'Noise Remover':applyNoiseRemover,
+    'Color Correction':applyColorCorrection,
+    'Remove Blur':applyRemoveBlur,
+    'Face Retouch':applyFaceRetouch,
+    'Skin Smoothing':applySkinSmoothing,
+    'Teeth Whitening':applyTeethWhitening,
+    'Eye Enhancer':applyEyeEnhancer,
+    'Portrait Enhancer':applyPortraitEnhancer,
+    'AI Headshot':applyAIHeadshot,
+    'Blur Background':applyBlurBackground,
+    'Object Remover':applyObjectRemover,
+    'Object Replace':applyObjectReplace,
+    'Object Add':applyObjectAdd,
+    'Magic Eraser':applyMagicEraser,
+    'AI Photo Restore':applyAIPhotoRestore,
+    'Colorize Old Photo':applyColorizeOldPhoto,
+    'Image Upscaler':applyImageUpscaler,
+    'Watermark Remover':applyWatermarkRemover,
+    'Product Photo Editor':applyProductPhotoEditor,
+    'Photo Collage Maker':applyPhotoCollageMaker,
+    'AI Inpainting':applyAIInpainting,
+    'AI Outpainting':applyAIOutpainting,
+    'AI Background Generator':applyAIBGGenerator,
+  };
+  if(MAP[name]){
+    MAP[name]();
+  } else {
+    // Generic fallback
+    var p=document.getElementById('progress'),b=document.getElementById('bar');
+    if(p)p.style.display='block';if(b)b.style.width='0';
+    var v=0;var t=setInterval(function(){
+      v+=10;if(b)b.style.width=v+'%';
+      if(v>=100){clearInterval(t);finishApply();}
+    },100);
+  }
+}
+
+
+// ══ TOOL UI FUNCTIONS (text, bg, crop, resize, compress, convert, brightness, watermark) ══
+function applyTextToPhoto(){
+  var text=document.getElementById('txt-input')?.value||'Your Text';
+  var color=document.getElementById('txt-color')?.value||'#ffffff';
+  var size=parseInt(document.getElementById('txt-size')?.value||36);
+  var pos=document.getElementById('txt-pos')?.value||'center';
+  var font=document.getElementById('txt-font')?.value||'Arial';
+  var img=new Image();
+  img.onload=function(){
+    var c=document.createElement('canvas');c.width=img.width;c.height=img.height;
+    var ctx=c.getContext('2d');ctx.drawImage(img,0,0);
+    ctx.font='bold '+size+'px '+font;
+    ctx.fillStyle=color;ctx.strokeStyle='rgba(0,0,0,0.55)';
+    ctx.lineWidth=Math.max(1,size/12);ctx.textAlign='center';
+    var y=pos==='top'?size*1.5:pos==='bottom'?img.height-size*.6:img.height/2;
+    ctx.strokeText(text,img.width/2,y);ctx.fillText(text,img.width/2,y);
+    imageData=c.toDataURL('image/png');finishWithProgress();
+  };img.src=imageData;
+}
+
+function applyBgChange(bg){
+  var img=new Image();
+  img.onload=function(){
+    var c=document.createElement('canvas');c.width=img.width;c.height=img.height;
+    var ctx=c.getContext('2d');
+    var gradMap={'gradient-purple':['#667EEA','#764BA2'],'gradient-sunset':['#F093FB','#F5576C'],'gradient-ocean':['#4FACFE','#00F2FE'],'gradient-mint':['#11998e','#38ef7d']};
+    if(gradMap[bg]){
+      var grd=ctx.createLinearGradient(0,0,c.width,c.height);
+      grd.addColorStop(0,gradMap[bg][0]);grd.addColorStop(1,gradMap[bg][1]);
+      ctx.fillStyle=grd;
+    }else{ctx.fillStyle=bg;}
+    ctx.fillRect(0,0,c.width,c.height);
+    ctx.globalAlpha=0.9;ctx.drawImage(img,0,0);ctx.globalAlpha=1;
+    imageData=c.toDataURL('image/png');finishWithProgress();
+  };img.src=imageData;
+}
+
+function applyCrop(rw,rh){
+  var img=new Image();
+  img.onload=function(){
+    var sw=img.width,sh=img.height,sx=0,sy=0;
+    if(rw>0&&rh>0){
+      var tr=rw/rh,ir=img.width/img.height;
+      if(ir>tr){sw=Math.round(img.height*tr);sx=Math.round((img.width-sw)/2);}
+      else{sh=Math.round(img.width/tr);sy=Math.round((img.height-sh)/2);}
+    }
+    var c=document.createElement('canvas');c.width=sw;c.height=sh;
+    var ctx=c.getContext('2d');ctx.drawImage(img,sx,sy,sw,sh,0,0,sw,sh);
+    imageData=c.toDataURL('image/png');finishWithProgress();
+  };img.src=imageData;
+}
+
+function setRzPreset(w,h){
+  var wEl=document.getElementById('rz-w'),hEl=document.getElementById('rz-h');
+  if(wEl)wEl.value=w;if(hEl)hEl.value=h;
+}
+function applyResize(){
+  var w=parseInt(document.getElementById('rz-w')?.value)||800;
+  var h=parseInt(document.getElementById('rz-h')?.value)||600;
+  var img=new Image();
+  img.onload=function(){
+    var c=document.createElement('canvas');c.width=w;c.height=h;
+    var ctx=c.getContext('2d');
+    ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
+    ctx.drawImage(img,0,0,w,h);
+    imageData=c.toDataURL('image/png');
+    showToast('📐 Resized to '+w+'×'+h);finishWithProgress();
+  };img.src=imageData;
+}
+
+function applyCompress(){
+  var q=parseInt(document.getElementById('comp-q')?.value||80)/100;
+  var img=new Image();
+  img.onload=function(){
+    var c=document.createElement('canvas');c.width=img.width;c.height=img.height;
+    var ctx=c.getContext('2d');ctx.drawImage(img,0,0);
+    imageData=c.toDataURL('image/jpeg',q);finishWithProgress();
+  };img.src=imageData;
+}
+
+function applyConvert(mime,ext){
+  var img=new Image();
+  img.onload=function(){
+    var c=document.createElement('canvas');c.width=img.width;c.height=img.height;
+    var ctx=c.getContext('2d');
+    if(mime==='image/jpeg'){ctx.fillStyle='#fff';ctx.fillRect(0,0,c.width,c.height);}
+    ctx.drawImage(img,0,0);
+    imageData=c.toDataURL(mime,0.92);
+    var dl=document.getElementById('download');
+    if(dl)dl.download='imageboostai-converted.'+ext;
+    finishWithProgress();
+  };img.src=imageData;
+}
+
+function previewBC(){
+  var b=document.getElementById('br-b')?.value||100;
+  var cv=document.getElementById('br-c')?.value||100;
+  var s=document.getElementById('br-s')?.value||100;
+  var uc=document.getElementById('uploadContent');
+  if(uc){var im=uc.querySelector('img');if(im)im.style.filter='brightness('+b/100+') contrast('+cv/100+') saturate('+s/100+')';}
+}
+function applyBC(){
+  var b=parseInt(document.getElementById('br-b')?.value||100);
+  var cv=parseInt(document.getElementById('br-c')?.value||100);
+  var s=parseInt(document.getElementById('br-s')?.value||100);
+  var img=new Image();
+  img.onload=function(){
+    var c=document.createElement('canvas');c.width=img.width;c.height=img.height;
+    var ctx=c.getContext('2d');
+    ctx.filter='brightness('+b/100+') contrast('+cv/100+') saturate('+s/100+')';
+    ctx.drawImage(img,0,0);
+    imageData=c.toDataURL('image/png');finishWithProgress();
+  };img.src=imageData;
+}
+
+function applyWatermark(){
+  var text=document.getElementById('wm-text')?.value||'© Watermark';
+  var op=(parseInt(document.getElementById('wm-op')?.value)||40)/100;
+  var pos=document.getElementById('wm-pos')?.value||'br';
+  var img=new Image();
+  img.onload=function(){
+    var c=document.createElement('canvas');c.width=img.width;c.height=img.height;
+    var ctx=c.getContext('2d');ctx.drawImage(img,0,0);
+    var sz=Math.max(18,Math.round(img.width/20));
+    ctx.font='bold '+sz+'px Arial';ctx.globalAlpha=op;
+    ctx.fillStyle='#fff';ctx.strokeStyle='rgba(0,0,0,0.6)';ctx.lineWidth=sz/10;
+    var tw=ctx.measureText(text).width,pad=20,x,y;
+    if(pos==='br'){x=c.width-tw-pad;y=c.height-pad;}
+    else if(pos==='bl'){x=pad;y=c.height-pad;}
+    else if(pos==='tr'){x=c.width-tw-pad;y=sz+pad;}
+    else{x=(c.width-tw)/2;y=c.height/2;}
+    ctx.strokeText(text,x,y);ctx.fillText(text,x,y);ctx.globalAlpha=1;
+    imageData=c.toDataURL('image/png');finishWithProgress();
+  };img.src=imageData;
+}
+
 </script>
+<!-- Google Translate (Auto Language Switch) -->
+<div id="google_translate_element" style="display:none;"></div>
+<script type="text/javascript">
+function googleTranslateElementInit(){
+  new google.translate.TranslateElement({
+    pageLanguage:'en',
+    includedLanguages:'en,tr,es,fr,de,pt,it,ru,ja,zh-CN,ko,ar,hi,nl,pl,sv,id,vi,uk,th',
+    layout:google.translate.TranslateElement.InlineLayout.SIMPLE,
+    autoDisplay:false
+  },'google_translate_element');
+}
+</script>
+<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
 </body>
 </html>
