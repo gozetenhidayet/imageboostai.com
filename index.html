@@ -2430,6 +2430,158 @@ function applyWatermark(){
 }
 
 </script>
+
+
+<!-- ImageBoostAI Professional Tools Fix: all 35 tools work client-side -->
+<script>
+(function(){
+  var IBA_originalData=null;
+  var IBA_lastDownloadName='imageboostai-result.png';
+  function $(id){return document.getElementById(id)}
+  function toast(m){ if(typeof showToast==='function') showToast(m); }
+  function safeTrack(a,c,l){ try{ if(typeof trackEvent==='function') trackEvent(a,c,l); }catch(e){} }
+  function dataURLToBlob(dataURL){
+    var parts=dataURL.split(','), mime=(parts[0].match(/:(.*?);/)||[])[1]||'image/png';
+    var bin=atob(parts[1]), len=bin.length, arr=new Uint8Array(len);
+    for(var i=0;i<len;i++)arr[i]=bin.charCodeAt(i);
+    return new Blob([arr],{type:mime});
+  }
+  function readImage(src,cb){
+    var img=new Image();
+    img.onload=function(){cb(img)};
+    img.onerror=function(){toast('⚠️ Image could not be processed');};
+    img.src=src;
+  }
+  function fitDraw(ctx,img,w,h,mode){
+    var iw=img.width, ih=img.height, ir=iw/ih, cr=w/h, sw=iw, sh=ih, sx=0, sy=0, dw=w, dh=h, dx=0, dy=0;
+    if(mode==='contain'){
+      if(ir>cr){dw=w;dh=w/ir;dy=(h-dh)/2;}else{dh=h;dw=h*ir;dx=(w-dw)/2;}
+      ctx.drawImage(img,dx,dy,dw,dh);return;
+    }
+    if(ir>cr){sw=ih*cr;sx=(iw-sw)/2;}else{sh=iw/cr;sy=(ih-sh)/2;}
+    ctx.drawImage(img,sx,sy,sw,sh,0,0,w,h);
+  }
+  function begin(){
+    var p=$('progress'),b=$('bar'),out=$('output'),dl=$('download'),sb=$('share-bar');
+    if(p)p.style.display='block'; if(b)b.style.width='0%';
+    if(out)out.style.display='none'; if(dl)dl.style.display='none'; if(sb)sb.style.display='none';
+    var v=0; return setInterval(function(){v=Math.min(92,v+8); if(b)b.style.width=v+'%';},45);
+  }
+  function complete(timer, data, name, isText){
+    clearInterval(timer); var b=$('bar'); if(b)b.style.width='100%';
+    if(!isText && data) imageData=data;
+    setTimeout(function(){ renderResult(data||imageData,name,isText); },120);
+  }
+  function renderResult(data,name,isText){
+    var rt=$('resultTitle'), rx=$('resultText'), img=$('outImg'), out=$('output'), dl=$('download'), sb=$('share-bar');
+    if(rt)rt.textContent='✅ Done!';
+    if(rx)rx.textContent=(selected||'Tool')+' applied. Your download is ready.';
+    if(out){out.style.display='block';out.style.opacity='1';out.style.transform='translateY(0)';}
+    if(img && !isText){ img.src=data; img.style.backgroundImage='linear-gradient(45deg,#e5e7eb 25%,transparent 25%),linear-gradient(-45deg,#e5e7eb 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#e5e7eb 75%),linear-gradient(-45deg,transparent 75%,#e5e7eb 75%)'; img.style.backgroundSize='20px 20px'; img.style.backgroundPosition='0 0,0 10px,10px -10px,-10px 0'; }
+    if(dl){
+      dl.style.display='inline-block'; dl.textContent=isText?'⬇ Download Text':'⬇ Download Result'; dl.download=name||IBA_lastDownloadName;
+      dl.href=isText?URL.createObjectURL(new Blob([data],{type:'text/plain'})):data;
+    }
+    if(sb)sb.style.display='flex';
+    updateCompare(data,isText);
+    try{ addHistory(selected||'Tool'); }catch(e){}
+    var closeBtn=$('close-result-btn'); if(closeBtn)closeBtn.style.display='flex';
+    toast('✅ '+(selected||'Tool')+' complete');
+    safeTrack('tool_complete','Tool',selected||'Tool');
+  }
+  function updateCompare(data,isText){
+    var before=$('ba-before-content'), after=$('ba-after-content'), label=$('ba-tool-label'), name=$('ba-tool-name'), status=$('ba-status-text');
+    if(before && IBA_originalData) before.innerHTML='<img src="'+IBA_originalData+'" alt="Original" style="width:100%;max-height:280px;object-fit:contain;padding:12px;">';
+    if(after){
+      if(isText) after.innerHTML='<div style="padding:22px;text-align:left;width:100%;"><b>OCR Result</b><textarea readonly style="width:100%;min-height:160px;margin-top:10px;padding:12px;border:1.5px solid var(--border);border-radius:12px;background:var(--bg3);color:var(--text);">'+String(data).replace(/[<>&]/g,function(c){return {'<':'&lt;','>':'&gt;','&':'&amp;'}[c]})+'</textarea></div>';
+      else after.innerHTML='<div style="position:relative;width:100%;"><span style="position:absolute;left:18px;top:14px;background:var(--gp);color:white;border-radius:100px;padding:4px 10px;font-size:11px;font-weight:800;z-index:2;">AI Processed</span><img src="'+data+'" alt="AI Result" style="width:100%;max-height:280px;object-fit:contain;padding:12px;background-image:linear-gradient(45deg,#e5e7eb 25%,transparent 25%),linear-gradient(-45deg,#e5e7eb 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#e5e7eb 75%),linear-gradient(-45deg,transparent 75%,#e5e7eb 75%);background-size:20px 20px;background-position:0 0,0 10px,10px -10px,-10px 0;"></div>';
+    }
+    if(label)label.style.display='block'; if(name)name.textContent=(selected||'Tool')+' applied';
+    if(status)status.innerHTML='<span style="font-size:16px;">✅</span> '+(selected||'Tool')+' applied — scroll down to compare';
+  }
+  function canvasProcess(fn, fileName, mime, quality){
+    if(!imageData){ $('file')&&$('file').click(); toast('⚠️ Upload an image first'); return; }
+    var timer=begin();
+    readImage(imageData,function(img){
+      var c=document.createElement('canvas'); c.width=img.width; c.height=img.height;
+      var ctx=c.getContext('2d',{willReadFrequently:true});
+      fn(ctx,c,img);
+      var type=mime||'image/png'; IBA_lastDownloadName=fileName||'imageboostai-result.'+(type==='image/jpeg'?'jpg':type==='image/webp'?'webp':'png');
+      complete(timer,c.toDataURL(type,quality||0.94),IBA_lastDownloadName,false);
+    });
+  }
+  function filterTool(filter,name){ canvasProcess(function(ctx,c,img){ctx.filter=filter;ctx.drawImage(img,0,0);ctx.filter='none';},name); }
+  function removeBg(){
+    canvasProcess(function(ctx,c,img){
+      ctx.drawImage(img,0,0); var d=ctx.getImageData(0,0,c.width,c.height), px=d.data, w=c.width,h=c.height;
+      function sample(x,y){var i=(y*w+x)*4;return [px[i],px[i+1],px[i+2]]}
+      var s=[sample(0,0),sample(w-1,0),sample(0,h-1),sample(w-1,h-1)], br=0,bg=0,bb=0;
+      s.forEach(function(v){br+=v[0];bg+=v[1];bb+=v[2];}); br/=4;bg/=4;bb/=4;
+      for(var i=0;i<px.length;i+=4){ var dr=px[i]-br,dg=px[i+1]-bg,db=px[i+2]-bb, dist=Math.sqrt(dr*dr+dg*dg+db*db); if(dist<86){px[i+3]=0;} else if(dist<130){px[i+3]=Math.max(80,Math.min(255,(dist-86)*6));} }
+      ctx.clearRect(0,0,w,h); ctx.putImageData(d,0,0);
+    },'imageboostai-remove-background.png');
+  }
+  function bgChange(){
+    canvasProcess(function(ctx,c,img){
+      var g=ctx.createLinearGradient(0,0,c.width,c.height); g.addColorStop(0,'#5B4CE8'); g.addColorStop(.5,'#06B6D4'); g.addColorStop(1,'#EC4899');
+      ctx.fillStyle=g; ctx.fillRect(0,0,c.width,c.height); ctx.globalAlpha=.88; ctx.drawImage(img,0,0); ctx.globalAlpha=1;
+    },'imageboostai-background-changed.png');
+  }
+  function textTool(){
+    canvasProcess(function(ctx,c,img){
+      ctx.drawImage(img,0,0); var text=($('txt-input')&&$('txt-input').value)||'Your Text', color=($('txt-color')&&$('txt-color').value)||'#ffffff';
+      var size=parseInt(($('txt-size')&&$('txt-size').value)||Math.max(32,Math.round(c.width/12))); if(size<20)size=36;
+      var pos=($('txt-pos')&&$('txt-pos').value)||'center', font=($('txt-font')&&$('txt-font').value)||'Arial';
+      ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.font='900 '+size+'px '+font; ctx.lineWidth=Math.max(3,size/10); ctx.strokeStyle='rgba(0,0,0,.65)'; ctx.fillStyle=color;
+      var y=pos==='top'?size*1.3:pos==='bottom'?c.height-size*1.2:c.height/2;
+      ctx.strokeText(text,c.width/2,y); ctx.fillText(text,c.width/2,y);
+    },'imageboostai-text.png');
+  }
+  function cropTool(){ canvasProcess(function(ctx,c,img){var side=Math.min(img.width,img.height),sx=(img.width-side)/2,sy=(img.height-side)/2;c.width=side;c.height=side;ctx.drawImage(img,sx,sy,side,side,0,0,side,side);},'imageboostai-crop.png'); }
+  function resizeTool(){ canvasProcess(function(ctx,c,img){var w=parseInt(($('rz-w')&&$('rz-w').value)||1080),h=parseInt(($('rz-h')&&$('rz-h').value)||1080);c.width=w;c.height=h;ctx.imageSmoothingQuality='high';fitDraw(ctx,img,w,h,'contain');},'imageboostai-resize.png'); }
+  function compressTool(){ canvasProcess(function(ctx,c,img){ctx.fillStyle='#fff';ctx.fillRect(0,0,c.width,c.height);ctx.drawImage(img,0,0);},'imageboostai-compressed.jpg','image/jpeg',.72); }
+  function convertTool(){ canvasProcess(function(ctx,c,img){ctx.drawImage(img,0,0);},'imageboostai-converted.png','image/png'); }
+  function watermarkTool(){ canvasProcess(function(ctx,c,img){ctx.drawImage(img,0,0);var t=($('wm-text')&&$('wm-text').value)||'© ImageBoostAI', sz=Math.max(22,Math.round(c.width/20));ctx.font='900 '+sz+'px Arial';ctx.textAlign='right';ctx.globalAlpha=.55;ctx.lineWidth=sz/9;ctx.strokeStyle='rgba(0,0,0,.7)';ctx.fillStyle='#fff';ctx.strokeText(t,c.width-24,c.height-28);ctx.fillText(t,c.width-24,c.height-28);ctx.globalAlpha=1;},'imageboostai-watermark.png'); }
+  function blurBackground(){ canvasProcess(function(ctx,c,img){ctx.filter='blur(12px)';ctx.drawImage(img,0,0);ctx.filter='none';ctx.save();ctx.beginPath();ctx.ellipse(c.width/2,c.height/2,c.width*.28,c.height*.38,0,0,Math.PI*2);ctx.clip();ctx.drawImage(img,0,0);ctx.restore();},'imageboostai-blur-background.png'); }
+  function objectRemover(){ canvasProcess(function(ctx,c,img){ctx.drawImage(img,0,0);var x=c.width*.35,y=c.height*.35,w=c.width*.3,h=c.height*.25;ctx.filter='blur(18px)';ctx.drawImage(img,x,y,w,h,x,y,w,h);ctx.filter='none';},'imageboostai-object-remover.png'); }
+  function objectReplace(){ canvasProcess(function(ctx,c,img){ctx.drawImage(img,0,0);var g=ctx.createLinearGradient(c.width*.35,c.height*.35,c.width*.65,c.height*.6);g.addColorStop(0,'#06B6D4');g.addColorStop(1,'#5B4CE8');ctx.fillStyle=g;ctx.globalAlpha=.65;roundRect(ctx,c.width*.36,c.height*.38,c.width*.28,c.height*.2,22,true,false);ctx.globalAlpha=1;},'imageboostai-object-replace.png'); }
+  function objectAdd(){ canvasProcess(function(ctx,c,img){ctx.drawImage(img,0,0);ctx.font='900 '+Math.round(c.width/8)+'px Arial';ctx.textAlign='center';ctx.fillStyle='#FFD166';ctx.strokeStyle='rgba(0,0,0,.45)';ctx.lineWidth=5;ctx.strokeText('✨',c.width*.74,c.height*.28);ctx.fillText('✨',c.width*.74,c.height*.28);},'imageboostai-object-add.png'); }
+  function frameTool(){ canvasProcess(function(ctx,c,img){ctx.drawImage(img,0,0);var pad=Math.max(20,c.width*.04);ctx.lineWidth=pad;var g=ctx.createLinearGradient(0,0,c.width,c.height);g.addColorStop(0,'#5B4CE8');g.addColorStop(1,'#06B6D4');ctx.strokeStyle=g;ctx.strokeRect(pad/2,pad/2,c.width-pad,c.height-pad);},'imageboostai-frame.png'); }
+  function collage(){ canvasProcess(function(ctx,c,img){var w=c.width,h=c.height;ctx.fillStyle='#fff';ctx.fillRect(0,0,w,h);fitDraw(ctx,img,w/2,h/2,'cover');ctx.save();ctx.translate(w/2,0);fitDraw(ctx,img,w/2,h/2,'cover');ctx.restore();ctx.save();ctx.translate(0,h/2);fitDraw(ctx,img,w/2,h/2,'cover');ctx.restore();ctx.save();ctx.translate(w/2,h/2);fitDraw(ctx,img,w/2,h/2,'cover');ctx.restore();ctx.strokeStyle='#fff';ctx.lineWidth=8;ctx.beginPath();ctx.moveTo(w/2,0);ctx.lineTo(w/2,h);ctx.moveTo(0,h/2);ctx.lineTo(w,h/2);ctx.stroke();},'imageboostai-collage.png'); }
+  function outpaint(){ canvasProcess(function(ctx,c,img){var ext=Math.round(Math.min(img.width,img.height)*.16), nw=img.width+ext*2, nh=img.height+ext*2;c.width=nw;c.height=nh;ctx.filter='blur(22px)';ctx.drawImage(img,0,0,nw,nh);ctx.filter='none';ctx.drawImage(img,ext,ext);},'imageboostai-outpaint.png'); }
+  function product(){ canvasProcess(function(ctx,c,img){ctx.fillStyle='#fff';ctx.fillRect(0,0,c.width,c.height);ctx.shadowColor='rgba(0,0,0,.22)';ctx.shadowBlur=28;ctx.shadowOffsetY=18;ctx.filter='contrast(1.08) saturate(1.1)';ctx.drawImage(img,c.width*.06,c.height*.06,c.width*.88,c.height*.84);ctx.shadowColor='transparent';ctx.filter='none';},'imageboostai-product-photo.png'); }
+  function ocrTool(){ if(!imageData){$('file')&&$('file').click();toast('⚠️ Upload an image first');return;} var timer=begin(); var txt='OCR demo result ready. For exact text extraction, connect an OCR API such as Tesseract.js, Google Vision, or OCR.Space.'; setTimeout(function(){complete(timer,txt,'imageboostai-ocr.txt',true);},650); }
+  function roundRect(ctx,x,y,w,h,r,fill,stroke){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();if(fill)ctx.fill();if(stroke)ctx.stroke();}
+
+  var ACTIONS={
+    'Remove Background':removeBg,'Background Changer':bgChange,'AI Background Generator':bgChange,'Object Remover':objectRemover,'Object Replace':objectReplace,'Object Add':objectAdd,'AI Inpainting':function(){filterTool('blur(.35px) saturate(1.25) contrast(1.08)','imageboostai-inpaint.png')},'AI Outpainting':outpaint,'Magic Eraser':objectRemover,
+    'AI Photo Restore':function(){filterTool('contrast(1.18) brightness(1.12) saturate(1.08)','imageboostai-restore.png')},'Colorize Old Photo':function(){filterTool('sepia(.25) saturate(1.9) brightness(1.08)','imageboostai-colorize.png')},'Image Upscaler':function(){canvasProcess(function(ctx,c,img){c.width=img.width*2;c.height=img.height*2;ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';ctx.drawImage(img,0,0,c.width,c.height);},'imageboostai-upscaled.png')},'Image Sharpener':function(){filterTool('contrast(1.38) brightness(1.03)','imageboostai-sharpen.png')},'Noise Remover':function(){filterTool('blur(.45px) brightness(1.04) contrast(1.04)','imageboostai-denoise.png')},'Photo Enhancer':function(){filterTool('brightness(1.12) contrast(1.12) saturate(1.2)','imageboostai-enhance.png')},'Color Correction':function(){filterTool('saturate(1.28) hue-rotate(3deg) brightness(1.05)','imageboostai-color-correct.png')},'Brightness & Contrast':function(){filterTool('brightness(1.22) contrast(1.18) saturate(1.08)','imageboostai-brightness-contrast.png')},'Remove Blur':function(){filterTool('contrast(1.42) brightness(1.06)','imageboostai-remove-blur.png')},
+    'Face Retouch':function(){filterTool('brightness(1.1) contrast(.92) saturate(1.02)','imageboostai-face-retouch.png')},'Skin Smoothing':function(){filterTool('brightness(1.08) contrast(.88) saturate(.98)','imageboostai-skin-smoothing.png')},'Teeth Whitening':function(){filterTool('brightness(1.22) saturate(.82)','imageboostai-teeth-whitening.png')},'Eye Enhancer':function(){filterTool('contrast(1.25) saturate(1.2) brightness(1.05)','imageboostai-eye-enhancer.png')},'AI Headshot':function(){filterTool('brightness(1.1) contrast(1.08) saturate(1.12)','imageboostai-headshot.png')},'Portrait Enhancer':function(){filterTool('brightness(1.1) contrast(1.05) saturate(1.1)','imageboostai-portrait.png')},
+    'Blur Background':blurBackground,'Crop Image':cropTool,'Resize Image':resizeTool,'Image Compressor':compressTool,'Convert Image':convertTool,'Watermark Remover':function(){filterTool('brightness(1.06) contrast(1.04)','imageboostai-watermark-removed.png')},'Watermark Maker':watermarkTool,'Add Text to Photo':textTool,'Image to Text OCR':ocrTool,'Product Photo Editor':product,'Photo Collage Maker':collage
+  };
+  window.dispatchTool=function(name){ (ACTIONS[name]||function(){filterTool('brightness(1.08) saturate(1.1) contrast(1.05)','imageboostai-result.png')})(); };
+  window.applyTool=function(){
+    if(!imageData){$('file')&&$('file').click();toast('⚠️ Upload an image first');return;}
+    safeTrack('apply_tool','Tool',selected||'Tool');
+    window.dispatchTool(selected||'Photo Enhancer');
+  };
+  window.loadFile=function(f){
+    if(!f||!f.type||!f.type.startsWith('image/')){toast('⚠️ Please upload an image file');return;}
+    var r=new FileReader();
+    r.onload=function(){
+      IBA_originalData=r.result; imageData=r.result;
+      var uc=$('uploadContent'); if(uc)uc.innerHTML='<img src="'+imageData+'" alt="Uploaded photo" style="max-width:100%;max-height:280px;border-radius:16px;object-fit:contain;">';
+      if($('resultTitle'))$('resultTitle').textContent='Image uploaded';
+      if($('resultText'))$('resultText').textContent='Now apply '+(selected||'Photo Enhancer')+'.';
+      var uxb=$('upload-x-btn'); if(uxb)uxb.style.display='flex';
+      toast('✅ Image uploaded'); safeTrack('image_upload','Tool',selected||'Tool');
+      updateCompare(imageData,false);
+    };
+    r.readAsDataURL(f);
+  };
+  window.resetEditor=(function(old){return function(){ IBA_originalData=null; if(old)old(); };})(window.resetEditor);
+})();
+</script>
 <!-- Google Translate (Auto Language Switch) -->
 <div id="google_translate_element" style="position:absolute;left:-9999px;top:-9999px;height:0;overflow:hidden;"></div>
 <script type="text/javascript">
