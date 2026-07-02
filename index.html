@@ -93,7 +93,7 @@
 <!-- Organization -->
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"Organization","name":"ImageBoostAI",
-"url":"https://imageboostai.com","email":"hello@imageboostai.com"}
+"url":"https://imageboostai.com","email":"contact@imageboostai.com"}
 </script>
 
 <!-- Google Analytics 4 -->
@@ -204,6 +204,43 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overf
 [data-theme="dark"] .o2{background:rgba(6,182,212,.18);}
 [data-theme="dark"] .o3{background:rgba(236,72,153,.15);}
 
+
+
+/* ══ CONTINUOUS ICON ANIMATIONS ══ */
+@keyframes a-float{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-6px) rotate(5deg)}}
+@keyframes a-spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+@keyframes a-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+@keyframes a-shake{0%,100%{transform:rotate(0)}20%{transform:rotate(-12deg)}40%{transform:rotate(12deg)}60%{transform:rotate(-8deg)}80%{transform:rotate(8deg)}}
+@keyframes a-bounce{0%,100%{transform:translateY(0)}40%{transform:translateY(-7px)}60%{transform:translateY(-4px)}}
+@keyframes a-hue{0%{filter:hue-rotate(0deg)}100%{filter:hue-rotate(360deg)}}
+@keyframes a-swing{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(5deg)}}
+@keyframes a-pop{0%,80%,100%{transform:scale(1)}90%{transform:scale(1.2)}}
+
+.ic-emoji{display:inline-block;animation-duration:3s;animation-iteration-count:infinite;animation-timing-function:ease-in-out;}
+.anim-bg .ic-emoji{animation-name:a-float;}
+.anim-fix .ic-emoji{animation-name:a-bounce;}
+.anim-face .ic-emoji{animation-name:a-pulse;animation-duration:2s;}
+.anim-convert .ic-emoji{animation-name:a-spin;animation-duration:4s;animation-timing-function:linear;}
+.anim-design .ic-emoji{animation-name:a-swing;animation-duration:2.5s;}
+
+/* Hover: stop continuous + do bounce */
+.tool-card:hover .ic-emoji{animation:a-bounce .6s cubic-bezier(.34,1.56,.64,1) forwards!important;}
+
+/* ══ NAV CATEGORY PILLS ══ */
+.nav-cat-pills{display:flex;gap:6px;align-items:center;flex-wrap:nowrap;}
+.ncp{padding:7px 13px;border-radius:100px;font-size:12.5px;font-weight:700;cursor:pointer;border:none;color:#fff;transition:all .25s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;position:relative;overflow:hidden;}
+.ncp::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,0);transition:background .2s;}
+.ncp:hover::after{background:rgba(255,255,255,.15);}
+.ncp:hover{transform:translateY(-3px) scale(1.06);box-shadow:0 6px 18px rgba(0,0,0,.2);}
+.ncp-all{background:linear-gradient(135deg,#5B4CE8,#7C6EFF);}
+.ncp-bg{background:linear-gradient(135deg,#06B6D4,#0EA5E9);}
+.ncp-fix{background:linear-gradient(135deg,#10B981,#059669);}
+.ncp-face{background:linear-gradient(135deg,#EC4899,#DB2777);}
+.ncp-conv{background:linear-gradient(135deg,#F59E0B,#D97706);}
+.ncp-des{background:linear-gradient(135deg,#8B5CF6,#7C3AED);}
+.ncp.active{transform:translateY(-2px);box-shadow:0 5px 16px rgba(0,0,0,.25);filter:brightness(1.08);}
+@media(max-width:900px){.nav-cat-pills{display:none;}}
+
 /* ══ SKIP LINK ══ */
 .skip-link{position:absolute;top:-40px;left:12px;background:var(--accent);color:#fff;padding:8px 14px;border-radius:0 0 8px 8px;font-weight:700;font-size:13px;text-decoration:none;z-index:9999;transition:top .2s;}
 .skip-link:focus{top:0;}
@@ -283,7 +320,7 @@ section{padding:56px 0;}
   backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);}
 .cat-bar-in{width:min(1200px,94%);margin:0 auto;display:flex;flex-direction:column;gap:10px;align-items:center;}
 .cat-pills{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;}
-.cat-pill{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:100px;font-size:13px;font-weight:700;cursor:pointer;border:none;color:#fff;transition:all .28s cubic-bezier(.34,1.56,.64,1);box-shadow:0 3px 12px rgba(0,0,0,.12);position:relative;overflow:hidden;}
+.cat-pill{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border-radius:100px;font-size:13.5px;font-weight:700;cursor:pointer;border:none;color:#fff;transition:all .28s cubic-bezier(.34,1.56,.64,1);box-shadow:0 4px 14px rgba(0,0,0,.15);position:relative;overflow:hidden;letter-spacing:.01em;}
 .cat-pill::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,0);transition:background .2s;}
 .cat-pill:hover::after{background:rgba(255,255,255,.12);}
 .cat-pill:hover{transform:translateY(-4px) scale(1.06);box-shadow:0 8px 24px rgba(0,0,0,.2);}
@@ -317,6 +354,12 @@ section{padding:56px 0;}
 @media(max-width:580px){.tools-grid{grid-template-columns:repeat(2,1fr);}}
 @media(max-width:360px){.tools-grid{grid-template-columns:1fr;}}
 .tool-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--rL);padding:20px 16px;cursor:pointer;transition:all .3s cubic-bezier(.34,1.56,.64,1);text-align:center;position:relative;overflow:hidden;animation:cardIn .5s ease both;}
+/* Category-colored card left border */
+.tool-card[data-cat="bg"]{border-left:3px solid #06B6D4;background:linear-gradient(to right,rgba(6,182,212,.04),var(--surface));}
+.tool-card[data-cat="fix"]{border-left:3px solid #10B981;background:linear-gradient(to right,rgba(16,185,129,.04),var(--surface));}
+.tool-card[data-cat="face"]{border-left:3px solid #EC4899;background:linear-gradient(to right,rgba(236,72,153,.04),var(--surface));}
+.tool-card[data-cat="convert"]{border-left:3px solid #F59E0B;background:linear-gradient(to right,rgba(245,158,11,.04),var(--surface));}
+.tool-card[data-cat="design"]{border-left:3px solid #8B5CF6;background:linear-gradient(to right,rgba(139,92,246,.04),var(--surface));}
 /* Card accent top border by category */
 .tool-card[data-cat="bg"]::after{background:linear-gradient(90deg,#06B6D4,#0EA5E9);}
 .tool-card[data-cat="fix"]::after{background:linear-gradient(90deg,#10B981,#34D399);}
@@ -561,11 +604,14 @@ footer{background:var(--text);color:rgba(255,255,255,.85);padding:3.5rem 1rem 1.
       ImageBoost<span class="logo-ai">AI</span>
     </a>
     <div class="nav-links">
-      <a href="#tools" class="nav-links-hide" onclick="filterTools('bg',document.querySelector('.cp-bg'))">🎭 Background</a>
-      <a href="#tools" class="nav-links-hide" onclick="filterTools('fix',document.querySelector('.cp-fix'))">🏛️ Restore</a>
-      <a href="#tools" class="nav-links-hide" onclick="filterTools('face',document.querySelector('.cp-face'))">💄 Face</a>
-      <a href="#tools" class="nav-links-hide" onclick="filterTools('convert',document.querySelector('.cp-convert'))">🔄 Convert</a>
-      <a href="#tools" class="nav-links-hide" onclick="filterTools('design',document.querySelector('.cp-design'))">🎨 Design</a>
+      <div class="nav-cat-pills">
+        <button class="ncp ncp-all active" onclick="navFilter('all',this)">🌟 All</button>
+        <button class="ncp ncp-bg" onclick="navFilter('bg',this)">🎭 Background</button>
+        <button class="ncp ncp-fix" onclick="navFilter('fix',this)">🏛️ Restore</button>
+        <button class="ncp ncp-face" onclick="navFilter('face',this)">💄 Face</button>
+        <button class="ncp ncp-conv" onclick="navFilter('convert',this)">🔄 Convert</button>
+        <button class="ncp ncp-des" onclick="navFilter('design',this)">🎨 Design</button>
+      </div>
       <div class="lw">
         <button class="lb" id="lb" onclick="toggleLangMenu()" aria-label="Select language" aria-expanded="false">
           🌐 <span id="lcode">EN</span>
@@ -593,41 +639,6 @@ footer{background:var(--text);color:rgba(255,255,255,.85);padding:3.5rem 1rem 1.
     </div>
   </div>
 </nav>
-
-<!-- HERO -->
-<header class="hero" id="home">
-  <div class="hero-inner">
-    <div class="h-badge"><span class="bdot"></span><span data-i="hbadge">35+ Free AI Photo Tools · No Login · Instant Results</span></div>
-    <h1 class="htitle"><span data-i="h1a">Professional</span> <span class="grad-text" data-i="h1b">AI Photo Editing</span></h1>
-    <p class="h-sub" data-i="hsub">Remove backgrounds, restore old photos, retouch faces, upscale images and more. Free forever. No signup. Works directly in your browser.</p>
-    <div class="h-btns">
-      <button class="btn-primary" onclick="document.getElementById('workspace').scrollIntoView({behavior:'smooth'})" data-i="hb1">📤 Upload &amp; Edit</button>
-      <button class="btn-secondary" onclick="document.getElementById('tools').scrollIntoView({behavior:'smooth'})" data-i="hb2">✨ Explore Tools</button>
-    </div>
-    <div class="h-tags">
-      <span class="htag" onclick="openTool('Remove Background')">🎭 <span data-i="ht1">Remove BG</span></span>
-      <span class="htag" onclick="openTool('AI Photo Restore')">🏛️ <span data-i="ht2">Restore Photo</span></span>
-      <span class="htag" onclick="openTool('Face Retouch')">💄 <span data-i="ht3">Face Retouch</span></span>
-      <span class="htag" onclick="openTool('Image Upscaler')">📈 <span data-i="ht4">Upscaler</span></span>
-      <span class="htag" onclick="openTool('Image to Text OCR')">🔎 <span data-i="ht5">Image to Text</span></span>
-    </div>
-  </div>
-</header>
-
-<!-- STATS BAR -->
-<div class="stats-bar">
-  <div class="stats-in">
-    <div class="stat"><div class="stat-n">35+</div><div class="stat-l" data-i="s1">AI Tools</div></div>
-    <div class="stat-div"></div>
-    <div class="stat"><div class="stat-n">0</div><div class="stat-l" data-i="s2">Signups Needed</div></div>
-    <div class="stat-div"></div>
-    <div class="stat"><div class="stat-n">150+</div><div class="stat-l" data-i="s3">Countries</div></div>
-    <div class="stat-div"></div>
-    <div class="stat"><div class="stat-n">100%</div><div class="stat-l" data-i="s4">Browser-Based</div></div>
-    <div class="stat-div"></div>
-    <div class="stat"><div class="stat-n">🔒</div><div class="stat-l" data-i="s5">Zero Data Stored</div></div>
-  </div>
-</div>
 
 <!-- CATEGORY BANNER -->
 <div class="cat-bar">
@@ -687,18 +698,6 @@ footer{background:var(--text);color:rgba(255,255,255,.85);padding:3.5rem 1rem 1.
     <script>(adsbygoogle=window.adsbygoogle||[]).push({});</script>
   </div>
 
-  <!-- TRENDING TOOLS -->
-  <div class="partners-box" style="margin-top:24px;">
-    <div class="partners-label">⭐ Most Popular Tools Today</div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;">
-      <button onclick="openTool('Remove Background')" style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--bg3);border:1.5px solid var(--border);border-radius:11px;cursor:pointer;color:var(--text);font-weight:600;font-size:13px;transition:all .2s;font-family:inherit;text-align:left;" onmouseover="this.style.borderColor='var(--accent)';this.style.background='var(--surface)'" onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--bg3)'">🎭 Remove BG</button>
-      <button onclick="openTool('AI Photo Restore')" style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--bg3);border:1.5px solid var(--border);border-radius:11px;cursor:pointer;color:var(--text);font-weight:600;font-size:13px;transition:all .2s;font-family:inherit;text-align:left;" onmouseover="this.style.borderColor='var(--accent)';this.style.background='var(--surface)'" onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--bg3)'">🏛️ Restore Photo</button>
-      <button onclick="openTool('Face Retouch')" style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--bg3);border:1.5px solid var(--border);border-radius:11px;cursor:pointer;color:var(--text);font-weight:600;font-size:13px;transition:all .2s;font-family:inherit;text-align:left;" onmouseover="this.style.borderColor='var(--accent)';this.style.background='var(--surface)'" onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--bg3)'">💄 Face Retouch</button>
-      <button onclick="openTool('Image Upscaler')" style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--bg3);border:1.5px solid var(--border);border-radius:11px;cursor:pointer;color:var(--text);font-weight:600;font-size:13px;transition:all .2s;font-family:inherit;text-align:left;" onmouseover="this.style.borderColor='var(--accent)';this.style.background='var(--surface)'" onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--bg3)'">📈 Upscaler</button>
-      <button onclick="openTool('Image to Text OCR')" style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--bg3);border:1.5px solid var(--border);border-radius:11px;cursor:pointer;color:var(--text);font-weight:600;font-size:13px;transition:all .2s;font-family:inherit;text-align:left;" onmouseover="this.style.borderColor='var(--accent)';this.style.background='var(--surface)'" onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--bg3)'">🔎 OCR Text</button>
-      <button onclick="openTool('Watermark Remover')" style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--bg3);border:1.5px solid var(--border);border-radius:11px;cursor:pointer;color:var(--text);font-weight:600;font-size:13px;transition:all .2s;font-family:inherit;text-align:left;" onmouseover="this.style.borderColor='var(--accent)';this.style.background='var(--surface)'" onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--bg3)'">🧼 Remove Watermark</button>
-    </div>
-  </div>
 
 </div>
 </section>
@@ -720,13 +719,14 @@ footer{background:var(--text);color:rgba(255,255,255,.85);padding:3.5rem 1rem 1.
           <div class="u-sub" data-i="up_sub">Click or drag an image here. JPG, PNG, WEBP, HEIC supported. Processed locally in your browser.</div>
         </div>
       </label>
-      <div class="result-box">
+      <div class="result-box" style="position:relative;">
+        <button id="close-result-btn" onclick="resetEditor();window.scrollTo({top:document.getElementById('tools').offsetTop-120,behavior:'smooth'})" style="display:none;position:absolute;top:14px;right:14px;width:32px;height:32px;background:#EF4444;color:#fff;border:none;border-radius:50%;font-size:16px;cursor:pointer;z-index:10;display:none;align-items:center;justify-content:center;font-weight:700;box-shadow:0 2px 8px rgba(239,68,68,.3);transition:all .2s;" aria-label="Close result and reset" title="Close">✕</button>
         <h3 id="resultTitle" data-i="res_title">Ready to Edit</h3>
         <p id="resultText" data-i="res_text">Pick any tool, upload a photo, then click Apply. The result appears here instantly.</p>
         <div class="progress-wrap" id="progress"><div class="progress-bar" id="bar"></div></div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;">
-          <button class="btn-primary" onclick="applyTool()" data-i="apply_btn">⚡ Apply Tool</button>
-          <button class="btn-secondary" onclick="resetEditor()" data-i="reset_btn">↻ Reset</button>
+          <button class="btn-primary" onclick="applyTool()" style="min-width:160px;">⚡ Apply Tool</button>
+          <button class="btn-secondary" onclick="resetEditor()">↻ Reset</button>
         </div>
         <div class="out-img-wrap" id="output"><img id="outImg" alt="Edited photo result"></div>
         <a class="btn-primary dl-btn" id="download" download="imageboostai-result.png" data-i="dl_btn">⬇ Download Result</a>
@@ -735,7 +735,6 @@ footer{background:var(--text);color:rgba(255,255,255,.85);padding:3.5rem 1rem 1.
           <span>Share:</span>
           <a id="share-email" href="#" class="share-btn sb-email">✉️ Email</a>
           <button onclick="copyLink()" class="share-btn sb-cp">📋 Copy Link</button>
-          <button onclick="resetEditor();window.scrollTo({top:0,behavior:'smooth'})" class="share-btn" style="background:#EF4444;color:#fff;" title="Close and start over">✕ Close</button>
         </div>
       </div>
     </div>
@@ -822,7 +821,7 @@ footer{background:var(--text);color:rgba(255,255,255,.85);padding:3.5rem 1rem 1.
       <p class="ft-desc" data-i="ft_desc">35+ free AI photo editing tools. Remove backgrounds, restore old photos, retouch faces. No login required.</p>
       <div class="ft-socials">
         <a href="https://x.com" target="_blank" rel="noopener" class="ft-soc" aria-label="X/Twitter">𝕏</a>
-        <a href="mailto:hello@imageboostai.com" class="ft-soc" aria-label="Email">✉️</a>
+        
         <a href="https://instagram.com" target="_blank" rel="noopener" class="ft-soc" aria-label="Instagram">◎</a>
       </div>
     </div>
@@ -952,7 +951,7 @@ function renderTools(list=tools){
       <button class="fav-btn" onclick="event.stopPropagation();this.classList.toggle('on');showToast(this.classList.contains('on')?'❤️ Added to favorites':'Removed from favorites')" aria-label="Add to favorites">♡</button>
       ${t[4]==='hot'?'<span class="tool-badge tb-hot">🔥 Hot</span>':''}
       ${t[4]==='new'?'<span class="tool-badge tb-new">✨ New</span>':''}
-      <div class="tool-ic" aria-hidden="true">${t[2]}</div>
+      <div class="tool-ic anim-${t[3]}" aria-hidden="true"><span class="ic-emoji">${t[2]}</span></div>
       <div class="tool-name">${t[0]}</div>
       <div class="tool-desc">${t[1]}</div>
     </div>`).join('');
@@ -966,23 +965,50 @@ function filterTools(cat,btn){
   renderTools(cat==='all'?tools:tools.filter(t=>t[3]===cat));
   trackEvent('filter_tools','UI',cat);
 }
+function navFilter(cat,btn){
+  // Sync nav pills
+  document.querySelectorAll('.ncp').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  // Also sync cat-bar pills
+  const catPill=document.querySelector('.cp-'+(cat==='all'?'all':cat==='bg'?'bg':cat==='fix'?'fix':cat==='face'?'face':cat==='convert'?'convert':'design'));
+  if(catPill){document.querySelectorAll('.cat-pill').forEach(b=>b.classList.remove('active'));catPill.classList.add('active');}
+  renderTools(cat==='all'?tools:tools.filter(t=>t[3]===cat));
+  document.getElementById('tools').scrollIntoView({behavior:'smooth'});
+  trackEvent('nav_filter','UI',cat);
+}
 
 /* ══ OPEN TOOL ══ */
 function openTool(name){
   const t=tools.find(x=>x[0]===name)||tools[0];
   selected=t[0]; selectedDesc=t[1];
-  document.getElementById('selectedTitle').textContent=t[2]+' '+t[0];
-  document.getElementById('selectedSmall').textContent='Selected Tool';
-  document.getElementById('resultTitle').textContent=t[0];
-  document.getElementById('resultText').textContent=t[1]+' Upload a photo above and click Apply.';
-  document.getElementById('workspace').scrollIntoView({behavior:'smooth'});
-  showToast(t[2]+' '+t[0]+' selected');
-  // URL deep-link
+  // Update workspace titles
+  const st=document.getElementById('selectedTitle');
+  const ss=document.getElementById('selectedSmall');
+  const rt=document.getElementById('resultTitle');
+  const rx=document.getElementById('resultText');
+  if(st)st.textContent=t[2]+' '+t[0];
+  if(ss)ss.textContent='Selected: '+t[0];
+  if(rt)rt.textContent=t[0];
+  if(rx)rx.textContent=t[1]+' Upload a photo and click ⚡ Apply Tool.';
+  // Scroll to workspace
+  const ws=document.getElementById('workspace');
+  if(ws){ws.scrollIntoView({behavior:'smooth',block:'start'});}
+  // Pulse the upload zone to guide user
+  const dz=document.getElementById('drop');
+  if(dz){
+    dz.style.transition='all .3s ease';
+    dz.style.borderColor='var(--accent)';
+    dz.style.boxShadow='0 0 0 4px rgba(91,76,232,.15),inset 0 0 40px rgba(91,76,232,.06)';
+    setTimeout(()=>{dz.style.borderColor='';dz.style.boxShadow='';},1800);
+  }
+  // Highlight active tool card
+  document.querySelectorAll('.tool-card').forEach(c=>c.style.outline='');
+  const activeCard=Array.from(document.querySelectorAll('.tool-card')).find(c=>c.getAttribute('aria-label')&&c.getAttribute('aria-label').startsWith(t[0]));
+  if(activeCard){activeCard.style.outline='2.5px solid var(--accent)';activeCard.style.outlineOffset='2px';}
+  showToast(t[2]+' '+t[0]+' selected — upload a photo now!');
   if(history.pushState){history.pushState(null,'','?tool='+encodeURIComponent(t[0]));}
   trackEvent('open_tool','Tool',t[0]);
-  if(typeof gtag!=='undefined'){
-    gtag('event','tool_open',{tool_name:t[0],tool_category:t[3]});
-  }
+  if(typeof gtag!=='undefined')gtag('event','tool_open',{tool_name:t[0],tool_category:t[3]});
 }
 
 /* ══ FILE UPLOAD ══ */
@@ -1049,6 +1075,9 @@ function finishApply(){
     shareEmail.href='mailto:?subject='+subj+'&body='+body;
   }
   if(typeof gtag!=='undefined')gtag('event','tool_complete',{tool_name:selected});
+  // Show close button in top-right
+  const closeBtn=document.getElementById('close-result-btn');
+  if(closeBtn){closeBtn.style.display='flex';}
 }
 function addHistory(name){
   const h=document.getElementById('history');
@@ -1059,11 +1088,15 @@ function addHistory(name){
 }
 function resetEditor(){
   imageData=null;if(fileEl)fileEl.value='';
-  document.getElementById('uploadContent').innerHTML='<div class="u-icon">🖼️</div><div class="u-title" data-i="up_title">Upload Your Photo</div><div class="u-sub" data-i="up_sub">Click or drag an image here.</div>';
+  document.getElementById('uploadContent').innerHTML='<div class="u-icon">🖼️</div><div class="u-title">Upload Your Photo</div><div class="u-sub">Click or drag an image here. JPG, PNG, WEBP supported.</div>';
   document.getElementById('output').style.display='none';
   document.getElementById('download').style.display='none';
   document.getElementById('progress').style.display='none';
-  document.getElementById('share-bar').style.display='none';
+  const sb=document.getElementById('share-bar');if(sb)sb.style.display='none';
+  const cb=document.getElementById('close-result-btn');if(cb)cb.style.display='none';
+  document.getElementById('resultTitle').textContent='Ready to Edit';
+  document.getElementById('resultText').textContent='Pick any tool, upload a photo, then click Apply.';
+  document.querySelectorAll('.tool-card').forEach(c=>c.style.outline='');
   showToast('Editor reset');
   if(history.pushState)history.pushState(null,'','/');
 }
@@ -1269,7 +1302,7 @@ const MODAL_CONTENT={
 <h3>4. Cookies</h3>
 <p>We use only functional cookies (theme, language preference). Third-party analytics and advertising services may set their own cookies. See our cookie consent banner for options.</p>
 <h3>5. GDPR / KVKK Compliance</h3>
-<p>Since we do not process personal data and all file handling is client-side, our GDPR obligations are minimal. For any privacy requests, contact: <a href="mailto:privacy@imageboostai.com">privacy@imageboostai.com</a></p>
+<p>Since we do not process personal data and all file handling is client-side, our GDPR obligations are minimal. For any privacy requests, contact: using our contact form above</p>
 <h3>6. Third-Party Libraries</h3>
 <p>No external libraries are loaded that could send your data to third parties for image processing.</p>
 <h3>7. Changes</h3>
@@ -1311,7 +1344,7 @@ const MODAL_CONTENT={
   <textarea id="cf-msg" placeholder="Your message..."></textarea>
   <button class="btn-primary" onclick="submitContact()" style="width:100%;padding:13px;">Send Message →</button>
 </div>
-<p style="margin-top:16px;font-size:13px;color:var(--muted);">Or email us: <a href="mailto:hello@imageboostai.com">hello@imageboostai.com</a></p>`
+<p style="margin-top:16px;font-size:13px;color:var(--muted);">We'll get back to you within 24 hours.</p>`
   }
 };
 
@@ -1365,3 +1398,40 @@ document.addEventListener('DOMContentLoaded',()=>{
 </script>
 </body>
 </html>
+
+<!-- HERO -->
+<header class="hero" id="home">
+  <div class="hero-inner">
+    <div class="h-badge"><span class="bdot"></span><span data-i="hbadge">35+ Free AI Photo Tools · No Login · Instant Results</span></div>
+    <h1 class="htitle"><span data-i="h1a">Professional</span> <span class="grad-text" data-i="h1b">AI Photo Editing</span></h1>
+    <p class="h-sub" data-i="hsub">Remove backgrounds, restore old photos, retouch faces, upscale images and more. Free forever. No signup. Works directly in your browser.</p>
+    <div class="h-btns">
+      <button class="btn-primary" onclick="document.getElementById('workspace').scrollIntoView({behavior:'smooth'})" data-i="hb1">📤 Upload &amp; Edit</button>
+      <button class="btn-secondary" onclick="document.getElementById('tools').scrollIntoView({behavior:'smooth'})" data-i="hb2">✨ Explore Tools</button>
+    </div>
+    <div class="h-tags">
+      <span class="htag" onclick="openTool('Remove Background')">🎭 <span data-i="ht1">Remove BG</span></span>
+      <span class="htag" onclick="openTool('AI Photo Restore')">🏛️ <span data-i="ht2">Restore Photo</span></span>
+      <span class="htag" onclick="openTool('Face Retouch')">💄 <span data-i="ht3">Face Retouch</span></span>
+      <span class="htag" onclick="openTool('Image Upscaler')">📈 <span data-i="ht4">Upscaler</span></span>
+      <span class="htag" onclick="openTool('Image to Text OCR')">🔎 <span data-i="ht5">Image to Text</span></span>
+    </div>
+  </div>
+</header>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stats-in">
+    <div class="stat"><div class="stat-n">35+</div><div class="stat-l" data-i="s1">AI Tools</div></div>
+    <div class="stat-div"></div>
+    <div class="stat"><div class="stat-n">0</div><div class="stat-l" data-i="s2">Signups Needed</div></div>
+    <div class="stat-div"></div>
+    <div class="stat"><div class="stat-n">150+</div><div class="stat-l" data-i="s3">Countries</div></div>
+    <div class="stat-div"></div>
+    <div class="stat"><div class="stat-n">100%</div><div class="stat-l" data-i="s4">Browser-Based</div></div>
+    <div class="stat-div"></div>
+    <div class="stat"><div class="stat-n">🔒</div><div class="stat-l" data-i="s5">Zero Data Stored</div></div>
+  </div>
+</div>
+
+
