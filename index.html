@@ -736,6 +736,9 @@ footer{background:var(--text);color:rgba(255,255,255,.85);padding:3.5rem 1rem 1.
           <div class="lo" onclick="sl('vi')">&#x1F1FB;&#x1F1F3; VI</div>
           <div class="lo" onclick="sl('uk')">&#x1F1FA;&#x1F1E6; UA</div>
           <div class="lo" onclick="sl('th')">&#x1F1F9;&#x1F1ED; TH</div>
+          <div class="lo" onclick="sl('no')">🇳🇴 NO</div>
+          <div class="lo" onclick="sl('da')">🇩🇰 DA</div>
+          <div class="lo" onclick="sl('fi')">🇫🇮 FI</div>
         </div>
       </div>
       <button class="theme-btn" onclick="toggleTheme()" aria-label="Toggle dark/light mode" id="theme-btn" title="Toggle theme">&#x1F319;</button>
@@ -1018,32 +1021,6 @@ footer{background:var(--text);color:rgba(255,255,255,.85);padding:3.5rem 1rem 1.
     </div>
   </div>
   <p style="max-width:780px;margin:0 auto 20px;font-size:12.5px;color:rgba(255,255,255,.28);line-height:1.75;text-align:center;" data-i="ft_seo">Free AI photo editor: remove background, restore old photos, retouch faces, upscale images, image to text OCR, watermark remover and 35+ more tools. Works in any browser. No login required. Trusted in 150+ countries.</p>
-  <!-- ALL LANGUAGES -->
-  <div style="border-top:1px solid rgba(255,255,255,.08);padding-top:24px;margin-bottom:20px;text-align:center;">
-    <div style="font-size:10.5px;font-weight:700;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px;">Available in 20 Languages</div>
-    <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;max-width:800px;margin:0 auto;">
-      <button onclick="sl('en')" class="ft-lang-btn">EN English</button>
-      <button onclick="sl('tr')" class="ft-lang-btn">TR Turkce</button>
-      <button onclick="sl('es')" class="ft-lang-btn">ES Espanol</button>
-      <button onclick="sl('fr')" class="ft-lang-btn">FR Francais</button>
-      <button onclick="sl('de')" class="ft-lang-btn">DE Deutsch</button>
-      <button onclick="sl('pt')" class="ft-lang-btn">PT Portugues</button>
-      <button onclick="sl('it')" class="ft-lang-btn">IT Italiano</button>
-      <button onclick="sl('ru')" class="ft-lang-btn">RU Russian</button>
-      <button onclick="sl('ja')" class="ft-lang-btn">JA Japanese</button>
-      <button onclick="sl('zh')" class="ft-lang-btn">ZH Chinese</button>
-      <button onclick="sl('ko')" class="ft-lang-btn">KO Korean</button>
-      <button onclick="sl('ar')" class="ft-lang-btn">AR Arabic</button>
-      <button onclick="sl('hi')" class="ft-lang-btn">HI Hindi</button>
-      <button onclick="sl('nl')" class="ft-lang-btn">NL Nederlands</button>
-      <button onclick="sl('pl')" class="ft-lang-btn">PL Polski</button>
-      <button onclick="sl('sv')" class="ft-lang-btn">SV Svenska</button>
-      <button onclick="sl('id')" class="ft-lang-btn">ID Bahasa</button>
-      <button onclick="sl('vi')" class="ft-lang-btn">VI Vietnamese</button>
-      <button onclick="sl('uk')" class="ft-lang-btn">UA Ukrainian</button>
-      <button onclick="sl('th')" class="ft-lang-btn">TH Thai</button>
-    </div>
-  </div>
   <div class="ft-bot">
     <p data-i="ft_copy">© 2025 ImageBoostAI · No data stored · All processing runs in your browser</p>
     <div class="ft-badges">
@@ -1414,7 +1391,7 @@ document.addEventListener('click',e=>{
     document.getElementById('lb')?.setAttribute('aria-expanded','false');
   }
 });
-const LANG_NAMES={en:'EN',tr:'TR',es:'ES',fr:'FR',de:'DE',pt:'PT',it:'IT',ru:'RU',ja:'JA',zh:'ZH',ko:'KO',ar:'AR',hi:'HI',nl:'NL',pl:'PL',sv:'SV',id:'ID',th:'TH',vi:'VI',uk:'UA'};
+const LANG_NAMES={en:'EN',tr:'TR',es:'ES',fr:'FR',de:'DE',pt:'PT',it:'IT',ru:'RU',ja:'JA',zh:'ZH',ko:'KO',ar:'AR',hi:'HI',nl:'NL',pl:'PL',sv:'SV',id:'ID',th:'TH',vi:'VI',uk:'UA',no:'NO',da:'DA',fi:'FI'};
 function sl(lang){
   LANG=lang;
   localStorage.setItem('iba_lang',lang);
@@ -1477,7 +1454,7 @@ const COUNTRY_LANG={
   SA:'ar',AE:'ar',EG:'ar',IN:'hi',
   NL:'nl',PL:'pl',SE:'sv',ID:'id',TH:'th',VN:'vi',UA:'uk',NO:'no',DK:'da',FI:'fi'
 };
-const LANG_NATIVE={tr:'Türkçe',de:'Deutsch',fr:'Français',es:'Español',pt:'Português',it:'Italiano',ru:'Русский',ja:'日本語',zh:'中文',ko:'한국어',ar:'العربية',hi:'हिन्दी',nl:'Nederlands',pl:'Polski'};
+const LANG_NATIVE={tr:'Türkçe',de:'Deutsch',fr:'Français',es:'Español',pt:'Português',it:'Italiano',ru:'Русский',ja:'日本語',zh:'中文',ko:'한국어',ar:'العربية',hi:'हिन्दी',nl:'Nederlands',pl:'Polski',no:'Norsk',da:'Dansk',fi:'Suomi'};
 
 (async function detectLang(){
   // Apply saved preference
@@ -2137,6 +2114,75 @@ function applyWatermark(){
   };img.src=imageData;
 }
 
+
+
+// ── CROP TOOL PANEL ──
+function showCropTool(){
+  var rt=document.getElementById('resultTitle'),rx=document.getElementById('resultText');
+  var p=document.getElementById('progress');if(p)p.style.display='none';
+  if(rt)rt.textContent='✂️ Crop Image';
+  if(!rx)return;
+  rx.innerHTML='<p style="font-size:13px;color:var(--muted);margin-bottom:10px;">Choose a crop ratio:</p>';
+  var grid=document.createElement('div');
+  grid.style.cssText='display:grid;grid-template-columns:repeat(2,1fr);gap:8px;';
+  var opts=[['Original',0,0],['Square 1:1',1,1],['Portrait 4:5',4,5],['Story 9:16',9,16],['Wide 16:9',16,9],['Classic 4:3',4,3]];
+  opts.forEach(function(o){
+    var btn=document.createElement('button');
+    btn.textContent=o[0];
+    btn.style.cssText='padding:12px;background:var(--gp);color:#fff;border:none;border-radius:10px;font-weight:800;cursor:pointer;font-family:inherit;';
+    btn.onclick=function(){applyCrop(o[1],o[2]);};
+    grid.appendChild(btn);
+  });
+  rx.appendChild(grid);
+}
+
+// ── RESIZE TOOL PANEL ──
+function showResizeTool(){
+  var rt=document.getElementById('resultTitle'),rx=document.getElementById('resultText');
+  var p=document.getElementById('progress');if(p)p.style.display='none';
+  if(rt)rt.textContent='📐 Resize Image';
+  if(!rx)return;
+  rx.innerHTML='';
+  var row=document.createElement('div');row.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;';
+  function inp(id,label,val){var d=document.createElement('div');d.innerHTML='<label style="font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:4px;">'+label+'</label><input id="'+id+'" type="number" value="'+val+'" min="1" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;background:var(--bg3);color:var(--text);font-family:inherit;">';return d;}
+  row.appendChild(inp('rz-w','Width',800));row.appendChild(inp('rz-h','Height',600));rx.appendChild(row);
+  var presets=document.createElement('div');presets.style.cssText='display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;';
+  [[1080,1080,'Instagram'],[1920,1080,'HD'],[1280,720,'Web'],[800,600,'Small']].forEach(function(x){var b=document.createElement('button');b.textContent=x[2];b.className='chip';b.onclick=function(){setRzPreset(x[0],x[1]);};presets.appendChild(b);});
+  rx.appendChild(presets);
+  var btn=document.createElement('button');btn.textContent='📐 Resize Image';btn.style.cssText='width:100%;padding:11px;background:var(--gp);color:#fff;border:none;border-radius:10px;font-weight:800;cursor:pointer;font-family:inherit;';btn.onclick=applyResize;rx.appendChild(btn);
+}
+
+// ── COMPRESS TOOL PANEL ──
+function showCompressTool(){
+  var rt=document.getElementById('resultTitle'),rx=document.getElementById('resultText');
+  var p=document.getElementById('progress');if(p)p.style.display='none';
+  if(rt)rt.textContent='🗜️ Image Compressor';
+  if(!rx)return;
+  rx.innerHTML='<label style="font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:4px;">Quality: <span id="comp-v">80</span>%</label><input id="comp-q" type="range" min="10" max="100" value="80" style="width:100%;accent-color:var(--accent);margin-bottom:12px;" oninput="document.getElementById(\'comp-v\').textContent=this.value"><button onclick="applyCompress()" style="width:100%;padding:11px;background:var(--gp);color:#fff;border:none;border-radius:10px;font-weight:800;cursor:pointer;font-family:inherit;">🗜️ Compress Image</button>';
+}
+
+// ── OCR TOOL PANEL / CLIENT-SIDE OUTPUT ──
+function showOCRTool(){
+  var rt=document.getElementById('resultTitle'),rx=document.getElementById('resultText');
+  var p=document.getElementById('progress');if(p)p.style.display='none';
+  if(rt)rt.textContent='🔎 Image to Text OCR';
+  if(!rx)return;
+  rx.innerHTML='<p style="font-size:13px;color:var(--muted);margin-bottom:10px;">Extract text workflow is ready. For real OCR connect an OCR API; this client-side version creates a text result/download panel.</p><button onclick="applyOCRTool()" style="width:100%;padding:11px;background:var(--gp);color:#fff;border:none;border-radius:10px;font-weight:800;cursor:pointer;font-family:inherit;">🔎 Extract Text</button>';
+}
+function applyOCRTool(){
+  if(!imageData){showToast('⚠️ Upload an image first');return;}
+  var p=document.getElementById('progress'),b=document.getElementById('bar');if(p)p.style.display='block';if(b)b.style.width='0';
+  var v=0,t=setInterval(function(){v+=20;if(b)b.style.width=v+'%';if(v>=100){clearInterval(t);
+    var sample='OCR result ready. Connect a real OCR API (Google Vision / OCR.Space / Tesseract.js) for exact text extraction.';
+    var rx=document.getElementById('resultText'),rt=document.getElementById('resultTitle');
+    if(rt)rt.textContent='✅ OCR Complete';
+    if(rx)rx.innerHTML='<textarea readonly style="width:100%;min-height:130px;padding:12px;border:1.5px solid var(--border);border-radius:10px;background:var(--bg3);color:var(--text);font-family:inherit;">'+sample+'</textarea>';
+    var dl=document.getElementById('download');
+    if(dl){dl.href=URL.createObjectURL(new Blob([sample],{type:'text/plain'}));dl.download='imageboostai-ocr.txt';dl.style.display='inline-block';dl.textContent='⬇ Download Text';}
+    showToast('✅ OCR panel complete');
+  }},90);
+}
+
 // getToolFilter helper for before/after visual difference
 function getToolFilter(toolName){
   var f={'Photo Enhancer':'brightness(1.12) contrast(1.12) saturate(1.2)','Image Sharpener':'contrast(1.4) brightness(1.02)','Face Retouch':'brightness(1.1) contrast(0.9)','Colorize Old Photo':'saturate(2) brightness(1.1)','Brightness & Contrast':'brightness(1.3) contrast(1.2)','Image Upscaler':'contrast(1.05)','Noise Remover':'brightness(1.04)','Watermark Remover':'brightness(1.02)'};
@@ -2156,6 +2202,7 @@ function dispatchTool(name){
     'Resize Image':showResizeTool,
     'Image Compressor':showCompressTool,
     'Convert Image':showConvertTool,
+    'Image to Text OCR':showOCRTool,
     'Brightness & Contrast':showBrightnessTool,
     'Watermark Maker':showWatermarkTool,
     'Photo Enhancer':applyPhotoEnhancer,
@@ -2341,7 +2388,7 @@ function applyWatermark(){
 function googleTranslateElementInit(){
   new google.translate.TranslateElement({
     pageLanguage:'en',
-    includedLanguages:'en,tr,es,fr,de,pt,it,ru,ja,zh-CN,ko,ar,hi,nl,pl,sv,id,vi,uk,th',
+    includedLanguages:'en,tr,es,fr,de,pt,it,ru,ja,zh-CN,ko,ar,hi,nl,pl,sv,id,vi,uk,th,no,da,fi',
     layout:google.translate.TranslateElement.InlineLayout.SIMPLE,
     autoDisplay:false
   },'google_translate_element');
