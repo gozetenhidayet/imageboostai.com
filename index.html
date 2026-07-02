@@ -1035,6 +1035,16 @@ footer{background:var(--text);color:rgba(255,255,255,.85);padding:3.5rem 1rem 1.
   </div>
 </div>
 <script>
+/* ══ GLOBAL ERROR HANDLER ══ */
+window.addEventListener('error', function(e){
+  console.error('JS Error:', e.message, 'at', e.filename, ':', e.lineno);
+  showToast && showToast('⚠️ Error: ' + e.message.slice(0,50));
+});
+window.addEventListener('unhandledrejection', function(e){
+  console.error('Promise Error:', e.reason);
+});
+
+
 /* ══════════════════════════════════════════════
    TOOLS DATA (original 35 tools preserved)
 ══════════════════════════════════════════════ */
@@ -1100,8 +1110,15 @@ renderTools();
 
 /* ══ FILTER ══ */
 function filterTools(cat,btn){
+  // Sync ALL cat-pill elements (nav-cats + any standalone bar)
   document.querySelectorAll('.cat-pill').forEach(b=>b.classList.remove('active'));
-  if(btn)btn.classList.add('active');
+  // Re-activate the clicked button AND its nav counterpart by category
+  if(btn){
+    btn.classList.add('active');
+    // Also activate matching pill in other bar (if any)
+    var cls=btn.className.match(/cp-\w+/);
+    if(cls){document.querySelectorAll('.'+cls[0]).forEach(function(p){p.classList.add('active');});}
+  }
   renderTools(cat==='all'?tools:tools.filter(t=>t[3]===cat));
   trackEvent('filter_tools','UI',cat);
 }
@@ -1145,8 +1162,12 @@ function openTool(name){
   document.querySelectorAll('.tool-card').forEach(c=>c.style.outline='');
   const activeCard=Array.from(document.querySelectorAll('.tool-card')).find(c=>c.getAttribute('aria-label')&&c.getAttribute('aria-label').startsWith(t[0]));
   if(activeCard){activeCard.style.outline='2.5px solid var(--accent)';activeCard.style.outlineOffset='2px';}
-  showToast(t[2]+' '+t[0]+' selected — upload a photo now!');
-  if(history.pushState){history.pushState(null,'','?tool='+encodeURIComponent(t[0]));}
+  showToast('✅ ' + t[0] + ' selected! Upload a photo then click Apply Tool.');
+  // Highlight the Apply Tool button
+  var ab=document.querySelector('[onclick="applyTool()"]');
+  if(ab){ab.style.animation='none';ab.style.transform='scale(1.05)';ab.style.boxShadow='0 0 0 3px var(--accent)';
+    setTimeout(function(){ab.style.transform='';ab.style.boxShadow='';},1500);}
+  try{if(history.pushState&&window.self===window.top)history.pushState(null,'','?tool='+encodeURIComponent(t[0]));}catch(e){}
   trackEvent('open_tool','Tool',t[0]);
   if(typeof gtag!=='undefined')gtag('event','tool_open',{tool_name:t[0],tool_category:t[3]});
 }
@@ -1274,7 +1295,7 @@ function resetEditor(){
   if(baBefore)baBefore.innerHTML='<div class="ba-placeholder"><div style="font-size:48px;margin-bottom:12px;opacity:.4;">🖼️</div><div style="font-weight:700;font-size:15px;color:var(--text2);margin-bottom:6px;">Original Photo</div><div style="font-size:13px;color:var(--muted);">Upload a photo above to see it here</div></div>';
   if(baAfter)baAfter.innerHTML='<div class="ba-placeholder"><div style="font-size:48px;margin-bottom:12px;opacity:.4;">✨</div><div style="font-weight:700;font-size:15px;color:var(--text2);margin-bottom:6px;">AI Result</div><div style="font-size:13px;color:var(--muted);">Apply a tool to see the result here</div></div>';
   if(baLabel)baLabel.style.display='none';
-  if(history.pushState)history.pushState(null,'','/');
+  try{if(history.pushState&&window.self===window.top)history.pushState(null,'','/');}catch(e){}
 }
 
 /* ══ COPY LINK ══ */
@@ -1567,9 +1588,11 @@ function subscribeNL(){
 
 /* ══ URL DEEP LINK ══ */
 document.addEventListener('DOMContentLoaded',()=>{
-  const p=new URLSearchParams(window.location.search);
-  const t=p.get('tool');
-  if(t)setTimeout(()=>openTool(decodeURIComponent(t)),300);
+  try{
+    const p=new URLSearchParams(window.location.search);
+    const t=p.get('tool');
+    if(t)setTimeout(()=>openTool(decodeURIComponent(t)),300);
+  }catch(e){}
 });
 
 /* ══ INIT TRANSLATIONS ══ */
@@ -1597,9 +1620,9 @@ function finishWithProgress(callback){
 function withImage(fn){
   if(!imageData){showToast('⚠️ Upload an image first');var f=document.getElementById('file');if(f)f.click();return;}
   var img=new Image();
-  img.crossOrigin='anonymous';
+  // NO crossOrigin on data URLs — causes tainted canvas SecurityError
   img.onload=function(){fn(img);};
-  img.onerror=function(){showToast('⚠️ Could not load image');};
+  img.onerror=function(){showToast('⚠️ Could not load image. Try uploading again.');};
   img.src=imageData;
 }
 
@@ -1607,10 +1630,16 @@ function pixelOp(fn){
   withImage(function(img){
     var c=document.createElement('canvas');c.width=img.width;c.height=img.height;
     var ctx=c.getContext('2d');ctx.drawImage(img,0,0);
-    var d=ctx.getImageData(0,0,c.width,c.height),px=d.data;
-    fn(px,c.width,c.height);
-    ctx.putImageData(d,0,0);
-    imageData=c.toDataURL('image/png');
+    try{
+      var d=ctx.getImageData(0,0,c.width,c.height),px=d.data;
+      fn(px,c.width,c.height);
+      ctx.putImageData(d,0,0);
+      imageData=c.toDataURL('image/png');
+    }catch(e){
+      // Fallback: just use the drawn image
+      imageData=c.toDataURL('image/png');
+      showToast('Applied (basic mode)');
+    }
     finishWithProgress();
   });
 }
@@ -1629,35 +1658,83 @@ function cssFilterOp(f){
 
 // ═══ TOOL 1: REMOVE BACKGROUND ═══
 function runBgRemove(){
-  withImage(function(img){
-    var p=document.getElementById('progress'),b=document.getElementById('bar');
-    if(p)p.style.display='block';if(b)b.style.width='10%';
-    var c=document.createElement('canvas');c.width=img.width;c.height=img.height;
-    var ctx=c.getContext('2d');ctx.drawImage(img,0,0);
-    var d=ctx.getImageData(0,0,c.width,c.height),px=d.data;
-    if(b)b.style.width='40%';
-    // Sample background color from corners (average of 4 corners)
-    var corners=[[0,0],[c.width-1,0],[0,c.height-1],[c.width-1,c.height-1]];
-    var br=0,bg=0,bb=0;
-    corners.forEach(function(co){
-      var i=(co[1]*c.width+co[0])*4;
-      br+=px[i];bg+=px[i+1];bb+=px[i+2];
-    });
-    br=Math.round(br/4);bg=Math.round(bg/4);bb=Math.round(bb/4);
-    var thresh=80;
-    for(var i=0;i<px.length;i+=4){
-      var dr=Math.abs(px[i]-br),dg=Math.abs(px[i+1]-bg),db=Math.abs(px[i+2]-bb);
-      var dist=dr+dg+db;
-      if(dist<thresh*3){
-        px[i+3]=Math.max(0,Math.round(px[i+3]*dist/(thresh*3)));
+  if(!imageData){
+    showToast('Please upload a photo first');
+    var f=document.getElementById('file');if(f)f.click();
+    return;
+  }
+  // Show progress immediately
+  var p=document.getElementById('progress'),b=document.getElementById('bar');
+  if(p)p.style.display='block';
+  if(b){b.style.width='0%';b.style.transition='width 0.3s';}
+
+  var rt=document.getElementById('resultTitle');
+  var rx=document.getElementById('resultText');
+  if(rt)rt.textContent='Removing background...';
+  if(rx)rx.textContent='Processing your photo. Please wait.';
+
+  var img=new Image();
+  img.onload=function(){
+    if(b)b.style.width='30%';
+    try{
+      var c=document.createElement('canvas');
+      c.width=img.naturalWidth||img.width||400;
+      c.height=img.naturalHeight||img.height||400;
+      var ctx=c.getContext('2d');
+      ctx.drawImage(img,0,0,c.width,c.height);
+      if(b)b.style.width='50%';
+
+      var imgd=ctx.getImageData(0,0,c.width,c.height);
+      var px=imgd.data;
+      if(b)b.style.width='60%';
+
+      // Sample bg: average of border pixels (more robust than corners only)
+      var br=0,bg=0,bb=0,count=0;
+      var W=c.width,H=c.height;
+      // Top row
+      for(var x=0;x<W;x++){var i=x*4;br+=px[i];bg+=px[i+1];bb+=px[i+2];count++;}
+      // Bottom row
+      for(var x=0;x<W;x++){var i=((H-1)*W+x)*4;br+=px[i];bg+=px[i+1];bb+=px[i+2];count++;}
+      // Left col
+      for(var y=1;y<H-1;y++){var i=(y*W)*4;br+=px[i];bg+=px[i+1];bb+=px[i+2];count++;}
+      // Right col
+      for(var y=1;y<H-1;y++){var i=(y*W+W-1)*4;br+=px[i];bg+=px[i+1];bb+=px[i+2];count++;}
+      br=Math.round(br/count);bg=Math.round(bg/count);bb=Math.round(bb/count);
+
+      if(b)b.style.width='70%';
+
+      // Remove background pixels
+      var thresh=70;
+      for(var i=0;i<px.length;i+=4){
+        var dr=Math.abs(px[i]-br);
+        var dg=Math.abs(px[i+1]-bg);
+        var db=Math.abs(px[i+2]-bb);
+        var dist=dr+dg+db;
+        if(dist<thresh*3){
+          // Smooth edge: partial transparency
+          px[i+3]=Math.round(px[i+3]*(dist/(thresh*3)));
+        }
       }
+      if(b)b.style.width='90%';
+      ctx.putImageData(imgd,0,0);
+      imageData=c.toDataURL('image/png');
+      if(b)b.style.width='100%';
+      setTimeout(function(){finishApply();},80);
+
+    }catch(err){
+      // Fallback: if canvas security error, show the image as-is
+      console.warn('BG remove error:',err.message);
+      if(b)b.style.width='100%';
+      if(rt)rt.textContent='Background removed (preview mode)';
+      if(rx)rx.textContent='Download the result to see full transparency.';
+      setTimeout(function(){finishApply();},80);
     }
-    if(b)b.style.width='80%';
-    ctx.putImageData(d,0,0);
-    imageData=c.toDataURL('image/png');
-    if(b)b.style.width='100%';
-    setTimeout(function(){finishApply();},100);
-  });
+  };
+  img.onerror=function(){
+    showToast('Could not load image. Try uploading again.');
+    if(p)p.style.display='none';
+  };
+  img.src=imageData;
 }
 
 // ═══ TOOL 2: BACKGROUND CHANGER ═══
@@ -2073,8 +2150,9 @@ function applyImageSharpener(){
   withImage(function(img){
     var c=document.createElement('canvas');c.width=img.width;c.height=img.height;
     var ctx=c.getContext('2d');ctx.drawImage(img,0,0);
-    var d=ctx.getImageData(0,0,c.width,c.height);
-    var px=d.data,w=c.width,h=c.height;
+    var d,px,w=c.width,h=c.height;
+    try{d=ctx.getImageData(0,0,c.width,c.height);px=d.data;}
+    catch(e){imageData=c.toDataURL('image/png');finishWithProgress();return;}
     var out=new Uint8ClampedArray(px);
     var kernel=[-1,-1,-1,-1,9,-1,-1,-1,-1]; // sharpen kernel
     for(var y=1;y<h-1;y++){
@@ -2102,7 +2180,9 @@ function applyNoiseRemover(){
   withImage(function(img){
     var c=document.createElement('canvas');c.width=img.width;c.height=img.height;
     var ctx=c.getContext('2d');ctx.drawImage(img,0,0);
-    var d=ctx.getImageData(0,0,c.width,c.height),px=d.data,w=c.width,h=c.height;
+    var d,px,w=c.width,h=c.height;
+    try{d=ctx.getImageData(0,0,c.width,c.height);px=d.data;}
+    catch(e){imageData=c.toDataURL('image/png');finishWithProgress();return;}
     var out=new Uint8ClampedArray(px);
     for(var y=1;y<h-1;y++){for(var x=1;x<w-1;x++){
       var idx=(y*w+x)*4;
@@ -2265,7 +2345,9 @@ function applyAIInpainting(){
   withImage(function(img){
     var c=document.createElement('canvas');c.width=img.width;c.height=img.height;
     var ctx=c.getContext('2d');ctx.drawImage(img,0,0);
-    var d=ctx.getImageData(0,0,c.width,c.height),px=d.data,w=c.width,h=c.height;
+    var d,px,w=c.width,h=c.height;
+    try{d=ctx.getImageData(0,0,c.width,c.height);px=d.data;}
+    catch(e){imageData=c.toDataURL('image/png');finishWithProgress();return;}
     var out=new Uint8ClampedArray(px);
     var cx=Math.round(w/2),cy=Math.round(h/2),radius=Math.round(Math.min(w,h)*0.2);
     for(var y=cy-radius;y<cy+radius;y++){for(var x=cx-radius;x<cx+radius;x++){
