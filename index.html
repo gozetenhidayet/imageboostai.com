@@ -297,6 +297,13 @@ h1.htitle{font-size:clamp(2.4rem,6vw,4.2rem);font-weight:900;line-height:1.06;le
 .htag{display:flex;align-items:center;gap:5px;background:var(--surface);border:1.5px solid var(--border);border-radius:100px;padding:7px 14px;font-size:12px;color:var(--muted);font-weight:600;cursor:pointer;transition:all .22s;}
 .htag:hover{background:var(--bg3);border-color:var(--accent);color:var(--accent);transform:translateY(-2px);}
 
+
+/* ══ HERO CHIPS ══ */
+.h-chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:1.4rem;animation:fadeUp .5s ease .4s both;}
+.h-chip{display:inline-flex;align-items:center;gap:5px;background:var(--surface);border:1.5px solid var(--border);border-radius:100px;padding:8px 16px;font-size:12.5px;color:var(--text2);font-weight:600;cursor:pointer;transition:all .25s cubic-bezier(.34,1.56,.64,1);box-shadow:0 2px 8px rgba(0,0,0,.06);}
+.h-chip:hover{background:var(--accent);border-color:var(--accent);color:#fff;transform:translateY(-3px);box-shadow:0 6px 18px rgba(91,76,232,.25);}
+@media(max-width:600px){.h-chip{font-size:11.5px;padding:7px 12px;}}
+
 /* ══ STATS ══ */
 .stats-bar{background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:1.3rem 1rem;}
 .stats-in{width:min(1000px,94%);margin:0 auto;display:flex;align-items:center;justify-content:center;gap:2rem;flex-wrap:wrap;text-align:center;}
@@ -318,8 +325,8 @@ section{padding:56px 0;}
   position:sticky;top:66px;z-index:90;
   box-shadow:0 2px 12px rgba(91,76,232,.07);
   backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);}
-.cat-bar-in{width:min(1200px,94%);margin:0 auto;display:flex;flex-direction:column;gap:10px;align-items:center;}
-.cat-pills{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;}
+.cat-bar-in{width:min(1200px,94%);margin:0 auto;display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center;}
+.cat-pills{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;width:100%;}
 .cat-pill{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border-radius:100px;font-size:13.5px;font-weight:700;cursor:pointer;border:none;color:#fff;transition:all .28s cubic-bezier(.34,1.56,.64,1);box-shadow:0 4px 14px rgba(0,0,0,.15);position:relative;overflow:hidden;letter-spacing:.01em;}
 .cat-pill::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,0);transition:background .2s;}
 .cat-pill:hover::after{background:rgba(255,255,255,.12);}
@@ -449,6 +456,27 @@ section{padding:56px 0;}
 .partner-card .pd{font-size:11px;color:var(--muted);}
 .partners-note{font-size:11px;color:var(--muted);text-align:center;margin-top:10px;}
 
+
+/* ══ BEFORE / AFTER ══ */
+.ba-grid{display:grid;grid-template-columns:1fr auto 1fr;gap:0;align-items:stretch;border-radius:24px;overflow:hidden;border:1.5px solid var(--border);background:var(--surface);box-shadow:var(--shadow);}
+.ba-panel{position:relative;min-height:260px;display:flex;flex-direction:column;}
+.ba-panel-after{background:linear-gradient(135deg,rgba(91,76,232,.03),rgba(6,182,212,.03));}
+.ba-label{display:flex;align-items:center;gap:7px;padding:14px 18px;font-size:11.5px;font-weight:800;letter-spacing:.1em;border-bottom:1px solid var(--border);}
+.ba-label-before{color:var(--muted);}
+.ba-label-after{color:var(--accent);}
+.ba-dot{width:8px;height:8px;border-radius:50%;}
+.ba-dot-before{background:var(--border2);}
+.ba-dot-after{background:var(--accent);box-shadow:0 0 8px rgba(91,76,232,.4);}
+.ba-content{flex:1;display:flex;align-items:center;justify-content:center;padding:20px;}
+.ba-placeholder{text-align:center;}
+.ba-divider{width:52px;display:flex;align-items:center;justify-content:center;background:var(--bg3);border-left:1px solid var(--border);border-right:1px solid var(--border);}
+.ba-vs{width:36px;height:36px;background:var(--gp);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:800;box-shadow:0 4px 14px rgba(91,76,232,.3);}
+.ba-content img{max-width:100%;max-height:220px;border-radius:12px;object-fit:contain;}
+@media(max-width:640px){
+  .ba-grid{grid-template-columns:1fr;grid-template-rows:auto auto auto;}
+  .ba-divider{width:100%;height:40px;border-left:none;border-right:none;border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+}
+
 /* ══ FAQ ══ */
 .faq-wrap{max-width:820px;margin:0 auto;}
 .faq-item{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);margin-bottom:10px;overflow:hidden;transition:border-color .2s;}
@@ -476,6 +504,11 @@ section{padding:56px 0;}
 .cf-form input,.cf-form textarea,.cf-form select{padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:inherit;font-size:14px;background:var(--bg3);color:var(--text);outline:none;transition:border-color .18s;}
 .cf-form input:focus,.cf-form textarea:focus{border-color:var(--accent);}
 .cf-form textarea{min-height:110px;resize:vertical;}
+
+
+/* ══ FOOTER LANG BUTTONS ══ */
+.ft-lang-btn{padding:6px 13px;border-radius:100px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:rgba(255,255,255,.6);font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;font-family:inherit;}
+.ft-lang-btn:hover{background:rgba(255,255,255,.15);color:#fff;border-color:rgba(255,255,255,.3);transform:translateY(-1px);}
 
 /* ══ FOOTER ══ */
 footer{background:var(--text);color:rgba(255,255,255,.85);padding:3.5rem 1rem 1.8rem;}
@@ -642,16 +675,15 @@ footer{background:var(--text);color:rgba(255,255,255,.85);padding:3.5rem 1rem 1.
 
 <!-- CATEGORY BANNER -->
 <div class="cat-bar">
-  <div class="cat-bar-in">
-    <div class="cat-pills">
-      <button class="cat-pill cp-all active" onclick="filterTools('all',this)" data-i="cp_all">🌟 All</button>
-      <button class="cat-pill cp-bg" onclick="filterTools('bg',this)" data-i="cp_bg">🎭 Background</button>
-      <button class="cat-pill cp-fix" onclick="filterTools('fix',this)" data-i="cp_fix">🏛️ Restore &amp; Fix</button>
-      <button class="cat-pill cp-face" onclick="filterTools('face',this)" data-i="cp_face">💄 Face</button>
-      <button class="cat-pill cp-convert" onclick="filterTools('convert',this)" data-i="cp_convert">🔄 Convert</button>
-      <button class="cat-pill cp-design" onclick="filterTools('design',this)" data-i="cp_design">🎨 Design</button>
+  <div class="cat-bar-in" style="align-items:center;justify-content:center;">
+    <div class="cat-pills" style="justify-content:center;width:100%;">
+      <button class="cat-pill cp-all active" onclick="filterTools('all',this)">🌟 All</button>
+      <button class="cat-pill cp-bg" onclick="filterTools('bg',this)">🎭 Background</button>
+      <button class="cat-pill cp-fix" onclick="filterTools('fix',this)">🏛️ Restore &amp; Fix</button>
+      <button class="cat-pill cp-face" onclick="filterTools('face',this)">💄 Face</button>
+      <button class="cat-pill cp-convert" onclick="filterTools('convert',this)">🔄 Convert</button>
+      <button class="cat-pill cp-design" onclick="filterTools('design',this)">🎨 Design</button>
     </div>
-    <div class="chip-row" id="chip-row"></div>
   </div>
 </div>
 
@@ -679,9 +711,9 @@ footer{background:var(--text);color:rgba(255,255,255,.85);padding:3.5rem 1rem 1.
 <section id="tools">
 <div class="wrap">
   <div class="sec-title">
-    <small data-i="tools_small">35 AI Photo Tools</small>
-    <h2 data-i="tools_h2">Choose a Tool &amp; Start Editing</h2>
-    <p data-i="tools_p">Click any tool to open the editor. Upload your photo and apply instantly.</p>
+    <small data-i="tools_small">35 AI Photo Tools — All Free</small>
+    <h2 data-i="tools_h2">Choose Your AI Photo Tool</h2>
+    <p data-i="tools_p">Click any tool to select it, upload your photo in the editor below, and download the result in seconds. No account required.</p>
   </div>
 
   <!-- TOP AD — Google Auto Ads handles display after approval -->
@@ -744,16 +776,50 @@ footer{background:var(--text);color:rgba(255,255,255,.85);padding:3.5rem 1rem 1.
 </section>
 
 <!-- BEFORE/AFTER -->
-<section id="before">
+<section id="before" style="padding:56px 0;">
 <div class="wrap">
   <div class="sec-title">
-    <small data-i="ba_small">Preview</small>
-    <h2 data-i="ba_h2">Before / After Workflow</h2>
-    <p data-i="ba_p">Upload your original photo, apply a tool, and compare the results side by side.</p>
+    <small>✨ Compare Results</small>
+    <h2>See the Difference</h2>
+    <p>Upload your photo, apply any AI tool, and instantly compare the before and after results.</p>
   </div>
-  <div class="ba-grid">
-    <div class="ba-box"><div><h3 data-i="ba1">Before</h3><p style="color:var(--muted);font-size:13px;margin-top:6px;" data-i="ba1s">Upload your original photo above</p></div></div>
-    <div class="ba-box"><div><h3 data-i="ba2">After</h3><p style="color:var(--muted);font-size:13px;margin-top:6px;" data-i="ba2s">Apply a tool to see the result here</p></div></div>
+  <div class="ba-grid" id="ba-container">
+    <!-- Before -->
+    <div class="ba-panel" id="ba-before">
+      <div class="ba-label ba-label-before">
+        <span class="ba-dot ba-dot-before"></span> BEFORE
+      </div>
+      <div class="ba-content" id="ba-before-content">
+        <div class="ba-placeholder">
+          <div style="font-size:48px;margin-bottom:12px;opacity:.4;">🖼️</div>
+          <div style="font-weight:700;font-size:15px;color:var(--text2);margin-bottom:6px;">Original Photo</div>
+          <div style="font-size:13px;color:var(--muted);">Upload a photo above to see it here</div>
+        </div>
+      </div>
+    </div>
+    <!-- Divider -->
+    <div class="ba-divider">
+      <div class="ba-vs">⚡ AI</div>
+    </div>
+    <!-- After -->
+    <div class="ba-panel ba-panel-after" id="ba-after">
+      <div class="ba-label ba-label-after">
+        <span class="ba-dot ba-dot-after"></span> AFTER
+      </div>
+      <div class="ba-content" id="ba-after-content">
+        <div class="ba-placeholder">
+          <div style="font-size:48px;margin-bottom:12px;opacity:.4;">✨</div>
+          <div style="font-weight:700;font-size:15px;color:var(--text2);margin-bottom:6px;">AI Result</div>
+          <div style="font-size:13px;color:var(--muted);">Apply a tool to see the result here</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Tool applied label -->
+  <div id="ba-tool-label" style="text-align:center;margin-top:16px;display:none;">
+    <span style="display:inline-flex;align-items:center;gap:6px;background:var(--bg3);border:1.5px solid var(--border2);border-radius:100px;padding:7px 18px;font-size:13px;font-weight:700;color:var(--accent);">
+      ✅ <span id="ba-tool-name">Tool applied</span>
+    </span>
   </div>
 </div>
 </section>
@@ -859,6 +925,32 @@ footer{background:var(--text);color:rgba(255,255,255,.85);padding:3.5rem 1rem 1.
     </div>
   </div>
   <p style="max-width:780px;margin:0 auto 20px;font-size:12.5px;color:rgba(255,255,255,.28);line-height:1.75;text-align:center;" data-i="ft_seo">Free AI photo editor: remove background, restore old photos, retouch faces, upscale images, image to text OCR, watermark remover and 35+ more tools. Works in any browser. No login required. Trusted in 150+ countries.</p>
+  <!-- ALL LANGUAGES -->
+  <div style="border-top:1px solid rgba(255,255,255,.08);padding-top:24px;margin-bottom:20px;text-align:center;">
+    <div style="font-size:10.5px;font-weight:700;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px;">Available in 20 Languages</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;max-width:800px;margin:0 auto;">
+      <button onclick="sl('en')" class="ft-lang-btn">EN English</button>
+      <button onclick="sl('tr')" class="ft-lang-btn">TR Turkce</button>
+      <button onclick="sl('es')" class="ft-lang-btn">ES Espanol</button>
+      <button onclick="sl('fr')" class="ft-lang-btn">FR Francais</button>
+      <button onclick="sl('de')" class="ft-lang-btn">DE Deutsch</button>
+      <button onclick="sl('pt')" class="ft-lang-btn">PT Portugues</button>
+      <button onclick="sl('it')" class="ft-lang-btn">IT Italiano</button>
+      <button onclick="sl('ru')" class="ft-lang-btn">RU Russian</button>
+      <button onclick="sl('ja')" class="ft-lang-btn">JA Japanese</button>
+      <button onclick="sl('zh')" class="ft-lang-btn">ZH Chinese</button>
+      <button onclick="sl('ko')" class="ft-lang-btn">KO Korean</button>
+      <button onclick="sl('ar')" class="ft-lang-btn">AR Arabic</button>
+      <button onclick="sl('hi')" class="ft-lang-btn">HI Hindi</button>
+      <button onclick="sl('nl')" class="ft-lang-btn">NL Nederlands</button>
+      <button onclick="sl('pl')" class="ft-lang-btn">PL Polski</button>
+      <button onclick="sl('sv')" class="ft-lang-btn">SV Svenska</button>
+      <button onclick="sl('id')" class="ft-lang-btn">ID Bahasa</button>
+      <button onclick="sl('vi')" class="ft-lang-btn">VI Vietnamese</button>
+      <button onclick="sl('uk')" class="ft-lang-btn">UA Ukrainian</button>
+      <button onclick="sl('th')" class="ft-lang-btn">TH Thai</button>
+    </div>
+  </div>
   <div class="ft-bot">
     <p data-i="ft_copy">© 2025 ImageBoostAI · No data stored · All processing runs in your browser</p>
     <div class="ft-badges">
@@ -1051,6 +1143,22 @@ function applyTool(){
   trackEvent('apply_tool','Tool',selected);
 }
 function finishApply(){
+  // Update Before/After panels
+  const baBefore=document.getElementById('ba-before-content');
+  const baAfter=document.getElementById('ba-after-content');
+  const baLabel=document.getElementById('ba-tool-label');
+  const baName=document.getElementById('ba-tool-name');
+  if(baBefore&&imageData){
+    baBefore.innerHTML='<img src="'+imageData+'" alt="Original" style="max-width:100%;max-height:220px;border-radius:12px;object-fit:contain;">';
+  }
+  if(baAfter&&imageData){
+    baAfter.innerHTML='<img src="'+imageData+'" alt="Result" style="max-width:100%;max-height:220px;border-radius:12px;object-fit:contain;">';
+  }
+  if(baLabel)baLabel.style.display='block';
+  if(baName)baName.textContent=selected+' applied';
+  // Scroll to before/after
+  setTimeout(()=>{const ba=document.getElementById('before');if(ba)ba.scrollIntoView({behavior:'smooth',block:'center'});},1200);
+  // Update workspace result
   const img=document.getElementById('outImg');
   img.src=imageData;
   const outWrap=document.getElementById('output');
@@ -1098,6 +1206,13 @@ function resetEditor(){
   document.getElementById('resultText').textContent='Pick any tool, upload a photo, then click Apply.';
   document.querySelectorAll('.tool-card').forEach(c=>c.style.outline='');
   showToast('Editor reset');
+  // Clear before/after
+  const baBefore=document.getElementById('ba-before-content');
+  const baAfter=document.getElementById('ba-after-content');
+  const baLabel=document.getElementById('ba-tool-label');
+  if(baBefore)baBefore.innerHTML='<div class="ba-placeholder"><div style="font-size:48px;margin-bottom:12px;opacity:.4;">🖼️</div><div style="font-weight:700;font-size:15px;color:var(--text2);margin-bottom:6px;">Original Photo</div><div style="font-size:13px;color:var(--muted);">Upload a photo above to see it here</div></div>';
+  if(baAfter)baAfter.innerHTML='<div class="ba-placeholder"><div style="font-size:48px;margin-bottom:12px;opacity:.4;">✨</div><div style="font-weight:700;font-size:15px;color:var(--text2);margin-bottom:6px;">AI Result</div><div style="font-size:13px;color:var(--muted);">Apply a tool to see the result here</div></div>';
+  if(baLabel)baLabel.style.display='none';
   if(history.pushState)history.pushState(null,'','/');
 }
 
@@ -1119,17 +1234,9 @@ const CHIPS=[
   {l:'👔 Headshot',k:'AI Headshot'},
   {l:'🛍️ Product',k:'Product Photo Editor'},
 ];
-(function initChips(){
-  const row=document.getElementById('chip-row');
-  if(!row)return;
-  CHIPS.forEach(c=>{
-    const s=document.createElement('button');
-    s.className='chip';s.textContent=c.l;
-    s.setAttribute('aria-label','Open '+c.k+' tool');
-    s.onclick=()=>{openTool(c.k);trackEvent('chip_click','UI',c.k);};
-    row.appendChild(s);
-  });
-})();
+// Chip row removed from banner — hero chips are in HTML directly
+// (No JS chip init needed)
+
 
 /* ══ FAQ TOGGLE ══ */
 function faqToggle(btn){
@@ -1201,7 +1308,7 @@ document.addEventListener('click',e=>{
     document.getElementById('lb')?.setAttribute('aria-expanded','false');
   }
 });
-const LANG_NAMES={en:'EN',tr:'TR',es:'ES',fr:'FR',de:'DE',pt:'PT',it:'IT',ru:'RU',ja:'JA',zh:'ZH',ko:'KO',ar:'AR',hi:'HI',nl:'NL',pl:'PL'};
+const LANG_NAMES={en:'EN',tr:'TR',es:'ES',fr:'FR',de:'DE',pt:'PT',it:'IT',ru:'RU',ja:'JA',zh:'ZH',ko:'KO',ar:'AR',hi:'HI',nl:'NL',pl:'PL',sv:'SV',id:'ID',th:'TH',vi:'VI',uk:'UA'};
 function sl(lang){
   LANG=lang;
   localStorage.setItem('iba_lang',lang);
@@ -1250,7 +1357,7 @@ const COUNTRY_LANG={
   BR:'pt',PT:'pt',IT:'it',RU:'ru',UA:'uk',
   JP:'ja',CN:'zh',TW:'zh',KR:'ko',
   SA:'ar',AE:'ar',EG:'ar',IN:'hi',
-  NL:'nl',PL:'pl',SE:'sv',ID:'id',TH:'th',VN:'vi'
+  NL:'nl',PL:'pl',SE:'sv',ID:'id',TH:'th',VN:'vi',UA:'uk',NO:'no',DK:'da',FI:'fi'
 };
 const LANG_NATIVE={tr:'Türkçe',de:'Deutsch',fr:'Français',es:'Español',pt:'Português',it:'Italiano',ru:'Русский',ja:'日本語',zh:'中文',ko:'한국어',ar:'العربية',hi:'हिन्दी',nl:'Nederlands',pl:'Polski'};
 
@@ -1403,18 +1510,24 @@ document.addEventListener('DOMContentLoaded',()=>{
 <header class="hero" id="home">
   <div class="hero-inner">
     <div class="h-badge"><span class="bdot"></span><span data-i="hbadge">35+ Free AI Photo Tools · No Login · Instant Results</span></div>
-    <h1 class="htitle"><span data-i="h1a">Professional</span> <span class="grad-text" data-i="h1b">AI Photo Editing</span></h1>
-    <p class="h-sub" data-i="hsub">Remove backgrounds, restore old photos, retouch faces, upscale images and more. Free forever. No signup. Works directly in your browser.</p>
+    <h1 class="htitle" data-i="h1_full">Edit Photos Like a <span class="grad-text">Professional</span><br>with AI — 100% Free</h1>
+    <p class="h-sub" data-i="hsub">Remove backgrounds in one click, restore old damaged photos, retouch faces naturally, upscale to 4K, and 30+ more AI tools. No login, no signup, no watermarks. Results in seconds.</p>
     <div class="h-btns">
-      <button class="btn-primary" onclick="document.getElementById('workspace').scrollIntoView({behavior:'smooth'})" data-i="hb1">📤 Upload &amp; Edit</button>
-      <button class="btn-secondary" onclick="document.getElementById('tools').scrollIntoView({behavior:'smooth'})" data-i="hb2">✨ Explore Tools</button>
+      <button class="btn-primary" onclick="document.getElementById('workspace').scrollIntoView({behavior:'smooth'})">📤 Upload &amp; Start Editing</button>
+      <button class="btn-secondary" onclick="document.getElementById('tools').scrollIntoView({behavior:'smooth'})">✨ Browse 35 Tools</button>
     </div>
-    <div class="h-tags">
-      <span class="htag" onclick="openTool('Remove Background')">🎭 <span data-i="ht1">Remove BG</span></span>
-      <span class="htag" onclick="openTool('AI Photo Restore')">🏛️ <span data-i="ht2">Restore Photo</span></span>
-      <span class="htag" onclick="openTool('Face Retouch')">💄 <span data-i="ht3">Face Retouch</span></span>
-      <span class="htag" onclick="openTool('Image Upscaler')">📈 <span data-i="ht4">Upscaler</span></span>
-      <span class="htag" onclick="openTool('Image to Text OCR')">🔎 <span data-i="ht5">Image to Text</span></span>
+    <!-- Quick tool chips -->
+    <div class="h-chips" id="h-chip-row">
+      <span class="h-chip" onclick="openTool('Remove Background')">🎭 Remove BG</span>
+      <span class="h-chip" onclick="openTool('AI Photo Restore')">🏛️ Restore Photo</span>
+      <span class="h-chip" onclick="openTool('Face Retouch')">💄 Face Retouch</span>
+      <span class="h-chip" onclick="openTool('Image Upscaler')">📈 Upscale 4K</span>
+      <span class="h-chip" onclick="openTool('Watermark Remover')">🧼 Remove Watermark</span>
+      <span class="h-chip" onclick="openTool('Image to Text OCR')">🔎 Image→Text</span>
+      <span class="h-chip" onclick="openTool('AI Headshot')">👔 AI Headshot</span>
+      <span class="h-chip" onclick="openTool('Magic Eraser')">✨ Magic Erase</span>
+      <span class="h-chip" onclick="openTool('Colorize Old Photo')">🎨 Colorize</span>
+      <span class="h-chip" onclick="openTool('Product Photo Editor')">🛍️ Product Photo</span>
     </div>
   </div>
 </header>
