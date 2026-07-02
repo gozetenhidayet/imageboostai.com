@@ -274,9 +274,13 @@ nav{position:sticky;top:0;z-index:100;background:var(--nav-bg);backdrop-filter:b
 .lw{position:relative;}
 .lb{padding:7px 12px;font-size:12px;font-weight:600;color:var(--muted);border:1.5px solid var(--border);border-radius:9px;background:var(--surface2);cursor:pointer;transition:all .2s;white-space:nowrap;display:flex;align-items:center;gap:4px;}
 .lb:hover{border-color:var(--accent);color:var(--accent);}
-.ld{position:absolute;top:calc(100%+8px);right:0;width:240px;background:var(--surface);border:1.5px solid var(--border);border-radius:14px;box-shadow:var(--shadow2);padding:.6rem .7rem;display:none;grid-template-columns:repeat(3,1fr);gap:3px;z-index:200;animation:slideDown .18s ease;}
+.ld{position:absolute;top:calc(100%+8px);right:0;width:min(560px,92vw);max-height:72vh;overflow-y:auto;background:var(--surface);border:1.5px solid var(--border);border-radius:14px;box-shadow:var(--shadow2);padding:.7rem;display:none;grid-template-columns:repeat(4,1fr);gap:4px;z-index:200;animation:slideDown .18s ease;}
+.lang-search{grid-column:1/-1;position:sticky;top:0;background:var(--surface);padding-bottom:6px;z-index:2;}
+.lang-search input{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:10px;background:var(--bg3);color:var(--text);font-family:inherit;font-size:12px;outline:none;}
+.lang-search input:focus{border-color:var(--accent);}
+@media(max-width:520px){.ld{grid-template-columns:repeat(2,1fr);right:-52px;width:min(340px,94vw);}}
 .ld.open{display:grid;}
-.lo{padding:7px 5px;font-size:11.5px;color:var(--muted);border-radius:8px;cursor:pointer;font-weight:500;text-align:center;transition:all .13s;}
+.lo{padding:8px 6px;font-size:11.5px;color:var(--muted);border-radius:8px;cursor:pointer;font-weight:600;text-align:left;transition:all .13s;display:flex;gap:5px;align-items:center;white-space:nowrap;}
 .lo:hover,.lo.act{background:var(--bg3);color:var(--accent);font-weight:700;}
 .theme-btn{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--border);background:var(--surface2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:17px;transition:all .2s;flex-shrink:0;}
 .theme-btn:hover{background:var(--bg3);border-color:var(--accent);}
@@ -667,7 +671,7 @@ footer{background:var(--text);color:rgba(255,255,255,.85);padding:3.5rem 1rem 1.
   .tools-grid{grid-template-columns:1fr;}
 }
 
-</style>
+.goog-te-banner-frame.skiptranslate,.goog-te-gadget-icon{display:none!important;}body{top:0!important;}#goog-gt-tt,.goog-te-balloon-frame{display:none!important;}</style>
 
 <!-- AdSense Auto Ads — works without specific slot IDs -->
 <script>
@@ -715,30 +719,72 @@ footer{background:var(--text);color:rgba(255,255,255,.85);padding:3.5rem 1rem 1.
         <button class="lb" id="lb" onclick="toggleLangMenu()" aria-label="Select language" aria-expanded="false">
           &#x1F310; <span id="lcode">EN</span>
         </button>
-        <div class="ld" id="ld" role="listbox" aria-label="Language options" style="width:300px;grid-template-columns:repeat(4,1fr);">
-          <div class="lo" onclick="sl('en')">&#x1F1FA;&#x1F1F8; EN</div>
-          <div class="lo" onclick="sl('tr')">&#x1F1F9;&#x1F1F7; TR</div>
-          <div class="lo" onclick="sl('es')">&#x1F1EA;&#x1F1F8; ES</div>
-          <div class="lo" onclick="sl('fr')">&#x1F1EB;&#x1F1F7; FR</div>
-          <div class="lo" onclick="sl('de')">&#x1F1E9;&#x1F1EA; DE</div>
-          <div class="lo" onclick="sl('pt')">&#x1F1E7;&#x1F1F7; PT</div>
-          <div class="lo" onclick="sl('it')">&#x1F1EE;&#x1F1F9; IT</div>
-          <div class="lo" onclick="sl('ru')">&#x1F1F7;&#x1F1FA; RU</div>
-          <div class="lo" onclick="sl('ja')">&#x1F1EF;&#x1F1F5; JA</div>
-          <div class="lo" onclick="sl('zh')">&#x1F1E8;&#x1F1F3; ZH</div>
-          <div class="lo" onclick="sl('ko')">&#x1F1F0;&#x1F1F7; KO</div>
-          <div class="lo" onclick="sl('ar')">&#x1F1F8;&#x1F1E6; AR</div>
-          <div class="lo" onclick="sl('hi')">&#x1F1EE;&#x1F1F3; HI</div>
-          <div class="lo" onclick="sl('nl')">&#x1F1F3;&#x1F1F1; NL</div>
-          <div class="lo" onclick="sl('pl')">&#x1F1F5;&#x1F1F1; PL</div>
-          <div class="lo" onclick="sl('sv')">&#x1F1F8;&#x1F1EA; SV</div>
-          <div class="lo" onclick="sl('id')">&#x1F1EE;&#x1F1E9; ID</div>
-          <div class="lo" onclick="sl('vi')">&#x1F1FB;&#x1F1F3; VI</div>
-          <div class="lo" onclick="sl('uk')">&#x1F1FA;&#x1F1E6; UA</div>
-          <div class="lo" onclick="sl('th')">&#x1F1F9;&#x1F1ED; TH</div>
-          <div class="lo" onclick="sl('no')">🇳🇴 NO</div>
-          <div class="lo" onclick="sl('da')">🇩🇰 DA</div>
-          <div class="lo" onclick="sl('fi')">🇫🇮 FI</div>
+        <div class="ld" id="ld" role="listbox" aria-label="Language options">
+          <div class="lang-search"><input id="langSearch" type="search" placeholder="Search language..." oninput="filterLangOptions(this.value)" onclick="event.stopPropagation()"></div>
+          <div class="lo" data-lang="en" onclick="sl('en')">🇺🇸 <span>English</span></div>
+          <div class="lo" data-lang="tr" onclick="sl('tr')">🇹🇷 <span>Türkçe</span></div>
+          <div class="lo" data-lang="es" onclick="sl('es')">🇪🇸 <span>Español</span></div>
+          <div class="lo" data-lang="fr" onclick="sl('fr')">🇫🇷 <span>Français</span></div>
+          <div class="lo" data-lang="de" onclick="sl('de')">🇩🇪 <span>Deutsch</span></div>
+          <div class="lo" data-lang="pt" onclick="sl('pt')">🇵🇹 <span>Português</span></div>
+          <div class="lo" data-lang="it" onclick="sl('it')">🇮🇹 <span>Italiano</span></div>
+          <div class="lo" data-lang="ru" onclick="sl('ru')">🇷🇺 <span>Русский</span></div>
+          <div class="lo" data-lang="ja" onclick="sl('ja')">🇯🇵 <span>日本語</span></div>
+          <div class="lo" data-lang="zh" onclick="sl('zh')">🇨🇳 <span>中文</span></div>
+          <div class="lo" data-lang="ko" onclick="sl('ko')">🇰🇷 <span>한국어</span></div>
+          <div class="lo" data-lang="ar" onclick="sl('ar')">🇸🇦 <span>العربية</span></div>
+          <div class="lo" data-lang="hi" onclick="sl('hi')">🇮🇳 <span>हिन्दी</span></div>
+          <div class="lo" data-lang="bn" onclick="sl('bn')">🇧🇩 <span>বাংলা</span></div>
+          <div class="lo" data-lang="ur" onclick="sl('ur')">🇵🇰 <span>اردو</span></div>
+          <div class="lo" data-lang="fa" onclick="sl('fa')">🇮🇷 <span>فارسی</span></div>
+          <div class="lo" data-lang="nl" onclick="sl('nl')">🇳🇱 <span>Nederlands</span></div>
+          <div class="lo" data-lang="pl" onclick="sl('pl')">🇵🇱 <span>Polski</span></div>
+          <div class="lo" data-lang="sv" onclick="sl('sv')">🇸🇪 <span>Svenska</span></div>
+          <div class="lo" data-lang="id" onclick="sl('id')">🇮🇩 <span>Indonesia</span></div>
+          <div class="lo" data-lang="vi" onclick="sl('vi')">🇻🇳 <span>Tiếng Việt</span></div>
+          <div class="lo" data-lang="th" onclick="sl('th')">🇹🇭 <span>ไทย</span></div>
+          <div class="lo" data-lang="uk" onclick="sl('uk')">🇺🇦 <span>Українська</span></div>
+          <div class="lo" data-lang="no" onclick="sl('no')">🇳🇴 <span>Norsk</span></div>
+          <div class="lo" data-lang="da" onclick="sl('da')">🇩🇰 <span>Dansk</span></div>
+          <div class="lo" data-lang="fi" onclick="sl('fi')">🇫🇮 <span>Suomi</span></div>
+          <div class="lo" data-lang="el" onclick="sl('el')">🇬🇷 <span>Ελληνικά</span></div>
+          <div class="lo" data-lang="cs" onclick="sl('cs')">🇨🇿 <span>Čeština</span></div>
+          <div class="lo" data-lang="sk" onclick="sl('sk')">🇸🇰 <span>Slovenčina</span></div>
+          <div class="lo" data-lang="hu" onclick="sl('hu')">🇭🇺 <span>Magyar</span></div>
+          <div class="lo" data-lang="ro" onclick="sl('ro')">🇷🇴 <span>Română</span></div>
+          <div class="lo" data-lang="bg" onclick="sl('bg')">🇧🇬 <span>Български</span></div>
+          <div class="lo" data-lang="hr" onclick="sl('hr')">🇭🇷 <span>Hrvatski</span></div>
+          <div class="lo" data-lang="sr" onclick="sl('sr')">🇷🇸 <span>Srpski</span></div>
+          <div class="lo" data-lang="sl" onclick="sl('sl')">🇸🇮 <span>Slovenščina</span></div>
+          <div class="lo" data-lang="lt" onclick="sl('lt')">🇱🇹 <span>Lietuvių</span></div>
+          <div class="lo" data-lang="lv" onclick="sl('lv')">🇱🇻 <span>Latviešu</span></div>
+          <div class="lo" data-lang="et" onclick="sl('et')">🇪🇪 <span>Eesti</span></div>
+          <div class="lo" data-lang="he" onclick="sl('he')">🇮🇱 <span>עברית</span></div>
+          <div class="lo" data-lang="ms" onclick="sl('ms')">🇲🇾 <span>Melayu</span></div>
+          <div class="lo" data-lang="tl" onclick="sl('tl')">🇵🇭 <span>Filipino</span></div>
+          <div class="lo" data-lang="sw" onclick="sl('sw')">🇰🇪 <span>Kiswahili</span></div>
+          <div class="lo" data-lang="af" onclick="sl('af')">🇿🇦 <span>Afrikaans</span></div>
+          <div class="lo" data-lang="am" onclick="sl('am')">🇪🇹 <span>አማርኛ</span></div>
+          <div class="lo" data-lang="az" onclick="sl('az')">🇦🇿 <span>Azərbaycanca</span></div>
+          <div class="lo" data-lang="ka" onclick="sl('ka')">🇬🇪 <span>ქართული</span></div>
+          <div class="lo" data-lang="hy" onclick="sl('hy')">🇦🇲 <span>Հայերեն</span></div>
+          <div class="lo" data-lang="kk" onclick="sl('kk')">🇰🇿 <span>Қазақша</span></div>
+          <div class="lo" data-lang="uz" onclick="sl('uz')">🇺🇿 <span>O‘zbek</span></div>
+          <div class="lo" data-lang="mn" onclick="sl('mn')">🇲🇳 <span>Монгол</span></div>
+          <div class="lo" data-lang="ne" onclick="sl('ne')">🇳🇵 <span>नेपाली</span></div>
+          <div class="lo" data-lang="si" onclick="sl('si')">🇱🇰 <span>සිංහල</span></div>
+          <div class="lo" data-lang="ta" onclick="sl('ta')">🇮🇳 <span>தமிழ்</span></div>
+          <div class="lo" data-lang="te" onclick="sl('te')">🇮🇳 <span>తెలుగు</span></div>
+          <div class="lo" data-lang="ml" onclick="sl('ml')">🇮🇳 <span>മലയാളം</span></div>
+          <div class="lo" data-lang="kn" onclick="sl('kn')">🇮🇳 <span>ಕನ್ನಡ</span></div>
+          <div class="lo" data-lang="mr" onclick="sl('mr')">🇮🇳 <span>मराठी</span></div>
+          <div class="lo" data-lang="gu" onclick="sl('gu')">🇮🇳 <span>ગુજરાતી</span></div>
+          <div class="lo" data-lang="pa" onclick="sl('pa')">🇮🇳 <span>ਪੰਜਾਬੀ</span></div>
+          <div class="lo" data-lang="ca" onclick="sl('ca')">🇪🇸 <span>Català</span></div>
+          <div class="lo" data-lang="eu" onclick="sl('eu')">🇪🇸 <span>Euskara</span></div>
+          <div class="lo" data-lang="ga" onclick="sl('ga')">🇮🇪 <span>Gaeilge</span></div>
+          <div class="lo" data-lang="is" onclick="sl('is')">🇮🇸 <span>Íslenska</span></div>
+          <div class="lo" data-lang="mt" onclick="sl('mt')">🇲🇹 <span>Malti</span></div>
         </div>
       </div>
       <button class="theme-btn" onclick="toggleTheme()" aria-label="Toggle dark/light mode" id="theme-btn" title="Toggle theme">&#x1F319;</button>
@@ -1391,25 +1437,35 @@ document.addEventListener('click',e=>{
     document.getElementById('lb')?.setAttribute('aria-expanded','false');
   }
 });
-const LANG_NAMES={en:'EN',tr:'TR',es:'ES',fr:'FR',de:'DE',pt:'PT',it:'IT',ru:'RU',ja:'JA',zh:'ZH',ko:'KO',ar:'AR',hi:'HI',nl:'NL',pl:'PL',sv:'SV',id:'ID',th:'TH',vi:'VI',uk:'UA',no:'NO',da:'DA',fi:'FI'};
+
+function filterLangOptions(q){
+  q=(q||'').toLowerCase().trim();
+  document.querySelectorAll('#ld .lo').forEach(el=>{
+    el.style.display=el.textContent.toLowerCase().includes(q)||el.dataset.lang.includes(q)?'flex':'none';
+  });
+}
+const LANG_NAMES={en:'EN',tr:'TR',es:'ES',fr:'FR',de:'DE',pt:'PT',it:'IT',ru:'RU',ja:'JA',zh:'ZH',ko:'KO',ar:'AR',hi:'HI',bn:'BN',ur:'UR',fa:'FA',nl:'NL',pl:'PL',sv:'SV',id:'ID',vi:'VI',th:'TH',uk:'UA',no:'NO',da:'DA',fi:'FI',el:'EL',cs:'CS',sk:'SK',hu:'HU',ro:'RO',bg:'BG',hr:'HR',sr:'SR',sl:'SL',lt:'LT',lv:'LV',et:'ET',he:'HE',ms:'MS',tl:'TL',sw:'SW',af:'AF',am:'AM',az:'AZ',ka:'KA',hy:'HY',kk:'KK',uz:'UZ',mn:'MN',ne:'NE',si:'SI',ta:'TA',te:'TE',ml:'ML',kn:'KN',mr:'MR',gu:'GU',pa:'PA',ca:'CA',eu:'EU',ga:'GA',is:'IS',mt:'MT'};
 function sl(lang){
   LANG=lang;
   localStorage.setItem('iba_lang',lang);
   applyTranslations(lang);
-  document.querySelectorAll('.lo').forEach(o=>{
-    const m=o.onclick?.toString().match(/'([a-z]{2,3})'/);
-    if(m)o.classList.toggle('act',m[1]===lang);
-  });
-  document.getElementById('lcode').textContent=LANG_NAMES[lang]||lang.toUpperCase();
+  document.querySelectorAll('.lo').forEach(o=>o.classList.toggle('act',o.dataset.lang===lang));
+  const codeEl=document.getElementById('lcode');
+  if(codeEl)codeEl.textContent=LANG_NAMES[lang]||lang.toUpperCase();
   document.documentElement.lang=lang;
-  document.documentElement.dir=lang==='ar'?'rtl':'ltr';
-  toggleLangMenu();
+  document.documentElement.dir=['ar','he','fa','ur'].includes(lang)?'rtl':'ltr';
+  document.getElementById('ld')?.classList.remove('open');
+  document.getElementById('lb')?.setAttribute('aria-expanded','false');
   trackEvent('switch_lang','UX',lang);
-  // Also trigger Google Translate
-  const gtLang={'zh':'zh-CN'};const gtCode=gtLang[lang]||lang;
+  translateWholePage(lang);
+}
+function translateWholePage(lang){
+  const googleCode={zh:'zh-CN',no:'no',tl:'tl'}[lang]||lang;
   try{
+    document.cookie='googtrans=/en/'+googleCode+';path=/';
+    document.cookie='googtrans=/en/'+googleCode+';domain='+location.hostname+';path=/';
     const sel=document.querySelector('.goog-te-combo');
-    if(sel){sel.value=gtCode;sel.dispatchEvent(new Event('change'));}
+    if(sel){sel.value=googleCode;sel.dispatchEvent(new Event('change'));}
   }catch(e){}
 }
 function applyDetectedLang(){sl(detectedLang);}
@@ -1447,47 +1503,39 @@ function applyTranslations(lang){
 
 /* ══ IP GEO LANGUAGE DETECTION ══ */
 const COUNTRY_LANG={
-  TR:'tr',DE:'de',AT:'de',CH:'de',FR:'fr',BE:'fr',
-  ES:'es',MX:'es',AR:'es',CO:'es',PE:'es',CL:'es',
-  BR:'pt',PT:'pt',IT:'it',RU:'ru',UA:'uk',
-  JP:'ja',CN:'zh',TW:'zh',KR:'ko',
-  SA:'ar',AE:'ar',EG:'ar',IN:'hi',
-  NL:'nl',PL:'pl',SE:'sv',ID:'id',TH:'th',VN:'vi',UA:'uk',NO:'no',DK:'da',FI:'fi'
+  US:'en',GB:'en',CA:'en',AU:'en',NZ:'en',IE:'en',TR:'tr',AZ:'az',DE:'de',AT:'de',CH:'de',FR:'fr',BE:'fr',ES:'es',MX:'es',AR:'es',CO:'es',PE:'es',CL:'es',BR:'pt',PT:'pt',IT:'it',RU:'ru',UA:'uk',JP:'ja',CN:'zh',TW:'zh',HK:'zh',KR:'ko',SA:'ar',AE:'ar',EG:'ar',MA:'ar',IL:'he',IR:'fa',PK:'ur',IN:'hi',BD:'bn',NL:'nl',PL:'pl',SE:'sv',ID:'id',TH:'th',VN:'vi',NO:'no',DK:'da',FI:'fi',GR:'el',CZ:'cs',SK:'sk',HU:'hu',RO:'ro',BG:'bg',HR:'hr',RS:'sr',SI:'sl',LT:'lt',LV:'lv',EE:'et',MY:'ms',PH:'tl',KE:'sw',ZA:'af',ET:'am',GE:'ka',AM:'hy',KZ:'kk',UZ:'uz',MN:'mn',NP:'ne',LK:'si',MT:'mt',IS:'is'
 };
-const LANG_NATIVE={tr:'Türkçe',de:'Deutsch',fr:'Français',es:'Español',pt:'Português',it:'Italiano',ru:'Русский',ja:'日本語',zh:'中文',ko:'한국어',ar:'العربية',hi:'हिन्दी',nl:'Nederlands',pl:'Polski',no:'Norsk',da:'Dansk',fi:'Suomi'};
+const LANG_NATIVE={tr:'Türkçe',es:'Español',fr:'Français',de:'Deutsch',pt:'Português',it:'Italiano',ru:'Русский',ja:'日本語',zh:'中文',ko:'한국어',ar:'العربية',hi:'हिन्दी',bn:'বাংলা',ur:'اردو',fa:'فارسی',nl:'Nederlands',pl:'Polski',sv:'Svenska',id:'Indonesia',vi:'Tiếng Việt',th:'ไทย',uk:'Українська',no:'Norsk',da:'Dansk',fi:'Suomi',el:'Ελληνικά',cs:'Čeština',sk:'Slovenčina',hu:'Magyar',ro:'Română',bg:'Български',hr:'Hrvatski',sr:'Srpski',sl:'Slovenščina',lt:'Lietuvių',lv:'Latviešu',et:'Eesti',he:'עברית',ms:'Melayu',tl:'Filipino',sw:'Kiswahili',af:'Afrikaans',am:'አማርኛ',az:'Azərbaycanca',ka:'ქართული',hy:'Հայերեն',kk:'Қазақша',uz:'O‘zbek',mn:'Монгол',ne:'नेपाली',si:'සිංහල',ta:'தமிழ்',te:'తెలుగు',ml:'മലയാളം',kn:'ಕನ್ನಡ',mr:'मराठी',gu:'ગુજરાતી',pa:'ਪੰਜਾਬੀ',ca:'Català',eu:'Euskara',ga:'Gaeilge',is:'Íslenska',mt:'Malti'};
 
 (async function detectLang(){
-  // Apply saved preference
   const saved=localStorage.getItem('iba_lang');
-  if(saved){
-    LANG=saved;
-    applyTranslations(saved);
-    document.getElementById('lcode').textContent=LANG_NAMES[saved]||saved.toUpperCase();
-    document.documentElement.lang=saved;
-    document.documentElement.dir=saved==='ar'?'rtl':'ltr';
-    document.querySelectorAll('.lo').forEach(o=>{
-      const m=o.onclick?.toString().match(/'([a-z]{2,3})'/);
-      if(m)o.classList.toggle('act',m[1]===saved);
-    });
-    return;
+  if(saved){sl(saved);return;}
+
+  function normalizeLang(x){
+    if(!x)return '';
+    x=x.toLowerCase();
+    if(x.startsWith('zh'))return 'zh';
+    if(x.startsWith('pt'))return 'pt';
+    if(x.startsWith('nb')||x.startsWith('nn'))return 'no';
+    return x.split('-')[0];
   }
-  // Auto-detect from IP
-  try{
-    const r=await fetch('https://ipapi.co/json/',{signal:AbortSignal.timeout(3000)});
-    const d=await r.json();
-    const lang=COUNTRY_LANG[d.country_code];
-    if(lang && LANG_NATIVE[lang]){
-      detectedLang=lang;
-      const banner=document.getElementById('lang-banner');
-      const btn=document.getElementById('lang-switch-btn');
-      const txt=document.getElementById('lang-banner-text');
-      if(banner&&btn&&txt){
-        txt.textContent='🌍 We detected you may speak '+LANG_NATIVE[lang]+'.';
-        btn.textContent='Switch to '+LANG_NATIVE[lang]+' →';
-        banner.classList.add('show');
-      }
-    }
-  }catch(e){}
+
+  let autoLang=normalizeLang((navigator.languages&&navigator.languages[0])||navigator.language||'');
+  if(!LANG_NAMES[autoLang])autoLang='';
+
+  if(!autoLang){
+    try{
+      const r=await fetch('https://ipapi.co/json/',{signal:AbortSignal.timeout(2500)});
+      const d=await r.json();
+      autoLang=COUNTRY_LANG[d.country_code]||'';
+    }catch(e){}
+  }
+
+  if(autoLang && autoLang!=='en'){
+    sl(autoLang);
+  }else{
+    sl('en');
+  }
 })();
 
 /* ══ MODALS ══ */
@@ -2383,12 +2431,12 @@ function applyWatermark(){
 
 </script>
 <!-- Google Translate (Auto Language Switch) -->
-<div id="google_translate_element" style="display:none;"></div>
+<div id="google_translate_element" style="position:absolute;left:-9999px;top:-9999px;height:0;overflow:hidden;"></div>
 <script type="text/javascript">
 function googleTranslateElementInit(){
   new google.translate.TranslateElement({
     pageLanguage:'en',
-    includedLanguages:'en,tr,es,fr,de,pt,it,ru,ja,zh-CN,ko,ar,hi,nl,pl,sv,id,vi,uk,th,no,da,fi',
+    includedLanguages:'en,tr,es,fr,de,pt,it,ru,ja,zh-CN,ko,ar,hi,bn,ur,fa,nl,pl,sv,id,vi,th,uk,no,da,fi,el,cs,sk,hu,ro,bg,hr,sr,sl,lt,lv,et,he,ms,tl,sw,af,am,az,ka,hy,kk,uz,mn,ne,si,ta,te,ml,kn,mr,gu,pa,ca,eu,ga,is,mt',
     layout:google.translate.TranslateElement.InlineLayout.SIMPLE,
     autoDisplay:false
   },'google_translate_element');
