@@ -912,7 +912,7 @@ footer{background:var(--text);color:rgba(255,255,255,.85);padding:3.5rem 1rem 1.
         <p id="resultText" data-i="res_text">Pick any tool, upload a photo, then click Apply. The result appears here instantly.</p>
         <div class="progress-wrap" id="progress"><div class="progress-bar" id="bar"></div></div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;">
-          <button class="btn-primary" onclick="applyTool()" style="min-width:160px;">⚡ Apply Tool</button>
+          <button id="applyToolBtn" class="btn-primary" onclick="applyTool()" style="min-width:160px;">⚡ Apply Tool</button>
           <button class="btn-secondary" onclick="resetEditor()">↻ Reset</button>
         </div>
         <div class="out-img-wrap" id="output"><img id="outImg" alt="Edited photo result"></div>
@@ -1135,9 +1135,13 @@ function navFilter(cat,btn){
 }
 
 /* ══ OPEN TOOL ══ */
+function hideApplyBtn(){var b=document.getElementById('applyToolBtn');if(b)b.style.display='none';}
+function showApplyBtn(){var b=document.getElementById('applyToolBtn');if(b)b.style.display='';}
+
 function openTool(name){
   const t=tools.find(x=>x[0]===name)||tools[0];
   selected=t[0]; selectedDesc=t[1];
+  showApplyBtn();
   // Update workspace titles
   const st=document.getElementById('selectedTitle');
   const ss=document.getElementById('selectedSmall');
@@ -1221,6 +1225,7 @@ function applyTool(){
 
 
 function finishApply(){
+  showApplyBtn();
   // Update Before/After panels
   const baBefore=document.getElementById('ba-before-content');
   const baAfter=document.getElementById('ba-after-content');
@@ -1276,6 +1281,7 @@ function addHistory(name){
   h.prepend(d);
 }
 function resetEditor(){
+  showApplyBtn();
   imageData=null;if(fileEl)fileEl.value='';
   document.getElementById('uploadContent').innerHTML='<div class="u-icon">🖼️</div><div class="u-title">Upload Your Photo</div><div class="u-sub">Click or drag an image here. JPG, PNG, WEBP supported.</div>';
   document.getElementById('output').style.display='none';
@@ -1718,35 +1724,68 @@ function runBgRemove(){
       // subject (a white shirt on a white backdrop, for example).
       // Connectivity keeps the subject intact even if it shares the
       // background's color.
+      //
+      // Two-threshold ("hysteresis") growth: a STRICT threshold anchors
+      // pixels to the known background colors, and a LOOSER threshold
+      // lets the region keep growing pixel-to-pixel along shadows and
+      // soft/anti-aliased edges next to the subject (e.g. the dark rim
+      // of shadow a product casts on the backdrop). Without the loose
+      // pass those shadowed slivers stay just outside the strict
+      // threshold and are left behind as disconnected leftover patches.
       var total=W*H;
       var visited=new Uint8Array(total);
       var mask=new Uint8Array(total); // 1 = background
       var stack=new Int32Array(total);
       var sp=0,head=0;
-      var thresh=48; // per-channel-ish tolerance
-      function closeToBg(i){
-        var r=px[i],g=px[i+1],bl=px[i+2];
+      var strictT=46, looseT=100;
+      function distToSeeds(i){
+        var r=px[i],g=px[i+1],bl=px[i+2],best=1e9;
         for(var k=0;k<seeds.length;k++){
           var sd=seeds[k];
-          if(Math.abs(r-sd[0])+Math.abs(g-sd[1])+Math.abs(bl-sd[2])<thresh*3) return true;
+          var d=Math.abs(r-sd[0])+Math.abs(g-sd[1])+Math.abs(bl-sd[2]);
+          if(d<best)best=d;
         }
-        return false;
+        return best;
       }
-      function tryPush(x,y){
+      function tryPushStrict(x,y){
         if(x<0||y<0||x>=W||y>=H) return;
         var p=y*W+x;
         if(visited[p]) return;
         visited[p]=1;
-        if(closeToBg(p*4)){mask[p]=1;stack[sp++]=p;}
+        if(distToSeeds(p*4)<strictT*3){mask[p]=1;stack[sp++]=p;}
       }
-      for(var x=0;x<W;x++){tryPush(x,0);tryPush(x,H-1);}
-      for(var y=0;y<H;y++){tryPush(0,y);tryPush(W-1,y);}
-      if(b)b.style.width='68%';
-
+      for(var x=0;x<W;x++){tryPushStrict(x,0);tryPushStrict(x,H-1);}
+      for(var y=0;y<H;y++){tryPushStrict(0,y);tryPushStrict(W-1,y);}
+      if(b)b.style.width='62%';
       while(head<sp){
         var p=stack[head++];
         var px0=p%W, py0=(p-px0)/W;
-        tryPush(px0+1,py0);tryPush(px0-1,py0);tryPush(px0,py0+1);tryPush(px0,py0-1);
+        tryPushStrict(px0+1,py0);tryPushStrict(px0-1,py0);tryPushStrict(px0,py0+1);tryPushStrict(px0,py0-1);
+      }
+      if(b)b.style.width='72%';
+
+      // Loose growth pass: from the current mask edge, absorb neighbouring
+      // pixels that are close to their already-masked neighbour's own
+      // color (follows gradients/shadows) AND still reasonably close to
+      // one of the original background seeds (keeps it anchored so it
+      // can't leak deep into the subject).
+      var stack2=new Int32Array(total);
+      var sp2=0,head2=0;
+      for(var p0=0;p0<total;p0++){ if(mask[p0]){stack2[sp2++]=p0;} }
+      function tryPushLoose(x,y,refI){
+        if(x<0||y<0||x>=W||y>=H) return;
+        var p=y*W+x;
+        if(visited[p]) return;
+        var i=p*4;
+        var dNeighbor=Math.abs(px[i]-px[refI])+Math.abs(px[i+1]-px[refI+1])+Math.abs(px[i+2]-px[refI+2]);
+        if(dNeighbor<strictT*2.2 && distToSeeds(i)<looseT*3){
+          visited[p]=1;mask[p]=1;stack2[sp2++]=p;
+        }
+      }
+      while(head2<sp2){
+        var p=stack2[head2++];
+        var px0=p%W, py0=(p-px0)/W, refI=p*4;
+        tryPushLoose(px0+1,py0,refI);tryPushLoose(px0-1,py0,refI);tryPushLoose(px0,py0+1,refI);tryPushLoose(px0,py0-1,refI);
       }
       if(b)b.style.width='82%';
 
@@ -1790,6 +1829,7 @@ function runBgRemove(){
 
 // ═══ TOOL 2: BACKGROUND CHANGER ═══
 function showBgChanger(){
+  hideApplyBtn();
   var rt=document.getElementById('resultTitle'),rx=document.getElementById('resultText');
   var p=document.getElementById('progress');if(p)p.style.display='none';
   if(rt)rt.textContent='Background Changer';
@@ -1853,6 +1893,7 @@ function applyBgChange(color,gradient){
 var txtState={posX:0.5,posY:0.82,dragging:false,scale:1,imgW:0,imgH:0,img:null};
 
 function showTextOverlay(){
+  hideApplyBtn();
   var rt=document.getElementById('resultTitle'),rx=document.getElementById('resultText');
   var p=document.getElementById('progress');if(p)p.style.display='none';
   if(rt)rt.textContent='Add Text to Photo';
@@ -2019,38 +2060,155 @@ function applyTextToPhoto(){
 }
 
 // ═══ TOOL 4: CROP IMAGE ═══
+// ═══ TOOL 4: CROP IMAGE (interactive, freeform) ═══
+var cropState={x:0.1,y:0.1,w:0.8,h:0.8,img:null,ratio:0};
+
 function showCropTool(){
+  hideApplyBtn();
   var rt=document.getElementById('resultTitle'),rx=document.getElementById('resultText');
   var p=document.getElementById('progress');if(p)p.style.display='none';
   if(rt)rt.textContent='Crop Image';
   if(!rx)return;
-  var ratios=[{l:'1:1 Square',w:1,h:1},{l:'16:9 Widescreen',w:16,h:9},{l:'4:3 Classic',w:4,h:3},{l:'9:16 Portrait',w:9,h:16},{l:'3:2 Photo',w:3,h:2},{l:'2:3 Portrait',w:2,h:3},{l:'Original',w:0,h:0}];
-  var desc=document.createElement('p');
-  desc.style.cssText='font-size:13px;color:var(--muted);margin-bottom:10px;';
-  desc.textContent='Select crop aspect ratio:';
-  var grid=document.createElement('div');
-  grid.style.cssText='display:grid;grid-template-columns:repeat(3,1fr);gap:8px;';
+  if(!imageData){
+    rx.innerHTML='';
+    var warn=document.createElement('p');
+    warn.style.cssText='font-size:13px;color:var(--muted);';
+    warn.textContent='Upload a photo first, then drag the crop box exactly where you want it.';
+    rx.appendChild(warn);
+    return;
+  }
+  function mk(tag,style,inner){var el=document.createElement(tag);if(style)el.style.cssText=style;if(inner)el.innerHTML=inner;return el;}
+
+  var desc=mk('p','font-size:13px;color:var(--muted);margin-bottom:8px;','🖱️ Drag inside the box to move it, drag a corner to resize. Or snap to a ratio below.');
+
+  var wrap=mk('div','position:relative;width:100%;margin-bottom:10px;border-radius:10px;overflow:hidden;border:1.5px solid var(--border);line-height:0;user-select:none;');
+  var img=document.createElement('img');
+  img.id='crop-img';img.style.cssText='display:block;width:100%;height:auto;user-select:none;pointer-events:none;';
+  img.draggable=false;
+  wrap.appendChild(img);
+
+  var box=mk('div','position:absolute;border:2px solid #fff;box-shadow:0 0 0 9999px rgba(0,0,0,.55);cursor:move;touch-action:none;');
+  box.id='crop-box';
+  wrap.appendChild(box);
+
+  var corners=['nw','ne','sw','se'];
+  corners.forEach(function(c){
+    var h=mk('div','position:absolute;width:16px;height:16px;background:#fff;border:2px solid var(--accent);border-radius:50%;touch-action:none;');
+    h.dataset.corner=c;
+    h.style.cursor=(c==='nw'||c==='se')?'nwse-resize':'nesw-resize';
+    if(c[0]==='n')h.style.top='-9px';else h.style.bottom='-9px';
+    if(c[1]==='w')h.style.left='-9px';else h.style.right='-9px';
+    box.appendChild(h);
+  });
+
+  var ratios=[{l:'Free',w:0,h:0},{l:'1:1',w:1,h:1},{l:'16:9',w:16,h:9},{l:'4:3',w:4,h:3},{l:'9:16',w:9,h:16},{l:'3:2',w:3,h:2}];
+  var grid=mk('div','display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-bottom:10px;');
   ratios.forEach(function(r){
     var btn=document.createElement('button');
     btn.textContent=r.l;
-    btn.style.cssText='padding:11px 6px;background:var(--bg3);border:1.5px solid var(--border);border-radius:9px;cursor:pointer;color:var(--text);font-weight:600;font-size:12px;font-family:inherit;transition:all .2s;';
-    btn.onmouseover=function(){this.style.borderColor='var(--accent)';this.style.background='var(--surface)';};
-    btn.onmouseout=function(){this.style.borderColor='var(--border)';this.style.background='var(--bg3)';};
-    btn.onclick=function(){applyCrop(r.w,r.h);};
+    btn.style.cssText='padding:8px 4px;background:var(--bg3);border:1.5px solid var(--border);border-radius:8px;cursor:pointer;color:var(--text);font-weight:600;font-size:11px;font-family:inherit;';
+    btn.onclick=function(){snapCropRatio(r.w,r.h);};
     grid.appendChild(btn);
   });
-  rx.innerHTML='';rx.appendChild(desc);rx.appendChild(grid);
+
+  var applyBtn=mk('button','width:100%;padding:12px;background:var(--gp);color:#fff;border:none;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;','✂️ Apply Crop');
+  applyBtn.onclick=applyCrop;
+
+  rx.innerHTML='';
+  rx.appendChild(desc);rx.appendChild(wrap);rx.appendChild(grid);rx.appendChild(applyBtn);
+
+  cropState.x=0.1;cropState.y=0.1;cropState.w=0.8;cropState.h=0.8;cropState.ratio=0;
+  var loader=new Image();
+  loader.onload=function(){
+    cropState.img=loader;
+    img.src=imageData;
+    drawCropBox();
+  };
+  loader.src=imageData;
+
+  function drawCropBox(){
+    box.style.left=(cropState.x*100)+'%';
+    box.style.top=(cropState.y*100)+'%';
+    box.style.width=(cropState.w*100)+'%';
+    box.style.height=(cropState.h*100)+'%';
+  }
+  cropState._draw=drawCropBox;
+
+  var dragMode=null,startMouse=null,startRect=null;
+  function pos(e){return {x:e.touches?e.touches[0].clientX:e.clientX, y:e.touches?e.touches[0].clientY:e.clientY};}
+  function onDown(e,mode){
+    dragMode=mode;startMouse=pos(e);
+    startRect={x:cropState.x,y:cropState.y,w:cropState.w,h:cropState.h};
+    e.preventDefault();e.stopPropagation();
+  }
+  box.addEventListener('mousedown',function(e){if(e.target===box)onDown(e,'move');});
+  box.addEventListener('touchstart',function(e){if(e.target===box)onDown(e,'move');},{passive:false});
+  box.querySelectorAll('[data-corner]').forEach(function(h){
+    h.addEventListener('mousedown',function(e){onDown(e,h.dataset.corner);});
+    h.addEventListener('touchstart',function(e){onDown(e,h.dataset.corner);},{passive:false});
+  });
+  function onMove(e){
+    if(!dragMode)return;
+    var rect=wrap.getBoundingClientRect();
+    var cur=pos(e);
+    var dx=(cur.x-startMouse.x)/rect.width, dy=(cur.y-startMouse.y)/rect.height;
+    var minS=0.08;
+    if(dragMode==='move'){
+      cropState.x=Math.min(1-startRect.w,Math.max(0,startRect.x+dx));
+      cropState.y=Math.min(1-startRect.h,Math.max(0,startRect.y+dy));
+    }else{
+      var nx=startRect.x,ny=startRect.y,nw=startRect.w,nh=startRect.h;
+      if(dragMode.indexOf('w')>=0){ // west edge moves x + w
+        var newX=Math.min(startRect.x+startRect.w-minS,Math.max(0,startRect.x+dx));
+        nw=startRect.x+startRect.w-newX; nx=newX;
+      }
+      if(dragMode.indexOf('e')>=0){
+        nw=Math.min(1-startRect.x,Math.max(minS,startRect.w+dx));
+      }
+      if(dragMode.indexOf('n')>=0){
+        var newY=Math.min(startRect.y+startRect.h-minS,Math.max(0,startRect.y+dy));
+        nh=startRect.y+startRect.h-newY; ny=newY;
+      }
+      if(dragMode.indexOf('s')>=0){
+        nh=Math.min(1-startRect.y,Math.max(minS,startRect.h+dy));
+      }
+      if(cropState.ratio>0){
+        // keep the fixed ratio while resizing from a corner
+        nh=nw/cropState.ratio;
+        if(ny+nh>1)nh=1-ny;
+        nw=nh*cropState.ratio;
+      }
+      cropState.x=nx;cropState.y=ny;cropState.w=nw;cropState.h=nh;
+    }
+    drawCropBox();
+    e.preventDefault();
+  }
+  function onUp(){dragMode=null;}
+  window.addEventListener('mousemove',onMove);
+  window.addEventListener('mouseup',onUp);
+  window.addEventListener('touchmove',onMove,{passive:false});
+  window.addEventListener('touchend',onUp);
 }
 
-function applyCrop(rw,rh){
+function snapCropRatio(rw,rh){
+  if(rw<=0||rh<=0){cropState.ratio=0;if(cropState._draw)cropState._draw();return;}
+  var ratio=rw/rh;
+  cropState.ratio=ratio;
+  var cx=cropState.x+cropState.w/2, cy=cropState.y+cropState.h/2;
+  var w=cropState.w, h=w/ratio;
+  if(h>1){h=1;w=h*ratio;}
+  cropState.w=w;cropState.h=h;
+  cropState.x=Math.min(1-w,Math.max(0,cx-w/2));
+  cropState.y=Math.min(1-h,Math.max(0,cy-h/2));
+  if(cropState._draw)cropState._draw();
+}
+
+function applyCrop(){
   if(!imageData){showToast('Please upload an image first');return;}
+  var cs={x:cropState.x,y:cropState.y,w:cropState.w,h:cropState.h};
   withImage(function(img){
-    var sw=img.width,sh=img.height,sx=0,sy=0;
-    if(rw>0&&rh>0){
-      var tr=rw/rh,ir=img.width/img.height;
-      if(ir>tr){sw=Math.round(img.height*tr);sx=Math.round((img.width-sw)/2);}
-      else{sh=Math.round(img.width/tr);sy=Math.round((img.height-sh)/2);}
-    }
+    var sx=Math.round(cs.x*img.width), sy=Math.round(cs.y*img.height);
+    var sw=Math.max(1,Math.round(cs.w*img.width)), sh=Math.max(1,Math.round(cs.h*img.height));
     var c=document.createElement('canvas');c.width=sw;c.height=sh;
     c.getContext('2d').drawImage(img,sx,sy,sw,sh,0,0,sw,sh);
     imageData=c.toDataURL('image/png');
@@ -2061,6 +2219,7 @@ function applyCrop(rw,rh){
 
 // ═══ TOOL 5: RESIZE IMAGE ═══
 function showResizeTool(){
+  hideApplyBtn();
   var rt=document.getElementById('resultTitle'),rx=document.getElementById('resultText');
   var p=document.getElementById('progress');if(p)p.style.display='none';
   if(rt)rt.textContent='Resize Image';
@@ -2113,6 +2272,7 @@ function applyResize(){
 
 // ═══ TOOL 6: IMAGE COMPRESSOR ═══
 function showCompressTool(){
+  hideApplyBtn();
   var rt=document.getElementById('resultTitle'),rx=document.getElementById('resultText');
   var p=document.getElementById('progress');if(p)p.style.display='none';
   if(rt)rt.textContent='Image Compressor';
@@ -2146,6 +2306,7 @@ function applyCompress(){
 
 // ═══ TOOL 7: CONVERT IMAGE ═══
 function showConvertTool(){
+  hideApplyBtn();
   var rt=document.getElementById('resultTitle'),rx=document.getElementById('resultText');
   var p=document.getElementById('progress');if(p)p.style.display='none';
   if(rt)rt.textContent='Convert Image Format';
@@ -2178,6 +2339,7 @@ function applyConvert(mime,ext){
 
 // ═══ TOOL 8: BRIGHTNESS & CONTRAST ═══
 function showBrightnessTool(){
+  hideApplyBtn();
   var rt=document.getElementById('resultTitle'),rx=document.getElementById('resultText');
   var p=document.getElementById('progress');if(p)p.style.display='none';
   if(rt)rt.textContent='Brightness & Contrast';
@@ -2235,6 +2397,7 @@ function applyBC(){
 
 // ═══ TOOL 9: WATERMARK MAKER ═══
 function showWatermarkTool(){
+  hideApplyBtn();
   var rt=document.getElementById('resultTitle'),rx=document.getElementById('resultText');
   var p=document.getElementById('progress');if(p)p.style.display='none';
   if(rt)rt.textContent='Watermark Maker';
