@@ -1137,39 +1137,80 @@ function navFilter(cat,btn){
 /* ══ OPEN TOOL ══ */
 function openTool(name){
   const t=tools.find(x=>x[0]===name)||tools[0];
+  if(!t)return;
   selected=t[0]; selectedDesc=t[1];
-  // Update workspace titles
+
+  // ── Update workspace header ──
   const st=document.getElementById('selectedTitle');
   const ss=document.getElementById('selectedSmall');
   const rt=document.getElementById('resultTitle');
   const rx=document.getElementById('resultText');
   if(st)st.textContent=t[2]+' '+t[0];
-  if(ss)ss.textContent='Selected: '+t[0];
-  if(rt)rt.textContent=t[0];
-  if(rx)rx.textContent=t[1]+' Upload a photo and click ⚡ Apply Tool.';
-  // Scroll only happens when Apply Tool is clicked, not on tool select
-  // (removed auto-scroll to keep user at top of page)
-  // Pulse the upload zone to guide user
+  if(ss)ss.textContent='Selected Tool';
+  if(rt)rt.textContent='Ready — '+t[0];
+
+  // ── If tool has a custom UI panel (text, bg, crop, resize, etc.)
+  //    show it immediately inside resultText
+  const uiTools={
+    'Add Text to Photo':showTextOverlay,
+    'Background Changer':showBgChanger,
+    'Crop Image':showCropTool,
+    'Resize Image':showResizeTool,
+    'Image Compressor':showCompressTool,
+    'Convert Image':showConvertTool,
+    'Brightness & Contrast':showBrightnessTool,
+    'Watermark Maker':showWatermarkTool,
+  };
+  if(uiTools[t[0]]){
+    // Show custom panel immediately (no need to upload first for these)
+    if(rx)rx.innerHTML='';
+    uiTools[t[0]]();
+  } else {
+    // For direct-apply tools: just show instruction
+    if(rx)rx.textContent=t[1]+' — Upload a photo then click ⚡ Apply Tool.';
+  }
+
+  // ── Scroll smoothly to workspace ──
+  const ws=document.getElementById('workspace');
+  if(ws){
+    ws.scrollIntoView({behavior:'smooth', block:'start'});
+  }
+
+  // ── Highlight upload zone ──
   const dz=document.getElementById('drop');
   if(dz){
     dz.style.transition='all .3s ease';
     dz.style.borderColor='var(--accent)';
-    dz.style.boxShadow='0 0 0 4px rgba(91,76,232,.15),inset 0 0 40px rgba(91,76,232,.06)';
+    dz.style.boxShadow='0 0 0 4px rgba(91,76,232,.15)';
     setTimeout(()=>{dz.style.borderColor='';dz.style.boxShadow='';},1800);
   }
-  // Highlight active tool card
-  document.querySelectorAll('.tool-card').forEach(c=>c.style.outline='');
-  const activeCard=Array.from(document.querySelectorAll('.tool-card')).find(c=>c.getAttribute('aria-label')&&c.getAttribute('aria-label').startsWith(t[0]));
-  if(activeCard){activeCard.style.outline='2.5px solid var(--accent)';activeCard.style.outlineOffset='2px';}
-  showToast('✅ ' + t[0] + ' selected! Upload a photo then click Apply Tool.');
-  // Highlight the Apply Tool button
-  var ab=document.querySelector('[onclick="applyTool()"]');
-  if(ab){ab.style.animation='none';ab.style.transform='scale(1.05)';ab.style.boxShadow='0 0 0 3px var(--accent)';
-    setTimeout(function(){ab.style.transform='';ab.style.boxShadow='';},1500);}
-  try{if(history.pushState&&window.self===window.top)history.pushState(null,'','?tool='+encodeURIComponent(t[0]));}catch(e){}
+
+  // ── Highlight active card ──
+  document.querySelectorAll('.tool-card').forEach(c=>{
+    c.style.outline='';c.style.transform='';
+  });
+  const activeCard=Array.from(document.querySelectorAll('.tool-card'))
+    .find(c=>c.querySelector('.tool-name')?.textContent===t[0]);
+  if(activeCard){
+    activeCard.style.outline='2.5px solid var(--accent)';
+    activeCard.style.outlineOffset='2px';
+    activeCard.style.boxShadow='0 8px 24px rgba(91,76,232,.25)';
+  }
+
+  // ── Flash Apply Tool button ──
+  const ab=document.querySelector('button.btn-primary[onclick="applyTool()"]');
+  if(ab){
+    ab.style.boxShadow='0 0 0 3px rgba(91,76,232,.4)';
+    ab.textContent='⚡ Apply: '+t[0];
+    setTimeout(()=>{ab.style.boxShadow='';ab.textContent='⚡ Apply Tool';},2500);
+  }
+
+  showToast(t[2]+' '+t[0]+' selected');
+  try{if(history.pushState&&window.self===window.top)
+    history.pushState(null,'','?tool='+encodeURIComponent(t[0]));}catch(e){}
   trackEvent('open_tool','Tool',t[0]);
-  if(typeof gtag!=='undefined')gtag('event','tool_open',{tool_name:t[0],tool_category:t[3]});
 }
+
 
 /* ══ FILE UPLOAD ══ */
 const fileEl=document.getElementById('file');
