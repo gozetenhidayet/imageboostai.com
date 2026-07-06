@@ -231,6 +231,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://toolnova.tools/add-text-to-pdf.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://toolnova.tools/qr-code-generator.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
