@@ -2820,7 +2820,7 @@ function applyWatermark(){
 })();
 
 function _img(src){return new Promise((res,rej)=>{const im=new Image(); im.onload=()=>res(im); im.onerror=rej; im.src=src;});}
-function _progress(done){const p=document.getElementById('progress'),b=document.getElementById('bar'); if(p)p.style.display='block'; let v=0; const t=setInterval(()=>{v=Math.min(95,v+12); if(b)b.style.width=v+'%';},45); return ()=>{clearInterval(t); if(b)b.style.width='100%'; setTimeout(()=>{if(p)p.style.display='none'; done&&done();},180);};}
+function _progress(done){const p=document.getElementById('progress'),b=document.getElementById('bar'); if(p)p.style.display='block'; let v=0; const t=setInterval(()=>{v=Math.min(95,v+12); if(b)b.style.width=v+'%';},45); return (cb)=>{clearInterval(t); if(b)b.style.width='100%'; setTimeout(()=>{if(p)p.style.display='none'; const fn=cb||done; fn&&fn();},180);};}
 function _canvas(w,h){const c=document.createElement('canvas'); c.width=Math.max(1,Math.round(w)); c.height=Math.max(1,Math.round(h)); return c;}
 function _downloadReady(data,ext){
   imageData=data;
