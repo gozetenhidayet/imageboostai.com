@@ -2856,14 +2856,41 @@ function applyTool(){
 function finishApply(){_downloadReady(imageData,'png');}
 function finishWithProgress(){const end=_progress(); end(()=>_downloadReady(imageData,'png'));}
 
+function _naiveCutout(im){
+  // Fallback heuristic (corner-color sampling) — only used if the AI model can't load.
+  const c=_canvas(im.width,im.height),x=c.getContext('2d'); x.drawImage(im,0,0); const d=x.getImageData(0,0,c.width,c.height),p=d.data; const pts=[0,(c.width-1)*4,(c.width*(c.height-1))*4,(c.width*c.height-1)*4]; let r=0,g=0,b=0; pts.forEach(i=>{r+=p[i];g+=p[i+1];b+=p[i+2];}); r/=4;g/=4;b/=4; for(let i=0;i<p.length;i+=4){const diff=Math.abs(p[i]-r)+Math.abs(p[i+1]-g)+Math.abs(p[i+2]-b); const light=(p[i]+p[i+1]+p[i+2])/3; if(diff<92 || (light>235 && Math.abs(p[i]-p[i+1])<18 && Math.abs(p[i+1]-p[i+2])<18)) p[i+3]=0;} x.putImageData(d,0,0); return c;
+}
+async function _getCutoutImage(im){
+  // Returns an <img> with the subject cut out on a transparent background,
+  // using the real in-browser AI model when available, else the naive fallback.
+  if(window.__imglyRemoveBackground){
+    try{
+      showToast('🧠 AI modeli çalışıyor (ilk çalıştırmada model indirilir, biraz sürebilir)…');
+      const blob=await window.__imglyRemoveBackground(imageData);
+      const url=URL.createObjectURL(blob);
+      return await _img(url);
+    }catch(e){
+      console.error('AI background removal failed, using fallback:',e);
+      showToast('⚠️ AI modeli yüklenemedi, basit yöntem kullanılıyor');
+    }
+  }
+  return _naiveCutout(im);
+}
 function runBgRemove(){
-  return _applyCanvas(async im=>{const c=_canvas(im.width,im.height),x=c.getContext('2d'); x.drawImage(im,0,0); const d=x.getImageData(0,0,c.width,c.height),p=d.data; const pts=[0,(c.width-1)*4,(c.width*(c.height-1))*4,(c.width*c.height-1)*4]; let r=0,g=0,b=0; pts.forEach(i=>{r+=p[i];g+=p[i+1];b+=p[i+2];}); r/=4;g/=4;b/=4; for(let i=0;i<p.length;i+=4){const diff=Math.abs(p[i]-r)+Math.abs(p[i+1]-g)+Math.abs(p[i+2]-b); const light=(p[i]+p[i+1]+p[i+2])/3; if(diff<92 || (light>235 && Math.abs(p[i]-p[i+1])<18 && Math.abs(p[i+1]-p[i+2])<18)) p[i+3]=0;} x.putImageData(d,0,0); return c.toDataURL('image/png');});
+  return _applyCanvas(async im=>{
+    const cut=await _getCutoutImage(im);
+    const c=_canvas(im.width,im.height),x=c.getContext('2d');
+    x.drawImage(cut,0,0,c.width,c.height);
+    return c.toDataURL('image/png');
+  });
 }
 function applyBackgroundChanger(){return applyBgChange('gradient-ocean');}
 function applyBgChange(bg='gradient-ocean'){
-  return _applyCanvas(async im=>{const c=_canvas(im.width,im.height),x=c.getContext('2d'); const maps={
+  return _applyCanvas(async im=>{
+    const cut=await _getCutoutImage(im);
+    const c=_canvas(im.width,im.height),x=c.getContext('2d'); const maps={
     'gradient-purple':['#667eea','#764ba2'],'gradient-sunset':['#f093fb','#f5576c'],'gradient-ocean':['#4facfe','#00f2fe'],'gradient-mint':['#11998e','#38ef7d']};
-    let grd=x.createLinearGradient(0,0,c.width,c.height), arr=maps[bg]||['#f8fafc','#dbeafe']; grd.addColorStop(0,arr[0]); grd.addColorStop(1,arr[1]); x.fillStyle=grd; x.fillRect(0,0,c.width,c.height); x.drawImage(im,0,0); return c.toDataURL('image/png');});
+    let grd=x.createLinearGradient(0,0,c.width,c.height), arr=maps[bg]||['#f8fafc','#dbeafe']; grd.addColorStop(0,arr[0]); grd.addColorStop(1,arr[1]); x.fillStyle=grd; x.fillRect(0,0,c.width,c.height); x.drawImage(cut,0,0,c.width,c.height); return c.toDataURL('image/png');});
 }
 function applyAIBGGenerator(){return _applyCanvas(async im=>{const c=_canvas(im.width,im.height),x=c.getContext('2d'); let g=x.createRadialGradient(c.width*.75,c.height*.25,20,c.width*.5,c.height*.5,Math.max(c.width,c.height)); g.addColorStop(0,'#22d3ee'); g.addColorStop(.45,'#5b4ce8'); g.addColorStop(1,'#111827'); x.fillStyle=g; x.fillRect(0,0,c.width,c.height); x.globalAlpha=.86; x.drawImage(im,0,0); x.globalAlpha=1; return c.toDataURL('image/png');});}
 function applyObjectRemover(){return _applyCanvas(async im=>{const c=_canvas(im.width,im.height),x=c.getContext('2d'); x.drawImage(im,0,0); const w=c.width*.28,h=c.height*.18,cx=(c.width-w)/2,cy=(c.height-h)/2; x.filter='blur(16px)'; x.drawImage(c,cx-40,cy-40,w+80,h+80,cx,cy,w,h); x.filter='none'; return c.toDataURL('image/png');});}
@@ -2920,6 +2947,13 @@ function dispatchTool(name){
   (MAP[name]||applyPhotoEnhancer)();
 }
 
+</script>
+<!-- Real AI background removal (runs fully in the user's browser, WASM + ONNX model, no server).
+     Loaded as a module so runBgRemove()/applyBgChange() can call window.__imglyRemoveBackground(). -->
+<script type="module">
+  import imglyRemoveBackground from "https://esm.sh/@imgly/background-removal@1.7.0";
+  window.__imglyRemoveBackground = (src) => imglyRemoveBackground(src, { model: 'small' });
+  window.__imglyReady = true;
 </script>
 <!-- Google Translate (Auto Language Switch) -->
 <div id="google_translate_element" style="position:absolute;left:-9999px;top:-9999px;height:0;overflow:hidden;"></div>
