@@ -671,6 +671,10 @@ footer{background:var(--text);color:rgba(255,255,255,.85);padding:3.5rem 1rem 1.
   .tools-grid{grid-template-columns:1fr;}
 }
 
+#workspace.fs-active{background:var(--bg,#fff);padding:20px;overflow-y:auto;}
+#workspace.fs-active .ws-grid{max-width:1400px;margin:0 auto;}
+#undo-btn:disabled,#redo-btn:disabled{opacity:.4;cursor:not-allowed;}
+
 .goog-te-banner-frame.skiptranslate,.goog-te-gadget-icon{display:none!important;}body{top:0!important;}#goog-gt-tt,.goog-te-balloon-frame{display:none!important;}</style>
 
 <!-- AdSense Auto Ads — works without specific slot IDs -->
@@ -914,6 +918,9 @@ footer{background:var(--text);color:rgba(255,255,255,.85);padding:3.5rem 1rem 1.
         <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;">
           <button class="btn-primary" onclick="applyTool()" style="min-width:160px;">⚡ Apply Tool</button>
           <button class="btn-secondary" onclick="resetEditor()">↻ Reset</button>
+          <button class="btn-secondary" id="undo-btn" onclick="doUndo()" disabled title="Undo last change">↶ Undo</button>
+          <button class="btn-secondary" id="redo-btn" onclick="doRedo()" disabled title="Redo">↷ Redo</button>
+          <button class="btn-secondary" id="fullscreen-btn" onclick="toggleFullscreen()" title="Fullscreen editor">⛶ Fullscreen</button>
         </div>
         <div class="out-img-wrap" id="output"><img id="outImg" alt="Edited photo result"></div>
         <a class="btn-primary dl-btn" id="download" download="imageboostai-result.png" data-i="dl_btn">⬇ Download Result</a>
@@ -5170,6 +5177,202 @@ function loadFile(f){
     }
   };
   r.readAsDataURL(f);
+}
+
+/* =========================================================
+   ROUND 9:
+   - Real Undo/Redo (actual image-state stack, not just a log list)
+   - Fullscreen toggle for the editor workspace
+   - Crop: draggable resize handles on the custom-selection rectangle
+========================================================= */
+window.__undoStack=[];
+window.__redoStack=[];
+const _MAX_HISTORY=12;
+function _pushUndo(prevImageData){
+  if(!prevImageData)return;
+  window.__undoStack.push(prevImageData);
+  if(window.__undoStack.length>_MAX_HISTORY)window.__undoStack.shift();
+  window.__redoStack=[];
+  _updateUndoRedoButtons();
+}
+function _refreshResultView(){
+  const out=document.getElementById('output');
+  if(out){
+    out.innerHTML='';
+    const img=document.createElement('img');
+    img.id='outImg';img.alt='Edited photo result';img.src=imageData;
+    img.style.cssText='display:block;width:100%;max-height:420px;object-fit:contain;border-radius:16px;';
+    out.appendChild(img);
+    out.style.display='block';
+  }
+  const dl=document.getElementById('download');
+  if(dl){dl.href=imageData;dl.style.display='inline-block';}
+}
+function _updateUndoRedoButtons(){
+  const u=document.getElementById('undo-btn'),r=document.getElementById('redo-btn');
+  if(u)u.disabled=window.__undoStack.length===0;
+  if(r)r.disabled=window.__redoStack.length===0;
+}
+function doUndo(){
+  if(window.__undoStack.length===0){showToast('⚠️ Nothing to undo');return;}
+  window.__redoStack.push(imageData);
+  imageData=window.__undoStack.pop();
+  _refreshResultView();
+  _updateUndoRedoButtons();
+  showToast('↶ Undone');
+}
+function doRedo(){
+  if(window.__redoStack.length===0){showToast('⚠️ Nothing to redo');return;}
+  window.__undoStack.push(imageData);
+  imageData=window.__redoStack.pop();
+  _refreshResultView();
+  _updateUndoRedoButtons();
+  showToast('↷ Redone');
+}
+function _downloadReady(data,ext){
+  _pushUndo(imageData);
+  imageData=data;
+  const out=document.getElementById('output'),dl=document.getElementById('download'),sb=document.getElementById('share-bar');
+  if(out){
+    out.innerHTML='';
+    const img=document.createElement('img');
+    img.id='outImg';img.alt='Edited photo result';img.src=data;
+    img.style.cssText='display:block;width:100%;max-height:420px;object-fit:contain;border-radius:16px;';
+    out.appendChild(img);
+    out.style.display='block';out.style.opacity='1';out.style.transform='none';
+  }
+  if(dl){dl.href=imageData;dl.download='imageboostai-'+selected.toLowerCase().replace(/[^a-z0-9]+/g,'-')+'.'+(ext||'png');dl.style.display='inline-block';dl.textContent='⬇ Download Result';}
+  if(sb)sb.style.display='flex';
+  const rt=document.getElementById('resultTitle'),rx=document.getElementById('resultText');
+  if(rt)rt.textContent='✅ Done!';
+  if(rx)rx.textContent=selected+' applied. Your download is ready.';
+  const closeBtn=document.getElementById('close-result-btn');if(closeBtn)closeBtn.style.display='flex';
+  addHistory&&addHistory(selected);
+  showToast&&showToast('✅ '+selected+' complete — download ready!');
+}
+
+/* ---- Fullscreen toggle ---- */
+function toggleFullscreen(){
+  const ws=document.getElementById('workspace');
+  if(!document.fullscreenElement){
+    const req=ws.requestFullscreen||ws.webkitRequestFullscreen||ws.msRequestFullscreen;
+    if(req){const p=req.call(ws);if(p&&p.catch)p.catch(()=>showToast('⚠️ Fullscreen not supported in this browser'));}
+    ws.classList.add('fs-active');
+  }else{
+    const exit=document.exitFullscreen||document.webkitExitFullscreen||document.msExitFullscreen;
+    if(exit)exit.call(document);
+    ws.classList.remove('fs-active');
+  }
+}
+document.addEventListener('fullscreenchange',()=>{
+  const ws=document.getElementById('workspace'),btn=document.getElementById('fullscreen-btn');
+  if(!document.fullscreenElement){if(ws)ws.classList.remove('fs-active');if(btn)btn.textContent='⛶ Fullscreen';}
+  else if(btn)btn.textContent='⛶ Exit Fullscreen';
+});
+
+/* ---- Crop: draggable resize handles on the custom-selection rectangle ---- */
+function _mkRectSelector(opts){
+  const maxW=(opts&&opts.maxW)||340;
+  const wrap=document.createElement('div');
+  wrap.style.cssText='position:relative;display:inline-block;max-width:100%;border-radius:10px;overflow:hidden;cursor:crosshair;user-select:none;border:1.5px solid var(--border);touch-action:none;';
+  const canvas=document.createElement('canvas');
+  canvas.style.cssText='display:block;max-width:100%;';
+  wrap.appendChild(canvas);
+  let img=null,rect=null;
+  const HANDLE_R=9;
+  function draw(){
+    if(!img)return;
+    const ctx=canvas.getContext('2d');
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.drawImage(img,0,0,canvas.width,canvas.height);
+    if(rect){
+      const rx0=rect.x*canvas.width,ry0=rect.y*canvas.height,rw=rect.w*canvas.width,rh=rect.h*canvas.height;
+      ctx.save();
+      ctx.strokeStyle='#5b4ce8';ctx.lineWidth=2;ctx.setLineDash([6,4]);
+      ctx.strokeRect(rx0,ry0,rw,rh);
+      ctx.fillStyle='rgba(91,76,232,.18)';
+      ctx.fillRect(rx0,ry0,rw,rh);
+      ctx.setLineDash([]);
+      const pts=[[rx0,ry0],[rx0+rw/2,ry0],[rx0+rw,ry0],[rx0,ry0+rh/2],[rx0+rw,ry0+rh/2],[rx0,ry0+rh],[rx0+rw/2,ry0+rh],[rx0+rw,ry0+rh]];
+      pts.forEach(p=>{ctx.beginPath();ctx.arc(p[0],p[1],HANDLE_R*0.6,0,Math.PI*2);ctx.fillStyle='#fff';ctx.fill();ctx.lineWidth=2;ctx.strokeStyle='#5b4ce8';ctx.stroke();});
+      ctx.restore();
+    }
+  }
+  img=new Image();
+  img.onload=function(){
+    const scale=Math.min(1,maxW/img.width);
+    canvas.width=Math.round(img.width*scale);canvas.height=Math.round(img.height*scale);
+    draw();
+  };
+  img.src=imageData;
+  let mode=null,startX=0,startY=0,startRect=null;
+  function posFromEvent(e){
+    const r=canvas.getBoundingClientRect();
+    const cx=(e.touches?e.touches[0].clientX:e.clientX)-r.left;
+    const cy=(e.touches?e.touches[0].clientY:e.clientY)-r.top;
+    return{x:Math.max(0,Math.min(1,cx/canvas.width)),y:Math.max(0,Math.min(1,cy/canvas.height))};
+  }
+  function hitTestHandle(p){
+    if(!rect)return null;
+    const px=p.x*canvas.width,py=p.y*canvas.height;
+    const rx0=rect.x*canvas.width,ry0=rect.y*canvas.height,rw=rect.w*canvas.width,rh=rect.h*canvas.height;
+    const handles={
+      nw:[rx0,ry0],n:[rx0+rw/2,ry0],ne:[rx0+rw,ry0],
+      w:[rx0,ry0+rh/2],e:[rx0+rw,ry0+rh/2],
+      sw:[rx0,ry0+rh],s:[rx0+rw/2,ry0+rh],se:[rx0+rw,ry0+rh]
+    };
+    for(const k in handles){
+      const h=handles[k];
+      if(Math.hypot(px-h[0],py-h[1])<HANDLE_R+4)return k;
+    }
+    if(px>=rx0&&px<=rx0+rw&&py>=ry0&&py<=ry0+rh)return 'move';
+    return null;
+  }
+  function down(e){
+    const p=posFromEvent(e);
+    const hit=rect?hitTestHandle(p):null;
+    if(rect&&hit){
+      mode=hit;startX=p.x;startY=p.y;startRect={x:rect.x,y:rect.y,w:rect.w,h:rect.h};
+    }else{
+      mode='new';startX=p.x;startY=p.y;rect={x:p.x,y:p.y,w:0,h:0};
+    }
+    e.preventDefault();
+  }
+  function move(e){
+    if(!mode)return;
+    const p=posFromEvent(e);
+    if(mode==='new'){
+      rect={x:Math.min(startX,p.x),y:Math.min(startY,p.y),w:Math.abs(p.x-startX),h:Math.abs(p.y-startY)};
+    }else if(mode==='move'){
+      const dx=p.x-startX,dy=p.y-startY;
+      let nx=startRect.x+dx,ny=startRect.y+dy;
+      nx=Math.max(0,Math.min(1-startRect.w,nx));ny=Math.max(0,Math.min(1-startRect.h,ny));
+      rect={x:nx,y:ny,w:startRect.w,h:startRect.h};
+    }else{
+      let{x,y,w,h}=startRect;
+      const dx=p.x-startX,dy=p.y-startY;
+      if(mode.includes('w')){x=startRect.x+dx;w=startRect.w-dx;}
+      if(mode.includes('e')){w=startRect.w+dx;}
+      if(mode.includes('n')){y=startRect.y+dy;h=startRect.h-dy;}
+      if(mode.includes('s')){h=startRect.h+dy;}
+      if(w<0){x=x+w;w=-w;}
+      if(h<0){y=y+h;h=-h;}
+      rect={x:Math.max(0,x),y:Math.max(0,y),w:Math.min(w,1-Math.max(0,x)),h:Math.min(h,1-Math.max(0,y))};
+    }
+    draw();
+    e.preventDefault();
+  }
+  function up(){
+    if(mode==='new'&&rect&&(rect.w<0.02||rect.h<0.02))rect=null;
+    mode=null;draw();
+  }
+  canvas.addEventListener('mousedown',down);
+  canvas.addEventListener('mousemove',move);
+  window.addEventListener('mouseup',up);
+  canvas.addEventListener('touchstart',down,{passive:false});
+  canvas.addEventListener('touchmove',move,{passive:false});
+  canvas.addEventListener('touchend',up);
+  return{element:wrap,getRect:()=>rect,reset:()=>{rect=null;draw();}};
 }
 
 
