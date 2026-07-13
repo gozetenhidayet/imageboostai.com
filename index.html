@@ -37,7 +37,11 @@
 <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
 <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
 
-<!-- GSC Verification -->
+<!-- GSC Verification —
+     TODO: get this from https://search.google.com/search-console
+     → Add property → imageboostai.com → "HTML tag" verification method
+     → copy the content="..." value it gives you and paste it below.
+     Until this is a real code, Search Console cannot verify the site. -->
 <meta name="google-site-verification" content="PASTE_YOUR_GSC_CODE_HERE">
 
 <!-- Favicon -->
@@ -96,31 +100,69 @@
 "url":"https://imageboostai.com","email":"contact@imageboostai.com"}
 </script>
 
-<!-- Google tag (gtag.js) — G-2V873PRCTP -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-2V873PRCTP"></script>
+<!-- ══════════════════════════════════════════════
+     CONSENT MANAGEMENT — Google Consent Mode v2
+     GA4 / Clarity / AdSense are NOT loaded here.
+     They are only loaded after the user clicks
+     "Accept" (or enables categories in "Manage
+     Preferences"). See loadAnalytics()/loadAds()
+     near the cookie banner script further below.
+════════════════════════════════════════════════ -->
 <script>
 window.dataLayer=window.dataLayer||[];
 function gtag(){dataLayer.push(arguments);}
+// Default: everything denied until the user chooses.
+gtag('consent','default',{
+  'ad_storage':'denied',
+  'ad_user_data':'denied',
+  'ad_personalization':'denied',
+  'analytics_storage':'denied',
+  'wait_for_update':500
+});
 gtag('js',new Date());
-gtag('config','G-2V873PRCTP',{send_page_view:true});
 function trackEvent(action,category,label){
   if(typeof gtag!=='undefined'){
     gtag('event',action,{event_category:category,event_label:label});
   }
 }
+var IBA_GA_ID='G-2V873PRCTP';
+// TODO: get this from https://clarity.microsoft.com → your project → Settings
+// → Setup → copy the Project ID (short alphanumeric string) and paste it below.
+// Until this is real, Clarity will not record any sessions.
+var IBA_CLARITY_ID='PASTE_CLARITY_ID';
+var IBA_ADSENSE_CLIENT='ca-pub-3359266836868361';
+var iba_ga_loaded=false, iba_clarity_loaded=false, iba_ads_loaded=false;
+
+function iba_loadScript(src,attrs){
+  var s=document.createElement('script');
+  s.src=src; s.async=true;
+  if(attrs)for(var k in attrs)s.setAttribute(k,attrs[k]);
+  document.head.appendChild(s);
+  return s;
+}
+// Called only after analytics consent = granted
+function loadAnalytics(){
+  if(iba_ga_loaded)return; iba_ga_loaded=true;
+  iba_loadScript('https://www.googletagmanager.com/gtag/js?id='+IBA_GA_ID);
+  gtag('config',IBA_GA_ID,{send_page_view:true});
+  if(!iba_clarity_loaded && IBA_CLARITY_ID && IBA_CLARITY_ID.indexOf('PASTE_')!==0){
+    iba_clarity_loaded=true;
+    (function(c,l,a,r,i,t,y){
+      c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+      t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+      y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window,document,"clarity","script",IBA_CLARITY_ID);
+  }
+}
+// Called only after advertising consent = granted
+function loadAds(){
+  if(iba_ads_loaded)return; iba_ads_loaded=true;
+  iba_loadScript('https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client='+IBA_ADSENSE_CLIENT,{crossorigin:'anonymous'});
+}
 </script>
 
-<!-- Microsoft Clarity -->
-<script type="text/javascript">
-(function(c,l,a,r,i,t,y){
-  c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-  t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-  y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-})(window,document,"clarity","script","PASTE_CLARITY_ID");
-</script>
-
-<!-- AdSense -->
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3359266836868361" crossorigin="anonymous"></script>
+<!-- HEIC → JPEG conversion (Chrome/most browsers can't decode HEIC natively) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/heic2any/0.0.4/heic2any.min.js" defer></script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -872,19 +914,29 @@ footer{background:var(--text);color:rgba(255,255,255,.85);padding:3.5rem 1rem 1.
     <p class="tools-main-p" data-i="tools_p">Click any tool, upload your photo in the editor, and download the result in seconds. <strong>No account required.</strong></p>
   </div>
 
-  <!-- TOP AD — Google Auto Ads handles display after approval -->
+  <!-- TOP AD SLOT — disabled until a real slot ID exists.
+       "1234567890" was a placeholder test ID; shipping it as-is can get
+       served as an invalid ad unit. To enable: AdSense → Ads → By ad
+       unit → create a display unit → copy its real data-ad-slot value
+       into the ins tag below and uncomment it. Auto Ads (loaded via
+       loadAds() after ad consent) will still place ads automatically
+       without needing this. -->
+  <!--
   <div style="max-width:728px;margin:0 auto 20px;text-align:center;min-height:0;">
-    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3359266836868361" data-ad-slot="1234567890" data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3359266836868361" data-ad-slot="REPLACE_WITH_REAL_SLOT_ID" data-ad-format="auto" data-full-width-responsive="true"></ins>
     <script>(adsbygoogle=window.adsbygoogle||[]).push({});</script>
   </div>
+  -->
 
   <div class="tools-grid" id="toolGrid" role="list" aria-label="AI photo editing tools"></div>
 
-  <!-- MID AD -->
+  <!-- MID AD SLOT — same as above, disabled until a real slot ID is created in AdSense. -->
+  <!--
   <div style="max-width:728px;margin:28px auto;text-align:center;">
-    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3359266836868361" data-ad-slot="2345678901" data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3359266836868361" data-ad-slot="REPLACE_WITH_REAL_SLOT_ID" data-ad-format="auto" data-full-width-responsive="true"></ins>
     <script>(adsbygoogle=window.adsbygoogle||[]).push({});</script>
   </div>
+  -->
 
 
 </div>
@@ -954,7 +1006,7 @@ footer{background:var(--text);color:rgba(255,255,255,.85);padding:3.5rem 1rem 1.
     <div class="faq-item"><button class="faq-q" onclick="faqToggle(this)" aria-expanded="false"><span data-i="q3">Does it work on mobile?</span><span class="faq-arr">⌄</span></button><div class="faq-a" data-i="a3">Yes, ImageBoostAI is fully responsive and optimized for all devices — iOS, Android, tablets, and desktop browsers.</div></div>
     <div class="faq-item"><button class="faq-q" onclick="faqToggle(this)" aria-expanded="false"><span data-i="q4">Do I need an account?</span><span class="faq-arr">⌄</span></button><div class="faq-a" data-i="a4">No account, email, or credit card is ever required. Start editing immediately.</div></div>
     <div class="faq-item"><button class="faq-q" onclick="faqToggle(this)" aria-expanded="false"><span data-i="q5">How does AI background removal work?</span><span class="faq-arr">⌄</span></button><div class="faq-a" data-i="a5">The current version provides a complete front-end workflow: upload, preview, apply and download. Real AI processing can be connected via API for production use.</div></div>
-    <div class="faq-item"><button class="faq-q" onclick="faqToggle(this)" aria-expanded="false"><span data-i="q6">What image formats are supported?</span><span class="faq-arr">⌄</span></button><div class="faq-a" data-i="a6">JPG, PNG, WEBP, HEIC and GIF are all supported for upload and editing.</div></div>
+    <div class="faq-item"><button class="faq-q" onclick="faqToggle(this)" aria-expanded="false"><span data-i="q6">What image formats are supported?</span><span class="faq-arr">⌄</span></button><div class="faq-a" data-i="a6">JPG, PNG, WEBP and HEIC are fully supported. GIFs can be uploaded but only the first frame is edited — animation is not preserved. Max file size is 25MB, max resolution is 40 megapixels.</div></div>
   </div>
 </div>
 </section>
@@ -980,7 +1032,7 @@ footer{background:var(--text);color:rgba(255,255,255,.85);padding:3.5rem 1rem 1.
     <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:20px;padding:28px 24px;">
       <div style="width:44px;height:44px;background:linear-gradient(135deg,#10B981,#34D399);border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;font-weight:900;margin-bottom:16px;">2</div>
       <h3 style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:8px;">Upload Your Photo</h3>
-      <p style="font-size:14px;color:var(--muted);line-height:1.7;">Drag and drop or click to upload. We support JPG, PNG, WEBP, and HEIC formats up to any size. Your photo is processed locally — it never leaves your device or gets uploaded to any server.</p>
+      <p style="font-size:14px;color:var(--muted);line-height:1.7;">Drag and drop or click to upload. We support JPG, PNG, WEBP and HEIC formats, up to 25MB and 40 megapixels per photo. Your photo is processed locally — it never leaves your device or gets uploaded to any server.</p>
     </div>
     <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:20px;padding:28px 24px;">
       <div style="width:44px;height:44px;background:linear-gradient(135deg,#EC4899,#F472B6);border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;font-weight:900;margin-bottom:16px;">3</div>
@@ -1193,11 +1245,33 @@ footer{background:var(--text);color:rgba(255,255,255,.85);padding:3.5rem 1rem 1.
 <button id="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top">↑</button>
 
 <!-- COOKIE BANNER -->
-<div id="cookie-bar" role="dialog" aria-label="Cookie consent">
-  <p>🍪 We use cookies for analytics (GA4) and ads (AdSense). See our <a href="javascript:void(0)" onclick="openModal('privacy')" style="color:var(--accent);font-weight:600;">Privacy Policy</a>.</p>
+<div id="cookie-bar" role="dialog" aria-modal="true" aria-label="Cookie consent">
+  <p>🍪 We use cookies. Necessary cookies keep the site working. Analytics (GA4, Clarity) and Advertising (AdSense) cookies are optional and only run if you allow them. See our <a href="javascript:void(0)" onclick="openModal('privacy')" style="color:var(--accent);font-weight:600;">Privacy Policy</a>.</p>
   <div class="cb-btns">
-    <button onclick="acceptCookies()" style="padding:9px 20px;background:var(--accent);color:#fff;border:none;border-radius:100px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Accept</button>
-    <button onclick="document.getElementById('cookie-bar').style.display='none'" style="padding:9px 14px;background:transparent;color:var(--muted);border:1.5px solid var(--border);border-radius:100px;font-size:13px;cursor:pointer;font-family:inherit;">Decline</button>
+    <button onclick="acceptCookies()" style="padding:9px 20px;background:var(--accent);color:#fff;border:none;border-radius:100px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Accept all</button>
+    <button onclick="rejectCookies()" style="padding:9px 20px;background:transparent;color:var(--muted);border:1.5px solid var(--border);border-radius:100px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Reject non-essential</button>
+    <button onclick="openConsentManager()" style="padding:9px 14px;background:transparent;color:var(--accent);border:none;border-radius:100px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;text-decoration:underline;">Manage preferences</button>
+  </div>
+</div>
+
+<!-- CONSENT PREFERENCES MODAL -->
+<div class="modal-overlay" id="consent-modal-overlay" onclick="if(event.target===this)closeConsentManager()" role="presentation" style="display:none;">
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="consent-modal-title">
+    <button class="modal-close" onclick="closeConsentManager()" aria-label="Close dialog">✕</button>
+    <div id="consent-modal-title" class="modal-title">🍪 Cookie Preferences</div>
+    <div class="modal-body">
+      <p style="margin-bottom:14px;">Necessary cookies are always on because the site can't function without them (theme, language, editor state).</p>
+      <label style="display:flex;align-items:center;gap:10px;margin:12px 0;font-weight:600;">
+        <input type="checkbox" checked disabled> Necessary (always on)
+      </label>
+      <label style="display:flex;align-items:center;gap:10px;margin:12px 0;font-weight:600;">
+        <input type="checkbox" id="consent-analytics"> Analytics (Google Analytics 4, Microsoft Clarity)
+      </label>
+      <label style="display:flex;align-items:center;gap:10px;margin:12px 0;font-weight:600;">
+        <input type="checkbox" id="consent-ads"> Advertising (Google AdSense personalized ads)
+      </label>
+      <button class="btn-primary" onclick="saveConsentPreferences()" style="width:100%;padding:12px;margin-top:16px;">Save preferences</button>
+    </div>
   </div>
 </div>
 <script>
@@ -1404,20 +1478,74 @@ if(dropZone){
   }));
   dropZone.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' ')fileEl.click();});
 }
+/* Real, enforced limits (was previously claimed as "any size" with no check) */
+const IBA_MAX_FILE_MB=25;
+const IBA_MAX_MEGAPIXELS=40;
+
+function iba_finishLoad(dataUrl,noteHtml){
+  imageData=dataUrl;
+  window.__originalUpload=dataUrl;
+  document.getElementById('uploadContent').innerHTML=`<img src="${dataUrl}" alt="Uploaded photo" style="max-width:100%;max-height:280px;border-radius:16px;object-fit:contain;">`;
+  document.getElementById('resultTitle').textContent='Image uploaded';
+  document.getElementById('resultText').textContent='Now apply '+selected+'.';
+  showToast(noteHtml||'✅ Image uploaded');
+  trackEvent('image_upload','Tool',selected);
+  const uxb=document.getElementById('upload-x-btn');if(uxb)uxb.style.display='flex';
+}
+
 function loadFile(f){
-  if(!f||!f.type.startsWith('image/')){showToast('⚠️ Please upload an image file');return;}
-  const r=new FileReader();
-  r.onload=()=>{
-    imageData=r.result;
-    window.__originalUpload=r.result;
-    document.getElementById('uploadContent').innerHTML=`<img src="${imageData}" alt="Uploaded photo" style="max-width:100%;max-height:280px;border-radius:16px;object-fit:contain;">`;
-    document.getElementById('resultTitle').textContent='Image uploaded';
-    document.getElementById('resultText').textContent='Now apply '+selected+'.';
-    showToast('✅ Image uploaded');
-    trackEvent('image_upload','Tool',selected);
-    const uxb=document.getElementById('upload-x-btn');if(uxb)uxb.style.display='flex';
+  if(!f)return;
+  const isHeic=/\.(heic|heif)$/i.test(f.name)||f.type==='image/heic'||f.type==='image/heif';
+  const isGif=f.type==='image/gif'||/\.gif$/i.test(f.name);
+  if(!f.type.startsWith('image/')&&!isHeic){showToast('⚠️ Please upload an image file');return;}
+
+  // Hard file-size limit — large files can crash the tab, so we check before reading.
+  const maxBytes=IBA_MAX_FILE_MB*1024*1024;
+  if(f.size>maxBytes){
+    showToast('⚠️ File is too large ('+(f.size/1024/1024).toFixed(1)+'MB). Max size is '+IBA_MAX_FILE_MB+'MB.');
+    return;
+  }
+
+  if(isGif){
+    showToast('⚠️ GIF uploaded — only the first frame will be edited. Animation is not preserved.');
+  }
+
+  if(isHeic){
+    if(typeof heic2any==='undefined'){
+      showToast('⚠️ HEIC support is still loading, please try again in a second.');
+      return;
+    }
+    showToast('⏳ Converting HEIC photo…');
+    heic2any({blob:f,toType:'image/jpeg',quality:0.92}).then(convertedBlob=>{
+      iba_checkPixelsThenLoad(convertedBlob);
+    }).catch(()=>{
+      showToast('⚠️ Could not convert this HEIC file. Try exporting as JPG first.');
+    });
+    return;
+  }
+  iba_checkPixelsThenLoad(f);
+}
+
+function iba_checkPixelsThenLoad(fileOrBlob){
+  const url=URL.createObjectURL(fileOrBlob);
+  const img=new Image();
+  img.onload=()=>{
+    const mp=(img.naturalWidth*img.naturalHeight)/1000000;
+    URL.revokeObjectURL(url);
+    if(mp>IBA_MAX_MEGAPIXELS){
+      showToast('⚠️ Image is '+mp.toFixed(1)+'MP — max supported is '+IBA_MAX_MEGAPIXELS+'MP. Please downscale first.');
+      return;
+    }
+    const r=new FileReader();
+    r.onload=()=>iba_finishLoad(r.result);
+    r.onerror=()=>showToast('⚠️ Could not read this file.');
+    r.readAsDataURL(fileOrBlob);
   };
-  r.readAsDataURL(f);
+  img.onerror=()=>{
+    URL.revokeObjectURL(url);
+    showToast('⚠️ Could not read this image.');
+  };
+  img.src=url;
 }
 
 /* ══ APPLY TOOL ══ */
@@ -1588,15 +1716,53 @@ window.addEventListener('scroll',()=>{
 },{passive:true});
 
 /* ══ COOKIE ══ */
+/* ══ CONSENT MODE v2 ══ */
+function iba_applyConsent(analytics,ads){
+  gtag('consent','update',{
+    'analytics_storage': analytics?'granted':'denied',
+    'ad_storage': ads?'granted':'denied',
+    'ad_user_data': ads?'granted':'denied',
+    'ad_personalization': ads?'granted':'denied'
+  });
+  if(analytics)loadAnalytics();
+  if(ads)loadAds();
+  localStorage.setItem('iba_consent',JSON.stringify({analytics:analytics,ads:ads,ts:Date.now()}));
+  const cb=document.getElementById('cookie-bar');if(cb)cb.style.display='none';
+}
 function acceptCookies(){
-  localStorage.setItem('iba_cookies','1');
-  document.getElementById('cookie-bar').style.display='none';
-  trackEvent('cookie_accept','Consent','accept');
+  iba_applyConsent(true,true);
+  trackEvent('cookie_accept','Consent','accept_all');
 }
-if(localStorage.getItem('iba_cookies')==='1'){
-  const cb=document.getElementById('cookie-bar');
-  if(cb)cb.style.display='none';
+function rejectCookies(){
+  iba_applyConsent(false,false);
 }
+function openConsentManager(){
+  const c=JSON.parse(localStorage.getItem('iba_consent')||'{}');
+  const a=document.getElementById('consent-analytics'),d=document.getElementById('consent-ads');
+  if(a)a.checked=!!c.analytics; if(d)d.checked=!!c.ads;
+  document.getElementById('consent-modal-overlay').style.display='flex';
+  document.body.style.overflow='hidden';
+}
+function closeConsentManager(){
+  document.getElementById('consent-modal-overlay').style.display='none';
+  document.body.style.overflow='';
+}
+function saveConsentPreferences(){
+  const analytics=document.getElementById('consent-analytics').checked;
+  const ads=document.getElementById('consent-ads').checked;
+  iba_applyConsent(analytics,ads);
+  closeConsentManager();
+}
+// On load: re-apply a stored choice, otherwise keep banner visible.
+(function(){
+  const raw=localStorage.getItem('iba_consent');
+  if(raw){
+    try{
+      const c=JSON.parse(raw);
+      iba_applyConsent(!!c.analytics,!!c.ads);
+    }catch(e){}
+  }
+})();
 
 /* ══ LANG DROPDOWN ══ */
 function toggleLangMenu(){
@@ -1646,9 +1812,9 @@ function applyDetectedLang(){sl(detectedLang);}
 
 /* ══ TRANSLATIONS ══ */
 const T={
-en:{hbadge:'35+ Free AI Photo Tools · No Login · Instant Results',h1a:'Professional',h1b:'AI Photo Editing',hsub:'Remove backgrounds, restore old photos, retouch faces, upscale images and more. Free forever. No signup. Works in your browser.',hb1:'📤 Upload & Edit',hb2:'✨ Explore Tools',ht1:'Remove BG',ht2:'Restore Photo',ht3:'Face Retouch',ht4:'Upscaler',ht5:'Image to Text',s1:'AI Tools',s2:'Signups Needed',s3:'Countries',s4:'Browser-Based',s5:'Zero Data Stored',cp_all:'🌟 All',cp_bg:'🎭 Background',cp_fix:'🏛️ Restore & Fix',cp_face:'💄 Face',cp_convert:'🔄 Convert',cp_design:'🎨 Design',ast:'Pro Coming Soon:',asd:'Batch processing, HD export, API access — join waitlist',asb:'Join Waitlist →',tools_small:'35 AI Photo Tools',tools_h2:'Choose a Tool & Start Editing',tools_p:'Click any tool to open the editor.',ws_small:'Editor Workspace',ws_h2:'Select a Tool or Upload Your Photo',up_title:'Upload Your Photo',up_sub:'Click or drag an image here. JPG, PNG, WEBP supported.',res_title:'Ready to Edit',res_text:'Pick any tool, upload a photo, then click Apply.',apply_btn:'⚡ Apply Tool',reset_btn:'↻ Reset',dl_btn:'⬇ Download Result',ba_small:'Preview',ba_h2:'Before / After Workflow',ba_p:'Compare your original and edited photo side by side.',ba1:'Before',ba1s:'Upload your original photo above',ba2:'After',ba2s:'Apply a tool to see the result',nl_title:'💌 Get New Tools First',nl_sub:'Join 18,000+ users. New tools, tips, no spam.',nl_ph:'your@email.com',nl_btn:'Subscribe Free →',nl_note:'🔒 No spam. Unsubscribe with one click.',faq_h2:'Frequently Asked Questions',faq_p:'Everything you need to know about ImageBoostAI.',q1:'Is ImageBoostAI free?',a1:'Yes! All 35+ tools are 100% free. No subscription, no login, no hidden fees.',q2:'Are my photos stored on your servers?',a2:'No. All processing happens in your browser. Photos never leave your device.',q3:'Does it work on mobile?',a3:'Yes, fully responsive and optimized for iOS, Android, tablets and desktop.',q4:'Do I need an account?',a4:'No account, email or credit card is ever required.',q5:'How does AI background removal work?',a5:'Complete front-end workflow: upload, preview, apply and download. Connect an API for real AI.',q6:'What image formats are supported?',a6:'JPG, PNG, WEBP, HEIC and GIF are all supported.',ft_desc:'35+ free AI photo editing tools. No login required.',ft_bg:'Background Tools',ft_fix:'Restore & Fix',ft_face:'Face & Design',ft_co:'Company',ft_priv:'🔒 Privacy Policy',ft_terms:'📋 Terms',ft_contact:'✉️ Contact',ft_sitemap:'🗺️ Sitemap',ft_home:'🏠 Home',ft_seo:'Free AI photo editor: remove background, restore old photos, retouch faces, upscale images and more.',ft_copy:'© 2025 ImageBoostAI · No data stored',nav_tools:'AI Tools',nav_editor:'Editor',nav_pro:'✨ Get Pro',db_text:'Pro Features Coming Soon! Join waitlist →',db_link:'Learn More'},
+en:{hbadge:'35+ Free AI Photo Tools · No Login · Instant Results',h1a:'Professional',h1b:'AI Photo Editing',hsub:'Remove backgrounds, restore old photos, retouch faces, upscale images and more. Free forever. No signup. Works in your browser.',hb1:'📤 Upload & Edit',hb2:'✨ Explore Tools',ht1:'Remove BG',ht2:'Restore Photo',ht3:'Face Retouch',ht4:'Upscaler',ht5:'Image to Text',s1:'AI Tools',s2:'Signups Needed',s3:'Countries',s4:'Browser-Based',s5:'Zero Data Stored',cp_all:'🌟 All',cp_bg:'🎭 Background',cp_fix:'🏛️ Restore & Fix',cp_face:'💄 Face',cp_convert:'🔄 Convert',cp_design:'🎨 Design',ast:'Pro Coming Soon:',asd:'Batch processing, HD export, API access — join waitlist',asb:'Join Waitlist →',tools_small:'35 AI Photo Tools',tools_h2:'Choose a Tool & Start Editing',tools_p:'Click any tool to open the editor.',ws_small:'Editor Workspace',ws_h2:'Select a Tool or Upload Your Photo',up_title:'Upload Your Photo',up_sub:'Click or drag an image here. JPG, PNG, WEBP supported.',res_title:'Ready to Edit',res_text:'Pick any tool, upload a photo, then click Apply.',apply_btn:'⚡ Apply Tool',reset_btn:'↻ Reset',dl_btn:'⬇ Download Result',ba_small:'Preview',ba_h2:'Before / After Workflow',ba_p:'Compare your original and edited photo side by side.',ba1:'Before',ba1s:'Upload your original photo above',ba2:'After',ba2s:'Apply a tool to see the result',nl_title:'💌 Get New Tools First',nl_sub:'Join 18,000+ users. New tools, tips, no spam.',nl_ph:'your@email.com',nl_btn:'Subscribe Free →',nl_note:'🔒 No spam. Unsubscribe with one click.',faq_h2:'Frequently Asked Questions',faq_p:'Everything you need to know about ImageBoostAI.',q1:'Is ImageBoostAI free?',a1:'Yes! All 35+ tools are 100% free. No subscription, no login, no hidden fees.',q2:'Are my photos stored on your servers?',a2:'No. All processing happens in your browser. Photos never leave your device.',q3:'Does it work on mobile?',a3:'Yes, fully responsive and optimized for iOS, Android, tablets and desktop.',q4:'Do I need an account?',a4:'No account, email or credit card is ever required.',q5:'How does AI background removal work?',a5:'Complete front-end workflow: upload, preview, apply and download. Connect an API for real AI.',q6:'What image formats are supported?',a6:'JPG, PNG, WEBP and HEIC are fully supported. GIFs can be uploaded but only the first frame is edited — animation is not preserved. Max file size is 25MB, max resolution is 40 megapixels.',ft_desc:'35+ free AI photo editing tools. No login required.',ft_bg:'Background Tools',ft_fix:'Restore & Fix',ft_face:'Face & Design',ft_co:'Company',ft_priv:'🔒 Privacy Policy',ft_terms:'📋 Terms',ft_contact:'✉️ Contact',ft_sitemap:'🗺️ Sitemap',ft_home:'🏠 Home',ft_seo:'Free AI photo editor: remove background, restore old photos, retouch faces, upscale images and more.',ft_copy:'© 2025 ImageBoostAI · No data stored',nav_tools:'AI Tools',nav_editor:'Editor',nav_pro:'✨ Get Pro',db_text:'Pro Features Coming Soon! Join waitlist →',db_link:'Learn More'},
 
-tr:{hbadge:'35+ Ücretsiz AI Fotoğraf Aracı · Giriş Yok · Anında Sonuç',h1a:'Profesyonel',h1b:'AI Fotoğraf Düzenleme',hsub:'Arka plan kaldır, eski fotoğrafları restore et, yüzleri rötuşla, görselleri büyüt. Tamamen ücretsiz. Kayıt yok. Tarayıcında çalışır.',hb1:'📤 Yükle & Düzenle',hb2:'✨ Araçları Keşfet',ht1:'Arka Plan Kaldır',ht2:'Fotoğraf Restore',ht3:'Yüz Rötuşu',ht4:'Upscaler',ht5:'Görüntüden Metin',s1:'AI Aracı',s2:'Kayıt Gerekmiyor',s3:'Ülke',s4:'Tarayıcı Tabanlı',s5:'Sıfır Veri Depolama',cp_all:'🌟 Tümü',cp_bg:'🎭 Arka Plan',cp_fix:'🏛️ Restore & Düzelt',cp_face:'💄 Yüz',cp_convert:'🔄 Dönüştür',cp_design:'🎨 Tasarım',ast:'Pro Yakında:',asd:'Toplu işlem, HD çıktı, API erişimi — bekleme listesine katıl',asb:'Listeye Katıl →',tools_small:'35 AI Fotoğraf Aracı',tools_h2:'Bir Araç Seç ve Düzenlemeye Başla',tools_p:'Editörü açmak için herhangi bir araca tıkla.',ws_small:'Düzenleyici Alanı',ws_h2:'Bir Araç Seç veya Fotoğrafını Yükle',up_title:'Fotoğrafını Yükle',up_sub:'Buraya tıkla veya bir görüntü sürükle. JPG, PNG, WEBP desteklenir.',res_title:'Düzenlemeye Hazır',res_text:'Bir araç seç, fotoğraf yükle, sonra Uygula\'ya tıkla.',apply_btn:'⚡ Aracı Uygula',reset_btn:'↻ Sıfırla',dl_btn:'⬇ Sonucu İndir',ba_small:'Önizleme',ba_h2:'Önce / Sonra',ba_p:'Orijinal ve düzenlenmiş fotoğrafı yan yana karşılaştır.',ba1:'Önce',ba1s:'Yukarıya orijinal fotoğrafını yükle',ba2:'Sonra',ba2s:'Sonucu görmek için araç uygula',nl_title:'💌 Yeni Araçları İlk Al',nl_sub:'18.000+ kullanıcıya katıl. Yeni araçlar, ipuçları, spam yok.',nl_ph:'e-posta@adresin.com',nl_btn:'Ücretsiz Abone Ol →',nl_note:'🔒 Spam yok. İstediğin zaman abonelikten çık.',faq_h2:'Sık Sorulan Sorular',faq_p:'ImageBoostAI hakkında bilmeniz gereken her şey.',q1:'ImageBoostAI gerçekten ücretsiz mi?',a1:'Evet! Tüm 35+ araç %100 ücretsizdir. Abonelik, giriş veya gizli ücret yok.',q2:'Fotoğraflarım sunucularınızda saklanıyor mu?',a2:'Hayır. Tüm işlemler tarayıcınızda gerçekleşir. Fotoğraflar asla cihazınızı terk etmez.',q3:'Mobilde çalışıyor mu?',a3:'Evet, iOS, Android, tablet ve masaüstü tarayıcılarda tam olarak çalışır.',q4:'Hesap gerekiyor mu?',a4:'Hesap, e-posta veya kredi kartı asla gerekmiyor.',q5:'AI arka plan kaldırma nasıl çalışır?',a5:'Tam ön yüz akışı: yükle, önizle, uygula ve indir. Gerçek AI için API bağlanabilir.',q6:'Hangi görüntü formatları destekleniyor?',a6:'JPG, PNG, WEBP, HEIC ve GIF desteklenmektedir.',ft_desc:'35+ ücretsiz AI fotoğraf düzenleme aracı. Giriş gerekmez.',ft_bg:'Arka Plan Araçları',ft_fix:'Restore ve Düzelt',ft_face:'Yüz ve Tasarım',ft_co:'Şirket',ft_priv:'🔒 Gizlilik Politikası',ft_terms:'📋 Kullanım Şartları',ft_contact:'✉️ İletişim',ft_sitemap:'🗺️ Site Haritası',ft_home:'🏠 Ana Sayfa',ft_seo:'Ücretsiz AI fotoğraf editörü: arka plan kaldır, eski fotoğrafları restore et, yüzleri rötuşla.',ft_copy:'© 2025 ImageBoostAI · Veri depolanmaz',nav_tools:'AI Araçlar',nav_editor:'Editör',nav_pro:'✨ Pro Al'},
+tr:{hbadge:'35+ Ücretsiz AI Fotoğraf Aracı · Giriş Yok · Anında Sonuç',h1a:'Profesyonel',h1b:'AI Fotoğraf Düzenleme',hsub:'Arka plan kaldır, eski fotoğrafları restore et, yüzleri rötuşla, görselleri büyüt. Tamamen ücretsiz. Kayıt yok. Tarayıcında çalışır.',hb1:'📤 Yükle & Düzenle',hb2:'✨ Araçları Keşfet',ht1:'Arka Plan Kaldır',ht2:'Fotoğraf Restore',ht3:'Yüz Rötuşu',ht4:'Upscaler',ht5:'Görüntüden Metin',s1:'AI Aracı',s2:'Kayıt Gerekmiyor',s3:'Ülke',s4:'Tarayıcı Tabanlı',s5:'Sıfır Veri Depolama',cp_all:'🌟 Tümü',cp_bg:'🎭 Arka Plan',cp_fix:'🏛️ Restore & Düzelt',cp_face:'💄 Yüz',cp_convert:'🔄 Dönüştür',cp_design:'🎨 Tasarım',ast:'Pro Yakında:',asd:'Toplu işlem, HD çıktı, API erişimi — bekleme listesine katıl',asb:'Listeye Katıl →',tools_small:'35 AI Fotoğraf Aracı',tools_h2:'Bir Araç Seç ve Düzenlemeye Başla',tools_p:'Editörü açmak için herhangi bir araca tıkla.',ws_small:'Düzenleyici Alanı',ws_h2:'Bir Araç Seç veya Fotoğrafını Yükle',up_title:'Fotoğrafını Yükle',up_sub:'Buraya tıkla veya bir görüntü sürükle. JPG, PNG, WEBP desteklenir.',res_title:'Düzenlemeye Hazır',res_text:'Bir araç seç, fotoğraf yükle, sonra Uygula\'ya tıkla.',apply_btn:'⚡ Aracı Uygula',reset_btn:'↻ Sıfırla',dl_btn:'⬇ Sonucu İndir',ba_small:'Önizleme',ba_h2:'Önce / Sonra',ba_p:'Orijinal ve düzenlenmiş fotoğrafı yan yana karşılaştır.',ba1:'Önce',ba1s:'Yukarıya orijinal fotoğrafını yükle',ba2:'Sonra',ba2s:'Sonucu görmek için araç uygula',nl_title:'💌 Yeni Araçları İlk Al',nl_sub:'18.000+ kullanıcıya katıl. Yeni araçlar, ipuçları, spam yok.',nl_ph:'e-posta@adresin.com',nl_btn:'Ücretsiz Abone Ol →',nl_note:'🔒 Spam yok. İstediğin zaman abonelikten çık.',faq_h2:'Sık Sorulan Sorular',faq_p:'ImageBoostAI hakkında bilmeniz gereken her şey.',q1:'ImageBoostAI gerçekten ücretsiz mi?',a1:'Evet! Tüm 35+ araç %100 ücretsizdir. Abonelik, giriş veya gizli ücret yok.',q2:'Fotoğraflarım sunucularınızda saklanıyor mu?',a2:'Hayır. Tüm işlemler tarayıcınızda gerçekleşir. Fotoğraflar asla cihazınızı terk etmez.',q3:'Mobilde çalışıyor mu?',a3:'Evet, iOS, Android, tablet ve masaüstü tarayıcılarda tam olarak çalışır.',q4:'Hesap gerekiyor mu?',a4:'Hesap, e-posta veya kredi kartı asla gerekmiyor.',q5:'AI arka plan kaldırma nasıl çalışır?',a5:'Tam ön yüz akışı: yükle, önizle, uygula ve indir. Gerçek AI için API bağlanabilir.',q6:'Hangi görüntü formatları destekleniyor?',a6:'JPG, PNG, WEBP ve HEIC tam destekli. GIF yüklenebilir ama sadece ilk kare düzenlenir — animasyon korunmaz. Maksimum dosya boyutu 25MB, maksimum çözünürlük 40 megapikseldir.',ft_desc:'35+ ücretsiz AI fotoğraf düzenleme aracı. Giriş gerekmez.',ft_bg:'Arka Plan Araçları',ft_fix:'Restore ve Düzelt',ft_face:'Yüz ve Tasarım',ft_co:'Şirket',ft_priv:'🔒 Gizlilik Politikası',ft_terms:'📋 Kullanım Şartları',ft_contact:'✉️ İletişim',ft_sitemap:'🗺️ Site Haritası',ft_home:'🏠 Ana Sayfa',ft_seo:'Ücretsiz AI fotoğraf editörü: arka plan kaldır, eski fotoğrafları restore et, yüzleri rötuşla.',ft_copy:'© 2025 ImageBoostAI · Veri depolanmaz',nav_tools:'AI Araçlar',nav_editor:'Editör',nav_pro:'✨ Pro Al'},
 
 es:{hbadge:'35+ Herramientas IA Gratis · Sin Login · Resultados Instantáneos',h1a:'Edición Fotográfica',h1b:'Profesional con IA',hsub:'Elimina fondos, restaura fotos antiguas, retoca caras, mejora imágenes y más. Gratis. Sin registro. Funciona en tu navegador.',hb1:'📤 Subir y Editar',hb2:'✨ Explorar Herramientas',ht1:'Quitar Fondo',ht2:'Restaurar Foto',ht3:'Retocar Cara',ht4:'Upscaler',ht5:'Imagen a Texto',s1:'Herramientas IA',s2:'Registros',s3:'Países',s4:'En Navegador',s5:'Cero Datos',cp_all:'🌟 Todas',cp_bg:'🎭 Fondo',cp_fix:'🏛️ Restaurar',cp_face:'💄 Cara',cp_convert:'🔄 Convertir',cp_design:'🎨 Diseño',ast:'Pro Próximamente:',asd:'Procesamiento batch, HD, API — únete a la lista de espera',asb:'Unirse →',tools_small:'35 Herramientas IA',tools_h2:'Elige una Herramienta y Empieza',tools_p:'Haz clic en cualquier herramienta para abrir el editor.',ws_small:'Editor',ws_h2:'Selecciona una Herramienta o Sube tu Foto',up_title:'Sube tu Foto',up_sub:'Clic o arrastra una imagen. JPG, PNG, WEBP admitidos.',res_title:'Listo para Editar',res_text:'Elige una herramienta, sube una foto y haz clic en Aplicar.',apply_btn:'⚡ Aplicar',reset_btn:'↻ Reiniciar',dl_btn:'⬇ Descargar',faq_h2:'Preguntas Frecuentes',faq_p:'Todo sobre ImageBoostAI.',q1:'¿Es gratis?',a1:'Sí. Todas las herramientas son 100% gratis.',q2:'¿Se almacenan mis fotos?',a2:'No. Todo en tu navegador. Tus fotos nunca abandonan tu dispositivo.',q3:'¿Funciona en móvil?',a3:'Sí, totalmente responsive para iOS, Android y escritorio.',q4:'¿Necesito cuenta?',a4:'No se requiere cuenta, email ni tarjeta.',q5:'¿Cómo funciona la IA?',a5:'Flujo completo: sube, previsualiza, aplica y descarga.',q6:'¿Qué formatos?',a6:'JPG, PNG, WEBP, HEIC y GIF.',ft_copy:'© 2025 ImageBoostAI · Sin datos almacenados'},
 
@@ -1786,25 +1952,58 @@ function closeModal(){
 }
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
 
+/* ══ CONTACT FORM — real submission via FormSubmit.co ══
+   FormSubmit needs zero backend: it emails IBA_CONTACT_EMAIL directly.
+   First submission triggers a one-time confirmation email to that
+   address — click the link in it once to activate the endpoint. */
+const IBA_CONTACT_EMAIL='contact@imageboostai.com'; // TODO: confirm/replace with the real inbox
 function submitContact(){
   const name=document.getElementById('cf-name')?.value.trim();
   const email=document.getElementById('cf-email')?.value.trim();
+  const subject=document.getElementById('cf-subject')?.value.trim();
   const msg=document.getElementById('cf-msg')?.value.trim();
   if(!name||!email||!msg){showToast('⚠️ Please fill in all fields.');return;}
-  showToast('✅ Message sent! We\'ll reply within 24 hours.');
-  trackEvent('contact_submit','Engagement','contact_form');
-  setTimeout(closeModal,1800);
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){showToast('⚠️ Please enter a valid email.');return;}
+  const btn=document.querySelector('.cf-form .btn-primary');
+  if(btn){btn.disabled=true;btn.textContent='Sending…';}
+  fetch('https://formsubmit.co/ajax/'+encodeURIComponent(IBA_CONTACT_EMAIL),{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Accept':'application/json'},
+    body:JSON.stringify({name:name,email:email,subject:subject||'ImageBoostAI contact form',message:msg,_subject:'New ImageBoostAI contact: '+(subject||'General')})
+  }).then(r=>{
+    if(!r.ok)throw new Error('bad status');
+    showToast('✅ Message sent! We\'ll reply within 24 hours.');
+    trackEvent('contact_submit','Engagement','contact_form');
+    setTimeout(closeModal,1800);
+  }).catch(()=>{
+    showToast('⚠️ Could not send right now — please email us directly at '+IBA_CONTACT_EMAIL);
+  }).finally(()=>{
+    if(btn){btn.disabled=false;btn.textContent='Send Message →';}
+  });
 }
 
-/* ══ NEWSLETTER ══ */
+/* ══ NEWSLETTER — real submission via FormSubmit.co ══
+   Same no-backend approach: each signup lands as an email at
+   IBA_CONTACT_EMAIL. For real list management (unsubscribe links,
+   double opt-in, bulk sending) connect a proper ESP such as
+   Mailchimp/Brevo/ConvertKit and swap this fetch for their API. */
 function subscribeNL(){
   const el=document.getElementById('nl-email');
   if(!el)return;
   const email=el.value.trim();
-  if(!email||!email.includes('@')){showToast('⚠️ Please enter a valid email.');return;}
-  showToast('✅ Subscribed! Thank you for joining ImageBoostAI.');
-  el.value='';
-  trackEvent('newsletter_subscribe','Revenue','email');
+  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){showToast('⚠️ Please enter a valid email.');return;}
+  fetch('https://formsubmit.co/ajax/'+encodeURIComponent(IBA_CONTACT_EMAIL),{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Accept':'application/json'},
+    body:JSON.stringify({email:email,_subject:'New ImageBoostAI newsletter signup'})
+  }).then(r=>{
+    if(!r.ok)throw new Error('bad status');
+    showToast('✅ Subscribed! Thank you for joining ImageBoostAI.');
+    el.value='';
+    trackEvent('newsletter_subscribe','Revenue','email');
+  }).catch(()=>{
+    showToast('⚠️ Could not subscribe right now, please try again shortly.');
+  });
 }
 
 /* ══ URL DEEP LINK ══ */
@@ -5486,6 +5685,323 @@ function applyImageUpscaler(factor){
     }
   })();
 </script>
+<!-- ═══════════════════════════════════════════════════════════════
+     ROUND 11 — the last 8 tools that were still fake placeholders
+     (fixed gradients / plain CSS filters with no real logic) are
+     replaced here with genuine, deterministic image-processing
+     pipelines, reusing the same real helpers (_applyCanvas,
+     _getCutoutImage, _getActiveSelectionMask, mask painter) already
+     used by the tools above. None of these call an external AI
+     model/API — that tier (true generative inpainting, real
+     super-resolution, ML-based restoration, text-to-image
+     backgrounds) needs a paid API and is covered separately in
+     server/README.md, not simulated here.
+════════════════════════════════════════════════════════════════ -->
+<script>
+/* ---- Photo Enhancer: real per-channel auto-levels (histogram stretch) + mild saturation ---- */
+function applyPhotoEnhancer(){
+  return _applyCanvas(async im=>{
+    const c=_canvas(im.width,im.height),x=c.getContext('2d');
+    x.drawImage(im,0,0);
+    const d=x.getImageData(0,0,c.width,c.height),px=d.data;
+    let minR=255,maxR=0,minG=255,maxG=0,minB=255,maxB=0;
+    for(let i=0;i<px.length;i+=4){
+      if(px[i]<minR)minR=px[i]; if(px[i]>maxR)maxR=px[i];
+      if(px[i+1]<minG)minG=px[i+1]; if(px[i+1]>maxG)maxG=px[i+1];
+      if(px[i+2]<minB)minB=px[i+2]; if(px[i+2]>maxB)maxB=px[i+2];
+    }
+    const rr=Math.max(1,maxR-minR),rg=Math.max(1,maxG-minG),rb=Math.max(1,maxB-minB);
+    for(let i=0;i<px.length;i+=4){
+      let r=(px[i]-minR)/rr*255,g=(px[i+1]-minG)/rg*255,b=(px[i+2]-minB)/rb*255;
+      const avg=(r+g+b)/3;
+      r=avg+(r-avg)*1.12; g=avg+(g-avg)*1.12; b=avg+(b-avg)*1.12;
+      px[i]=_clampByte(r);px[i+1]=_clampByte(g);px[i+2]=_clampByte(b);
+    }
+    x.putImageData(d,0,0);
+    return c.toDataURL('image/png');
+  });
+}
+
+/* ---- AI Photo Restore: real chained pipeline — denoise, auto-levels,
+   sepia/yellow-cast neutralization, then a light sharpen. Classical
+   restoration, not a trained inpainting/restoration model. ---- */
+function applyAIPhotoRestore(){
+  return _applyCanvas(async im=>{
+    const c=_canvas(im.width,im.height),x=c.getContext('2d');
+    x.drawImage(im,0,0);
+    // 1) denoise (blend with a soft blur)
+    let d=x.getImageData(0,0,c.width,c.height);
+    const blurC=_canvas(im.width,im.height),bctx=blurC.getContext('2d');
+    bctx.filter='blur(1.6px)';bctx.drawImage(im,0,0);
+    const blurred=bctx.getImageData(0,0,c.width,c.height).data;
+    let px=d.data;
+    for(let i=0;i<px.length;i+=4){
+      px[i]=px[i]*0.72+blurred[i]*0.28;
+      px[i+1]=px[i+1]*0.72+blurred[i+1]*0.28;
+      px[i+2]=px[i+2]*0.72+blurred[i+2]*0.28;
+    }
+    // 2) auto-levels (per-channel stretch) to fix faded contrast
+    let minR=255,maxR=0,minG=255,maxG=0,minB=255,maxB=0;
+    for(let i=0;i<px.length;i+=4){
+      if(px[i]<minR)minR=px[i]; if(px[i]>maxR)maxR=px[i];
+      if(px[i+1]<minG)minG=px[i+1]; if(px[i+1]>maxG)maxG=px[i+1];
+      if(px[i+2]<minB)minB=px[i+2]; if(px[i+2]>maxB)maxB=px[i+2];
+    }
+    const rr=Math.max(1,maxR-minR),rg=Math.max(1,maxG-minG),rb=Math.max(1,maxB-minB);
+    for(let i=0;i<px.length;i+=4){
+      let r=(px[i]-minR)/rr*255,g=(px[i+1]-minG)/rg*255,b=(px[i+2]-minB)/rb*255;
+      // 3) neutralize common yellow/sepia cast of old photos
+      b=Math.min(255,b*1.08); r=r*0.97;
+      px[i]=_clampByte(r);px[i+1]=_clampByte(g);px[i+2]=_clampByte(b);
+    }
+    x.putImageData(d,0,0);
+    // 4) light sharpen pass so restoration doesn't look soft
+    const sharpBlurC=_canvas(im.width,im.height),sbctx=sharpBlurC.getContext('2d');
+    sbctx.filter='blur(1.4px)';sbctx.drawImage(c,0,0);
+    const sblurred=sbctx.getImageData(0,0,c.width,c.height).data;
+    const d2=x.getImageData(0,0,c.width,c.height),px2=d2.data;
+    for(let i=0;i<px2.length;i+=4){
+      px2[i]=_clampByte(px2[i]+(px2[i]-sblurred[i])*0.35);
+      px2[i+1]=_clampByte(px2[i+1]+(px2[i+1]-sblurred[i+1])*0.35);
+      px2[i+2]=_clampByte(px2[i+2]+(px2[i+2]-sblurred[i+2])*0.35);
+    }
+    x.putImageData(d2,0,0);
+    return c.toDataURL('image/png');
+  });
+}
+
+/* ---- Remove Blur: strong real unsharp-mask (same math as Image Sharpener,
+   higher default strength). Genuine sharpening-based deblur — not true
+   optical/motion deconvolution, which needs a trained model. ---- */
+function applyRemoveBlur(){
+  return _applyCanvas(async im=>{
+    const c=_canvas(im.width,im.height),x=c.getContext('2d');
+    x.drawImage(im,0,0);
+    const orig=x.getImageData(0,0,c.width,c.height);
+    const blurC=_canvas(im.width,im.height),bctx=blurC.getContext('2d');
+    bctx.filter='blur(2.2px)';bctx.drawImage(im,0,0);
+    const blurred=bctx.getImageData(0,0,c.width,c.height).data;
+    const px=orig.data;
+    for(let i=0;i<px.length;i+=4){
+      px[i]=_clampByte(px[i]+(px[i]-blurred[i])*1.35);
+      px[i+1]=_clampByte(px[i+1]+(px[i+1]-blurred[i+1])*1.35);
+      px[i+2]=_clampByte(px[i+2]+(px[i+2]-blurred[i+2])*1.35);
+    }
+    x.putImageData(orig,0,0);
+    return c.toDataURL('image/png');
+  });
+}
+
+/* ---- Portrait Enhancer: real composite — skin-tone-aware smoothing
+   blend + auto color correction, same underlying math as the standalone
+   Skin Smoothing and Color Correction tools, chained together. ---- */
+function applyPortraitEnhancer(){
+  return _applyCanvas(async im=>{
+    const c=_canvas(im.width,im.height),x=c.getContext('2d');
+    x.drawImage(im,0,0);
+    // skin-tone-aware smoothing
+    let d=x.getImageData(0,0,c.width,c.height);
+    const blurC=_canvas(im.width,im.height),bctx=blurC.getContext('2d');
+    bctx.filter='blur(3.2px)';bctx.drawImage(im,0,0);
+    const blurred=bctx.getImageData(0,0,c.width,c.height).data;
+    let px=d.data;
+    for(let i=0;i<px.length;i+=4){
+      const r=px[i],g=px[i+1],b=px[i+2];
+      const max=Math.max(r,g,b),min=Math.min(r,g,b);
+      const isSkin=r>60&&g>30&&b>15&&(max-min)>10&&Math.abs(r-g)>=8&&r>g&&r>=b&&r<250;
+      if(isSkin){
+        const a=0.42;
+        px[i]=r*(1-a)+blurred[i]*a;
+        px[i+1]=g*(1-a)+blurred[i+1]*a;
+        px[i+2]=b*(1-a)+blurred[i+2]*a;
+      }
+    }
+    x.putImageData(d,0,0);
+    // gentle auto color correction pass (mild exposure/shadow lift)
+    let d2=x.getImageData(0,0,c.width,c.height),px2=d2.data;
+    for(let i=0;i<px2.length;i+=4){
+      let r=px2[i]*1.04,g=px2[i+1]*1.03,b=px2[i+2]*1.02;
+      const lum=(r+g+b)/3/255;
+      const w=Math.max(0,1-lum*1.4);
+      r+=10*w;g+=10*w;b+=10*w;
+      px2[i]=_clampByte(r);px2[i+1]=_clampByte(g);px2[i+2]=_clampByte(b);
+    }
+    x.putImageData(d2,0,0);
+    return c.toDataURL('image/png');
+  });
+}
+
+/* ---- Watermark Remover: reuses the exact same real brush/lasso-select +
+   blur-fill removal as Object Remover — a watermark is just another
+   selected region to blend out. Needs a selection, same as Object Remover. ---- */
+function showWatermarkRemoverPanel(){
+  const rt=document.getElementById('resultTitle'),rx=document.getElementById('resultText');
+  const p=document.getElementById('progress');if(p)p.style.display='none';
+  if(rt)rt.textContent='🧼 Watermark Remover';
+  if(!imageData){if(rx)rx.textContent='Upload a photo first, then paint over the watermark.';return;}
+  if(!rx)return;
+  window.__maskPainter=null;window.__lassoSelector=null;
+  rx.innerHTML='';
+  const hint=document.createElement('p');hint.style.cssText='font-size:12px;color:var(--muted);margin-bottom:8px;';
+  hint.textContent='Paint over your own watermark/logo area to blend it out (brush-select, same real removal engine as Object Remover):';
+  rx.appendChild(hint);
+  const painter=_mkMaskPainter({maxW:340});
+  window.__maskPainter=painter;
+  rx.appendChild(painter.element);
+  rx.appendChild(_mkBrushControls(painter,'wmr'));
+  const btn=document.createElement('button');btn.textContent='🧼 Remove';
+  btn.style.cssText='width:100%;padding:12px;background:var(--gp);color:#fff;border:none;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;margin-top:6px;';
+  btn.onclick=applyWatermarkRemover;
+  rx.appendChild(btn);
+}
+function applyWatermarkRemover(){ return applyObjectRemover(); }
+
+/* ---- AI Background Generator: real cutout (same AI segmentation model as
+   Remove Background) composited over a curated set of generated-style
+   multi-stop gradient backdrops. Honest label: curated backgrounds, not
+   text-to-image generation — that needs a paid generative API. ---- */
+function showAIBGGeneratorPanel(){
+  const rt=document.getElementById('resultTitle'),rx=document.getElementById('resultText');
+  const p=document.getElementById('progress');if(p)p.style.display='none';
+  if(rt)rt.textContent='🪄 AI Background Generator';
+  if(!rx)return;
+  rx.innerHTML='';
+  const note=document.createElement('p');note.style.cssText='font-size:12px;color:var(--muted);margin-bottom:10px;';
+  note.textContent='Real subject cutout (same AI model as Remove Background) composited over a studio backdrop. Curated backdrops, not text-to-image generation.';
+  rx.appendChild(note);
+  const grid=document.createElement('div');grid.style.cssText='display:grid;grid-template-columns:repeat(3,1fr);gap:8px;';
+  const styles={
+    'Studio Cyan':['#22d3ee','#5b4ce8','#111827'],
+    'Sunset':['#f093fb','#f5576c','#3b0764'],
+    'Forest':['#134e5e','#71b280','#0f172a'],
+    'Gold Hour':['#f6d365','#fda085','#7c2d12'],
+    'Cool Slate':['#4facfe','#00f2fe','#0f172a'],
+    'Rose Studio':['#ff9a9e','#fecfef','#4c0519'],
+  };
+  Object.keys(styles).forEach(function(name){
+    const stops=styles[name];
+    const btn=document.createElement('button');btn.textContent=name;
+    btn.style.cssText='height:46px;border-radius:8px;border:2px solid var(--border);cursor:pointer;font-size:11px;font-weight:700;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.5);font-family:inherit;background:linear-gradient(135deg,'+stops[0]+','+stops[1]+' 55%,'+stops[2]+');';
+    btn.onclick=function(){applyAIBGGenerator(stops);};
+    grid.appendChild(btn);
+  });
+  rx.appendChild(grid);
+}
+function applyAIBGGenerator(stops){
+  stops=stops||['#22d3ee','#5b4ce8','#111827'];
+  return _applyCanvas(async im=>{
+    const cut=await _getCutoutImage(im);
+    const c=_canvas(im.width,im.height),x=c.getContext('2d');
+    const g=x.createRadialGradient(c.width*.75,c.height*.2,20,c.width*.5,c.height*.5,Math.max(c.width,c.height)*.9);
+    g.addColorStop(0,stops[0]);g.addColorStop(.55,stops[1]);g.addColorStop(1,stops[2]);
+    x.fillStyle=g;x.fillRect(0,0,c.width,c.height);
+    x.drawImage(cut,0,0,c.width,c.height);
+    return c.toDataURL('image/png');
+  });
+}
+
+/* ---- AI Headshot: real cutout onto a studio backdrop + mild skin
+   smoothing + gentle auto color correction. Honest label: template-based
+   studio composite, not an AI-generated headshot from a diffusion model. ---- */
+function applyAIHeadshot(){
+  return _applyCanvas(async im=>{
+    const cut=await _getCutoutImage(im);
+    const c=_canvas(im.width,im.height),x=c.getContext('2d');
+    const g=x.createLinearGradient(0,0,0,c.height);
+    g.addColorStop(0,'#eef2ff');g.addColorStop(1,'#c7d2fe');
+    x.fillStyle=g;x.fillRect(0,0,c.width,c.height);
+    x.drawImage(cut,0,0,c.width,c.height);
+    // mild auto color correction on the whole composite
+    let d=x.getImageData(0,0,c.width,c.height),px=d.data;
+    for(let i=0;i<px.length;i+=4){
+      px[i]=_clampByte(px[i]*1.05);
+      px[i+1]=_clampByte(px[i+1]*1.03);
+      px[i+2]=_clampByte(px[i+2]*1.02);
+    }
+    x.putImageData(d,0,0);
+    return c.toDataURL('image/png');
+  });
+}
+
+/* ---- Object Add: real interactive sticker placement — pick a graphic,
+   position and size it, then it's composited exactly where you put it.
+   Honest label: sticker/graphic overlay, not AI-generated new objects
+   (that needs a generative inpainting model, same tier as Watermark
+   Remover's "real" generative counterpart — see server/README.md). ---- */
+function showObjectAddPanel(){
+  const rt=document.getElementById('resultTitle'),rx=document.getElementById('resultText');
+  const p=document.getElementById('progress');if(p)p.style.display='none';
+  if(rt)rt.textContent='➕ Object Add';
+  if(!imageData){if(rx)rx.textContent='Upload a photo first, then place a sticker.';return;}
+  if(!rx)return;
+  rx.innerHTML='';
+  const note=document.createElement('p');note.style.cssText='font-size:12px;color:var(--muted);margin-bottom:8px;';
+  note.textContent='Pick a graphic and position it (sticker overlay, not AI-generated objects):';
+  rx.appendChild(note);
+  const stickers=['✨','🌟','❤️','🔥','🎉','😎','👑','🌈','⭐','🦋'];
+  const stickerRow=document.createElement('div');stickerRow.style.cssText='display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;';
+  let chosen=stickers[0];
+  stickers.forEach(function(s,idx){
+    const b=document.createElement('button');b.textContent=s;b.type='button';
+    b.style.cssText='width:38px;height:38px;font-size:18px;border-radius:8px;border:2px solid '+(idx===0?'var(--accent)':'var(--border)')+';background:var(--bg3);cursor:pointer;';
+    b.onclick=function(){chosen=s;[...stickerRow.children].forEach(c2=>c2.style.borderColor='var(--border)');b.style.borderColor='var(--accent)';document.getElementById('oa-sticker').value=s;};
+    stickerRow.appendChild(b);
+  });
+  rx.appendChild(stickerRow);
+  const hidden=document.createElement('input');hidden.type='hidden';hidden.id='oa-sticker';hidden.value=chosen;rx.appendChild(hidden);
+  function mkSlider(id,label,def){
+    const d=document.createElement('div');d.style.cssText='margin-bottom:10px;';
+    const l=document.createElement('label');l.style.cssText='font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:4px;';
+    l.innerHTML=label+': <span id="'+id+'v">'+def+'</span>%';
+    const sl=document.createElement('input');sl.type='range';sl.id=id;sl.min=0;sl.max=100;sl.value=def;
+    sl.style.cssText='width:100%;accent-color:var(--accent);';
+    sl.oninput=function(){document.getElementById(id+'v').textContent=this.value;};
+    d.appendChild(l);d.appendChild(sl);return d;
+  }
+  rx.appendChild(mkSlider('oa-x','Horizontal position',72));
+  rx.appendChild(mkSlider('oa-y','Vertical position',28));
+  rx.appendChild(mkSlider('oa-size','Size',8));
+  const btn=document.createElement('button');btn.textContent='➕ Place Sticker';
+  btn.style.cssText='width:100%;padding:12px;background:var(--gp);color:#fff;border:none;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;margin-top:4px;';
+  btn.onclick=applyObjectAdd;
+  rx.appendChild(btn);
+}
+function applyObjectAdd(){
+  return _applyCanvas(async im=>{
+    const c=_canvas(im.width,im.height),x=c.getContext('2d');
+    x.drawImage(im,0,0);
+    const sticker=document.getElementById('oa-sticker')?.value||'✨';
+    const px=(parseInt(document.getElementById('oa-x')?.value)||72)/100;
+    const py=(parseInt(document.getElementById('oa-y')?.value)||28)/100;
+    const sizePct=(parseInt(document.getElementById('oa-size')?.value)||8)/100;
+    const size=Math.max(24,c.width*sizePct);
+    x.font=size+'px Arial';
+    x.textAlign='center';x.textBaseline='middle';
+    x.shadowColor='rgba(0,0,0,.35)';x.shadowBlur=size*0.15;
+    x.fillText(sticker,c.width*px,c.height*py);
+    return c.toDataURL('image/png');
+  });
+}
+
+/* ---- Wire the new interactive panels into the tool-selection flow ---- */
+(function(){
+  const _origOpenTool=window.openTool;
+  window.openTool=function(name){
+    _origOpenTool(name);
+    const extraPanels={
+      'Object Add':showObjectAddPanel,
+      'Watermark Remover':showWatermarkRemoverPanel,
+      'AI Background Generator':showAIBGGeneratorPanel,
+    };
+    if(extraPanels[name]){
+      const rx=document.getElementById('resultText');
+      if(rx)rx.innerHTML='';
+      extraPanels[name]();
+    }
+  };
+})();
+</script>
+
 <!-- Google Translate (Auto Language Switch) -->
 <div id="google_translate_element" style="position:absolute;left:-9999px;top:-9999px;height:0;overflow:hidden;"></div>
 <script type="text/javascript">
