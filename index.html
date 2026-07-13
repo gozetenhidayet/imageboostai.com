@@ -2946,23 +2946,69 @@ function _naiveCutout(im){
   fctx.putImageData(fd,0,0);
   return fullC;
 }
+function _slog(){
+  // Safe logger: some in-app/WebView browsers don't implement console.debug
+  // (or even parts of console), so never call console methods directly for
+  // non-critical logging — this checks first and never throws.
+  try{
+    if(typeof console!=='undefined'&&console&&typeof console.log==='function'){
+      console.log.apply(console,arguments);
+    }
+  }catch(e){}
+}
+async function _deeplabCutout(im){
+  const model=await window.__deeplabModelPromise;
+  if(!model)throw new Error('DeepLab unavailable');
+  const srcCanvas=_canvas(im.width,im.height);
+  srcCanvas.getContext('2d').drawImage(im,0,0);
+  const result=await model.segment(srcCanvas);
+  const legend=result.legend,width=result.width,height=result.height,segmentationMap=result.segmentationMap;
+  if(!legend||Object.keys(legend).length===0)throw new Error('DeepLab found no recognized subject (person/animal/vehicle/etc.)');
+  const maskC=_canvas(width,height),maskCtx=maskC.getContext('2d');
+  const maskImgData=maskCtx.createImageData(width,height);
+  for(let i=0;i<width*height;i++){
+    const r=segmentationMap[i*4],g=segmentationMap[i*4+1],b=segmentationMap[i*4+2];
+    const v=(r===0&&g===0&&b===0)?0:255; // black = background class in DeepLab's colormap
+    maskImgData.data[i*4]=v;maskImgData.data[i*4+1]=v;maskImgData.data[i*4+2]=v;maskImgData.data[i*4+3]=255;
+  }
+  maskCtx.putImageData(maskImgData,0,0);
+  const fullMaskC=_canvas(im.width,im.height),fmctx=fullMaskC.getContext('2d');
+  fmctx.imageSmoothingEnabled=true;fmctx.imageSmoothingQuality='high';
+  fmctx.filter='blur('+Math.max(1,Math.round(im.width*0.004))+'px)';
+  fmctx.drawImage(maskC,0,0,im.width,im.height);
+  const fullMask=fmctx.getImageData(0,0,im.width,im.height).data;
+  const outC=_canvas(im.width,im.height),octx=outC.getContext('2d');
+  octx.drawImage(im,0,0);
+  const outData=octx.getImageData(0,0,im.width,im.height),px=outData.data;
+  for(let i=0;i<im.width*im.height;i++){px[i*4+3]=fullMask[i*4];}
+  octx.putImageData(outData,0,0);
+  return await _img(outC.toDataURL('image/png'));
+}
 async function _getCutoutImage(im){
-  // Returns an <img> with the subject cut out on a transparent background,
-  // using the real in-browser AI model when available, else the local
-  // flood-fill fallback (always works, no network needed).
-  if(location.protocol==='file:'){
-    showToast('ℹ️ Bu dosya file:// ile açık — AI modeli bu şekilde yüklenemez (CORS). Yerel yedek yöntem kullanılıyor. Gerçek AI için dosyayı bir web sunucusundan (http/https) aç.');
-  }else if(window.__imglyRemoveBackground){
+  // Returns an <img> with the subject cut out on a transparent background.
+  // Tries, in order: (1) DeepLab (classic <script> tag — works even on file://,
+  // recognizes 20 real subject classes), (2) imgly (ES module — needs http/https
+  // hosting), (3) local flood-fill (always works, no network needed, lower quality).
+  try{
+    const model=window.__deeplabModelPromise?await window.__deeplabModelPromise:null;
+    if(model){
+      showToast('🧠 AI modeli çalışıyor (DeepLab)…');
+      return await _deeplabCutout(im);
+    }
+  }catch(e){
+    /* silent: expected fallback */
+  }
+  if(location.protocol!=='file:'&&window.__imglyRemoveBackground){
     try{
-      showToast('🧠 AI modeli çalışıyor (ilk çalıştırmada model indirilir, biraz sürebilir)…');
+      showToast('🧠 AI modeli çalışıyor (imgly, ilk çalıştırmada model indirilir)…');
       const blob=await window.__imglyRemoveBackground(imageData);
       const url=URL.createObjectURL(blob);
       return await _img(url);
     }catch(e){
-      console.error('AI background removal failed, using fallback:',e);
-      showToast('⚠️ AI modeli yüklenemedi, yerel yöntem kullanılıyor');
+      /* silent: expected fallback */
     }
   }
+  showToast('⚠️ AI modelleri kullanılamadı (ağ/CORS), yerel yöntem kullanılıyor');
   return _naiveCutout(im);
 }
 function runBgRemove(){
@@ -4272,6 +4318,385 @@ function applyWatermark(){
   });
 }
 
+/* =========================================================
+   ROUND 6:
+   - Image to Text OCR: REAL text extraction (Tesseract.js) + language
+     picker + Copy/TXT/Word download (was a fake canned string before)
+   - Product Photo Editor: REAL drop shadow + reflection (was dead code
+     before — shadow properties were set but never actually rendered)
+   - Object Remover / Object Replace: added a Lasso (polygon) selection
+     tool alongside the brush
+   - Zoom Compare: 100%/200% magnifier toggle on the before/after slider
+========================================================= */
+
+/* ---- Real OCR via Tesseract.js ---- */
+function showOCRTool(){
+  const rt=document.getElementById('resultTitle'),rx=document.getElementById('resultText');
+  const p=document.getElementById('progress');if(p)p.style.display='none';
+  if(rt)rt.textContent='🔎 Image to Text OCR';
+  if(!rx)return;
+  if(!imageData){rx.textContent='Upload a photo with text, then extract it.';return;}
+  rx.innerHTML='';
+  const desc=document.createElement('p');desc.style.cssText='font-size:13px;color:var(--muted);margin-bottom:10px;';
+  desc.textContent='Real text recognition (runs in your browser). Pick the language(s) in the photo:';
+  rx.appendChild(desc);
+  const langSel=document.createElement('select');langSel.id='ocr-lang';
+  langSel.style.cssText='width:100%;padding:9px;border:1.5px solid var(--border);border-radius:9px;background:var(--bg3);color:var(--text);font-family:inherit;font-size:13px;margin-bottom:12px;';
+  [['eng','English'],['tur','Türkçe'],['deu','Deutsch'],['fra','Français'],['spa','Español'],['ita','Italiano'],['por','Português'],['rus','Русский'],['ara','العربية'],['jpn','日本語'],['chi_sim','中文 (简体)'],['kor','한국어']].forEach(function(o){
+    const op=document.createElement('option');op.value=o[0];op.textContent=o[1];if(o[0]==='eng')op.selected=true;langSel.appendChild(op);
+  });
+  rx.appendChild(langSel);
+  const btn=document.createElement('button');btn.textContent='🔎 Extract Text';
+  btn.style.cssText='width:100%;padding:12px;background:var(--gp);color:#fff;border:none;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;';
+  btn.onclick=applyOCRTool;
+  rx.appendChild(btn);
+}
+async function applyOCRTool(){
+  if(!imageData){showToast('⚠️ Upload an image first');return;}
+  const rt=document.getElementById('resultTitle'),rx=document.getElementById('resultText'),p=document.getElementById('progress'),b=document.getElementById('bar');
+  const lang=document.getElementById('ocr-lang')?.value||'eng';
+  if(p){p.style.display='block';if(b)b.style.width='30%';}
+  if(rt)rt.textContent='Reading text…';
+  if(rx)rx.textContent='Running OCR ('+lang+')…';
+  try{
+    if(typeof Tesseract==='undefined')throw new Error('OCR engine not loaded (needs internet — this downloads a language model on first use)');
+    const result=await Tesseract.recognize(imageData,lang);
+    const text=(result&&result.data&&result.data.text||'').trim()||'(No text detected)';
+    if(p)p.style.display='none';
+    if(rt)rt.textContent='✅ OCR Complete';
+    if(rx){
+      rx.innerHTML='';
+      const ta=document.createElement('textarea');ta.readOnly=true;ta.id='ocr-result-text';ta.value=text;
+      ta.style.cssText='width:100%;min-height:160px;padding:12px;border:1.5px solid var(--border);border-radius:10px;background:var(--bg3);color:var(--text);font-family:inherit;font-size:13px;margin-bottom:10px;';
+      rx.appendChild(ta);
+      const btnRow=document.createElement('div');btnRow.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:8px;';
+      const copyBtn=document.createElement('button');copyBtn.textContent='📋 Copy to Clipboard';
+      copyBtn.style.cssText='padding:10px;background:var(--bg3);border:1.5px solid var(--border);border-radius:9px;cursor:pointer;color:var(--text);font-weight:700;font-size:12.5px;font-family:inherit;';
+      copyBtn.onclick=function(){navigator.clipboard.writeText(ta.value).then(()=>showToast('📋 Copied!'));};
+      const wordBtn=document.createElement('button');wordBtn.textContent='⬇ Download as Word';
+      wordBtn.style.cssText='padding:10px;background:var(--bg3);border:1.5px solid var(--border);border-radius:9px;cursor:pointer;color:var(--text);font-weight:700;font-size:12.5px;font-family:inherit;';
+      wordBtn.onclick=function(){
+        const html='<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"></head><body><pre style="font-family:Calibri,Arial,sans-serif;white-space:pre-wrap;">'+ta.value.replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</pre></body></html>';
+        const blob=new Blob(['\ufeff',html],{type:'application/msword'});
+        const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='imageboostai-ocr.doc';a.click();
+      };
+      btnRow.appendChild(copyBtn);btnRow.appendChild(wordBtn);
+      rx.appendChild(btnRow);
+    }
+    const dl=document.getElementById('download');
+    if(dl){dl.href=URL.createObjectURL(new Blob([text],{type:'text/plain'}));dl.download='imageboostai-ocr.txt';dl.style.display='inline-block';dl.textContent='⬇ Download as TXT';}
+    const sb=document.getElementById('share-bar');if(sb)sb.style.display='flex';
+    showToast('✅ OCR complete');
+    addHistory&&addHistory('Image to Text OCR');
+  }catch(e){
+    if(p)p.style.display='none';
+    console.error('OCR failed:',e);
+    if(rt)rt.textContent='⚠️ OCR failed';
+    if(rx)rx.textContent='Could not run OCR: '+e.message+'. This needs an internet connection (downloads a language model on first use) and works best when the page is hosted via http/https rather than opened as a local file.';
+    showToast('⚠️ OCR failed — see message below');
+  }
+}
+
+/* ---- Product Photo Editor: real drop shadow + reflection ---- */
+function applyProductPhotoEditor(){
+  return _applyCanvas(async im=>{
+    const padX=Math.round(im.width*0.12),padTop=Math.round(im.height*0.08);
+    const shadowGap=Math.max(4,Math.round(im.height*0.015));
+    const reflH=Math.round(im.height*0.32);
+    const bottomPad=Math.round(im.height*0.05);
+    const c=_canvas(im.width+padX*2,padTop+im.height+shadowGap+reflH+bottomPad);
+    const x=c.getContext('2d');
+    x.fillStyle='#ffffff';x.fillRect(0,0,c.width,c.height);
+    const prodX=padX,prodY=padTop;
+    x.save();
+    x.filter='blur('+Math.max(6,Math.round(im.width*0.03))+'px)';
+    x.fillStyle='rgba(0,0,0,.24)';
+    x.beginPath();
+    x.ellipse(prodX+im.width/2,prodY+im.height+shadowGap,im.width*0.36,Math.max(4,im.height*0.045),0,0,Math.PI*2);
+    x.fill();
+    x.restore();
+    // Build the reflection on its own transparent layer first, fade IT out, then
+    // composite normally onto the white canvas — this fades into solid white
+    // instead of punching a transparent hole through the background.
+    const reflLayer=_canvas(im.width,reflH),rlctx=reflLayer.getContext('2d');
+    rlctx.save();
+    rlctx.translate(0,im.height);
+    rlctx.scale(1,-1);
+    rlctx.globalAlpha=0.32;
+    rlctx.drawImage(im,0,0,im.width,im.height);
+    rlctx.restore();
+    const gradC=_canvas(im.width,reflH),gctx=gradC.getContext('2d');
+    const grad=gctx.createLinearGradient(0,0,0,reflH);
+    grad.addColorStop(0,'rgba(255,255,255,0)');grad.addColorStop(1,'rgba(255,255,255,1)');
+    gctx.fillStyle=grad;gctx.fillRect(0,0,im.width,reflH);
+    rlctx.globalCompositeOperation='destination-out';
+    rlctx.drawImage(gradC,0,0);
+    x.drawImage(reflLayer,prodX,prodY+im.height+shadowGap);
+    x.filter='contrast(1.06) saturate(1.08) brightness(1.03)';
+    x.drawImage(im,prodX,prodY,im.width,im.height);
+    x.filter='none';
+    return c.toDataURL('image/png');
+  });
+}
+
+/* ---- Lasso (polygon) selection, added alongside the brush ---- */
+function _mkLassoSelector(opts){
+  const maxW=(opts&&opts.maxW)||340;
+  const wrap=document.createElement('div');
+  wrap.style.cssText='position:relative;display:inline-block;max-width:100%;border-radius:10px;overflow:hidden;border:1.5px solid var(--border);cursor:crosshair;touch-action:none;line-height:0;';
+  const canvas=document.createElement('canvas');canvas.style.cssText='display:block;max-width:100%;';
+  wrap.appendChild(canvas);
+  let img=null,points=[],closed=false;
+  const ctx=canvas.getContext('2d');
+  function draw(){
+    if(!img)return;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.drawImage(img,0,0,canvas.width,canvas.height);
+    if(points.length>0){
+      ctx.save();
+      ctx.strokeStyle='#5b4ce8';ctx.lineWidth=2;ctx.fillStyle='rgba(91,76,232,.28)';
+      ctx.beginPath();ctx.moveTo(points[0].x,points[0].y);
+      for(let i=1;i<points.length;i++)ctx.lineTo(points[i].x,points[i].y);
+      if(closed){ctx.closePath();ctx.fill();}
+      ctx.stroke();
+      points.forEach(p=>{ctx.beginPath();ctx.arc(p.x,p.y,4,0,Math.PI*2);ctx.fillStyle='#5b4ce8';ctx.fill();});
+      ctx.restore();
+    }
+  }
+  const img2=new Image();
+  img2.onload=function(){
+    const scale=Math.min(1,maxW/img2.width);
+    canvas.width=Math.round(img2.width*scale);canvas.height=Math.round(img2.height*scale);
+    img=img2;draw();
+  };
+  img2.src=imageData;
+  function posFromEvent(e){
+    const r=canvas.getBoundingClientRect();
+    return{x:(e.touches?e.touches[0].clientX:e.clientX)-r.left,y:(e.touches?e.touches[0].clientY:e.clientY)-r.top};
+  }
+  function click(e){
+    if(closed)return;
+    const p=posFromEvent(e);
+    if(points.length>2){
+      const d=Math.hypot(p.x-points[0].x,p.y-points[0].y);
+      if(d<12){closed=true;draw();return;}
+    }
+    points.push(p);draw();
+    e.preventDefault();
+  }
+  canvas.addEventListener('click',click);
+  canvas.addEventListener('touchend',click,{passive:false});
+  return{
+    element:wrap,
+    clear:()=>{points=[];closed=false;draw();},
+    hasSelection:()=>closed&&points.length>2,
+    getFullResMask:(fullW,fullH)=>{
+      const mc=_canvas(canvas.width,canvas.height),mctx=mc.getContext('2d');
+      mctx.fillStyle='#fff';
+      mctx.beginPath();mctx.moveTo(points[0].x,points[0].y);
+      for(let i=1;i<points.length;i++)mctx.lineTo(points[i].x,points[i].y);
+      mctx.closePath();mctx.fill();
+      const full=_canvas(fullW,fullH),fctx=full.getContext('2d');
+      fctx.imageSmoothingEnabled=true;fctx.imageSmoothingQuality='high';
+      fctx.drawImage(mc,0,0,fullW,fullH);
+      return full;
+    }
+  };
+}
+function _mkSelectionModeSwitcher(onBrush,onLasso){
+  const row=document.createElement('div');row.style.cssText='display:flex;gap:6px;margin-bottom:8px;';
+  const brushBtn=document.createElement('button');brushBtn.textContent='🖌️ Brush';brushBtn.type='button';
+  const lassoBtn=document.createElement('button');lassoBtn.textContent='📐 Lasso';lassoBtn.type='button';
+  [brushBtn,lassoBtn].forEach(b=>{b.style.cssText='flex:1;padding:8px;border:1.5px solid var(--border);border-radius:8px;cursor:pointer;font-weight:700;font-family:inherit;font-size:12.5px;';});
+  function setActive(which){
+    brushBtn.style.background=which==='brush'?'var(--accent)':'var(--bg3)';brushBtn.style.color=which==='brush'?'#fff':'var(--text)';
+    lassoBtn.style.background=which==='lasso'?'var(--accent)':'var(--bg3)';lassoBtn.style.color=which==='lasso'?'#fff':'var(--text)';
+  }
+  brushBtn.onclick=()=>{setActive('brush');onBrush();};
+  lassoBtn.onclick=()=>{setActive('lasso');onLasso();};
+  setActive('brush');
+  row.appendChild(brushBtn);row.appendChild(lassoBtn);
+  return row;
+}
+(function(){
+  window.showObjectRemoverPanel=function(){
+    const rt=document.getElementById('resultTitle'),rx=document.getElementById('resultText');
+    const p=document.getElementById('progress');if(p)p.style.display='none';
+    if(rt)rt.textContent='🧽 Object Remover';
+    if(!rx)return;
+    window.__maskPainter=null;window.__lassoSelector=null;
+    if(!imageData){rx.textContent='Upload a photo first, then select what you want removed.';return;}
+    rx.innerHTML='';
+    const hint=document.createElement('p');hint.style.cssText='font-size:12px;color:var(--muted);margin-bottom:8px;';
+    hint.textContent='Brush: paint over the area. Lasso: click points around it, click near the start to close. Blends nearby pixels — not full AI inpainting.';
+    rx.appendChild(hint);
+    const body=document.createElement('div');
+    function renderBrush(){
+      body.innerHTML='';
+      const painter=_mkMaskPainter({maxW:340});
+      window.__maskPainter=painter;window.__lassoSelector=null;
+      body.appendChild(painter.element);
+      body.appendChild(_mkBrushControls(painter,'rm'));
+    }
+    function renderLasso(){
+      body.innerHTML='';
+      const lasso=_mkLassoSelector({maxW:340});
+      window.__lassoSelector=lasso;window.__maskPainter=null;
+      body.appendChild(lasso.element);
+      const clearBtn=document.createElement('button');clearBtn.textContent='↺ Clear';clearBtn.type='button';
+      clearBtn.style.cssText='margin-top:8px;padding:8px 12px;background:var(--bg3);border:1.5px solid var(--border);border-radius:8px;cursor:pointer;color:var(--text);font-weight:600;font-size:12px;font-family:inherit;';
+      clearBtn.onclick=()=>lasso.clear();
+      body.appendChild(clearBtn);
+    }
+    rx.appendChild(_mkSelectionModeSwitcher(renderBrush,renderLasso));
+    rx.appendChild(body);
+    renderBrush();
+    const btn=document.createElement('button');btn.textContent='🧽 Remove Selected Area';
+    btn.style.cssText='width:100%;padding:12px;background:var(--gp);color:#fff;border:none;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;margin-top:10px;';
+    btn.onclick=applyObjectRemover;
+    rx.appendChild(btn);
+  };
+})();
+(function(){
+  window.showObjectRecolorPanel=function(){
+    const rt=document.getElementById('resultTitle'),rx=document.getElementById('resultText');
+    const p=document.getElementById('progress');if(p)p.style.display='none';
+    if(rt)rt.textContent='🎨 Object Replace → Recolor Area';
+    if(!rx)return;
+    window.__maskPainter=null;window.__lassoSelector=null;
+    if(!imageData){rx.textContent='Upload a photo first.';return;}
+    rx.innerHTML='';
+    const note=document.createElement('p');
+    note.style.cssText='font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.5;background:var(--bg3);padding:8px 10px;border-radius:8px;';
+    note.innerHTML='⚠️ <b>Honest note:</b> truly "replacing" an object with a different one needs a generative AI model (image diffusion) and isn\'t possible in a free, server-less browser tool. What this <i>can</i> do: change the color/tone of the area you select.';
+    rx.appendChild(note);
+    const body=document.createElement('div');
+    function renderBrush(){
+      body.innerHTML='';
+      const painter=_mkMaskPainter({maxW:340});
+      window.__maskPainter=painter;window.__lassoSelector=null;
+      body.appendChild(painter.element);
+      body.appendChild(_mkBrushControls(painter,'rc'));
+    }
+    function renderLasso(){
+      body.innerHTML='';
+      const lasso=_mkLassoSelector({maxW:340});
+      window.__lassoSelector=lasso;window.__maskPainter=null;
+      body.appendChild(lasso.element);
+      const clearBtn=document.createElement('button');clearBtn.textContent='↺ Clear';clearBtn.type='button';
+      clearBtn.style.cssText='margin-top:8px;padding:8px 12px;background:var(--bg3);border:1.5px solid var(--border);border-radius:8px;cursor:pointer;color:var(--text);font-weight:600;font-size:12px;font-family:inherit;';
+      clearBtn.onclick=()=>lasso.clear();
+      body.appendChild(clearBtn);
+    }
+    rx.appendChild(_mkSelectionModeSwitcher(renderBrush,renderLasso));
+    rx.appendChild(body);
+    renderBrush();
+    const row=document.createElement('div');row.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0;';
+    const d1=document.createElement('div');
+    const l1=document.createElement('label');l1.style.cssText='font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:4px;';l1.textContent='New Color';
+    const colorIn=document.createElement('input');colorIn.type='color';colorIn.id='rc-color';colorIn.value='#5b4ce8';
+    colorIn.style.cssText='width:100%;height:36px;border:1.5px solid var(--border);border-radius:8px;cursor:pointer;padding:2px;';
+    d1.appendChild(l1);d1.appendChild(colorIn);
+    const d2=document.createElement('div');
+    const l2=document.createElement('label');l2.style.cssText='font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:4px;';l2.innerHTML='Intensity: <span id="rc-iv">55</span>%';
+    const intensity=document.createElement('input');intensity.type='range';intensity.id='rc-intensity';intensity.min=10;intensity.max=100;intensity.value=55;intensity.style.cssText='width:100%;accent-color:var(--accent);';
+    intensity.oninput=function(){document.getElementById('rc-iv').textContent=this.value;};
+    d2.appendChild(l2);d2.appendChild(intensity);
+    row.appendChild(d1);row.appendChild(d2);rx.appendChild(row);
+    const btn=document.createElement('button');btn.textContent='🎨 Apply Color';
+    btn.style.cssText='width:100%;padding:12px;background:var(--gp);color:#fff;border:none;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;';
+    btn.onclick=applyObjectReplace;
+    rx.appendChild(btn);
+  };
+})();
+function _getActiveSelectionMask(fullW,fullH){
+  if(window.__lassoSelector&&window.__lassoSelector.hasSelection())return window.__lassoSelector.getFullResMask(fullW,fullH);
+  if(window.__maskPainter&&window.__maskPainter.hasPaint())return window.__maskPainter.getFullResMask(fullW,fullH);
+  return null;
+}
+function applyObjectRemover(){
+  const hasSel=(window.__lassoSelector&&window.__lassoSelector.hasSelection())||(window.__maskPainter&&window.__maskPainter.hasPaint());
+  if(!hasSel){showToast('⚠️ Select an area first (brush or lasso)');return;}
+  return _applyCanvas(async im=>{
+    const c=_canvas(im.width,im.height),x=c.getContext('2d');
+    x.drawImage(im,0,0);
+    const maskCanvas=_getActiveSelectionMask(im.width,im.height);
+    const maskData=maskCanvas.getContext('2d').getImageData(0,0,im.width,im.height).data;
+    const blurC=_canvas(im.width,im.height),bctx=blurC.getContext('2d');
+    bctx.filter='blur('+Math.max(8,Math.round(Math.max(im.width,im.height)*0.03))+'px)';
+    bctx.drawImage(im,0,0);
+    const blurData=bctx.getImageData(0,0,im.width,im.height).data;
+    const imgData=x.getImageData(0,0,im.width,im.height),px=imgData.data;
+    for(let i=0;i<maskData.length;i+=4){
+      const a=maskData[i]/255;
+      if(a>0.02){
+        px[i]=px[i]*(1-a)+blurData[i]*a;
+        px[i+1]=px[i+1]*(1-a)+blurData[i+1]*a;
+        px[i+2]=px[i+2]*(1-a)+blurData[i+2]*a;
+      }
+    }
+    x.putImageData(imgData,0,0);
+    return c.toDataURL('image/png');
+  });
+}
+function applyObjectReplace(){
+  const hasSel=(window.__lassoSelector&&window.__lassoSelector.hasSelection())||(window.__maskPainter&&window.__maskPainter.hasPaint());
+  if(!hasSel){showToast('⚠️ Select an area first (brush or lasso)');return;}
+  const hexColor=document.getElementById('rc-color')?.value||'#5b4ce8';
+  const amount=(parseInt(document.getElementById('rc-intensity')?.value)||55)/100;
+  return _applyCanvas(async im=>{
+    const c=_canvas(im.width,im.height),x=c.getContext('2d');
+    x.drawImage(im,0,0);
+    const maskCanvas=_getActiveSelectionMask(im.width,im.height);
+    const maskData=maskCanvas.getContext('2d').getImageData(0,0,im.width,im.height).data;
+    const recolorC=_canvas(im.width,im.height),rctx2=recolorC.getContext('2d');
+    rctx2.drawImage(im,0,0);
+    rctx2.globalCompositeOperation='color';
+    rctx2.fillStyle=hexColor;
+    rctx2.fillRect(0,0,im.width,im.height);
+    const recolorData=rctx2.getImageData(0,0,im.width,im.height).data;
+    const imgData=x.getImageData(0,0,im.width,im.height),px=imgData.data;
+    for(let i=0;i<maskData.length;i+=4){
+      const a=(maskData[i]/255)*amount;
+      if(a>0.01){
+        px[i]=px[i]*(1-a)+recolorData[i]*a;
+        px[i+1]=px[i+1]*(1-a)+recolorData[i+1]*a;
+        px[i+2]=px[i+2]*(1-a)+recolorData[i+2]*a;
+      }
+    }
+    x.putImageData(imgData,0,0);
+    return c.toDataURL('image/png');
+  });
+}
+
+/* ---- Zoom Compare: 100%/200% toggle on the before/after slider ---- */
+(function(){
+  const _orig=_mkCompareSlider;
+  window._mkCompareSlider=function(beforeSrc,afterSrc){
+    const wrap=_orig(beforeSrc,afterSrc);
+    const zoomRow=document.createElement('div');
+    zoomRow.style.cssText='display:flex;gap:6px;margin-top:8px;';
+    [['100%',1],['200%',2]].forEach(function(pair){
+      const btn=document.createElement('button');btn.textContent='🔍 '+pair[0];btn.type='button';
+      btn.style.cssText='padding:7px 12px;background:var(--bg3);border:1.5px solid var(--border);border-radius:8px;cursor:pointer;color:var(--text);font-weight:700;font-size:12px;font-family:inherit;';
+      btn.onclick=function(){
+        wrap.style.transform='scale('+pair[1]+')';
+        wrap.style.transformOrigin='top left';
+        wrap.style.marginBottom=pair[1]>1?((pair[1]-1)*100)+'%':'0';
+      };
+      zoomRow.appendChild(btn);
+    });
+    const holder=document.createElement('div');
+    holder.style.cssText='overflow:auto;max-height:420px;';
+    holder.appendChild(wrap);
+    const outer=document.createElement('div');
+    outer.appendChild(holder);
+    outer.appendChild(zoomRow);
+    return outer;
+  };
+})();
+
+
 </script>
 <!-- Real AI background removal (runs fully in the user's browser, WASM + ONNX model, no server).
      Loaded as a module so runBgRemove()/applyBgChange() can call window.__imglyRemoveBackground(). -->
@@ -4279,6 +4704,28 @@ function applyWatermark(){
   import imglyRemoveBackground from "https://esm.sh/@imgly/background-removal@1.7.0";
   window.__imglyRemoveBackground = (src) => imglyRemoveBackground(src, { model: 'small' });
   window.__imglyReady = true;
+</script>
+<!-- Secondary/primary AI segmentation path: TensorFlow.js + DeepLab v3, loaded via CLASSIC
+     script tags (not ES modules). Classic scripts don't require CORS headers to execute,
+     so — unlike the imgly module above — this also works when the page is opened directly
+     via file:// (which is why we keep both: this one is the more reliable path). DeepLab
+     recognizes 20 common subject classes (person, cat, dog, bird, car, etc.) via real
+     semantic segmentation, not a color heuristic. -->
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/deeplab@0.2.2/dist/deeplab.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<script>
+  window.__deeplabModelPromise = (async () => {
+    try{
+      if(typeof deeplab === 'undefined' || typeof tf === 'undefined') return null;
+      const model = await deeplab.load({base:'pascal', quantizationBytes:2});
+      window.__deeplabReady = true;
+      return model;
+    }catch(e){
+      /* silent: expected fallback */
+      return null;
+    }
+  })();
 </script>
 <!-- Google Translate (Auto Language Switch) -->
 <div id="google_translate_element" style="position:absolute;left:-9999px;top:-9999px;height:0;overflow:hidden;"></div>
