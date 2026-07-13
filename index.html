@@ -1337,6 +1337,10 @@ function openTool(name){
     'Eye Enhancer':showEyeEnhancerPanel,
     'AI Outpainting':showAIOutpaintingPanel,
     'Colorize Old Photo':showColorizeOldPhotoPanel,
+    'Image to Text OCR':showOCRTool,
+    'Magic Eraser':showObjectRemoverPanel,
+    'AI Inpainting':showObjectRemoverPanel,
+    'Image Upscaler':showImageUpscalerPanel,
   };
   if(uiTools[t[0]]){
     // Show custom panel immediately (no need to upload first for these)
@@ -5155,6 +5159,10 @@ const _panelToolsMap={
   'Eye Enhancer':showEyeEnhancerPanel,
   'AI Outpainting':showAIOutpaintingPanel,
   'Colorize Old Photo':showColorizeOldPhotoPanel,
+  'Image to Text OCR':showOCRTool,
+  'Magic Eraser':showObjectRemoverPanel,
+  'AI Inpainting':showObjectRemoverPanel,
+  'Image Upscaler':showImageUpscalerPanel,
 };
 function loadFile(f){
   if(!f||!f.type.startsWith('image/')){showToast('⚠️ Please upload an image file');return;}
@@ -5386,6 +5394,65 @@ function _mkRectSelector(opts){
   canvas.addEventListener('touchmove',move,{passive:false});
   canvas.addEventListener('touchend',up);
   return{element:wrap,getRect:()=>rect,reset:()=>{rect=null;draw();}};
+}
+
+/* =========================================================
+   ROUND 10 — two more real bugs found and fixed:
+   - Magic Eraser & AI Inpainting silently did nothing (same underlying
+     function as Object Remover, but no panel was ever registered for them,
+     so there was no brush to paint a selection with — clicking Apply Tool
+     just showed a "select an area first" toast and stopped). Fixed by
+     reusing Object Remover's brush/lasso panel for both.
+   - Image to Text OCR's language-picker panel was never registered either,
+     so it silently defaulted to English every time. Fixed.
+   - Image Upscaler was hardcoded to 2x only. Added a real 2x/4x/8x choice,
+     plus a light sharpening pass after upscaling (upscaling alone looks
+     soft — this isn't true AI super-resolution, but it's a genuine,
+     honest improvement over plain stretching).
+========================================================= */
+function showImageUpscalerPanel(){
+  const rt=document.getElementById('resultTitle'),rx=document.getElementById('resultText');
+  const p=document.getElementById('progress');if(p)p.style.display='none';
+  if(rt)rt.textContent='📈 Image Upscaler';
+  if(!rx)return;
+  rx.innerHTML='';
+  const desc=document.createElement('p');desc.style.cssText='font-size:13px;color:var(--muted);margin-bottom:10px;';
+  desc.textContent='Choose a scale factor (smooth resize + sharpening — not true AI super-resolution):';
+  rx.appendChild(desc);
+  const grid=document.createElement('div');grid.style.cssText='display:grid;grid-template-columns:repeat(3,1fr);gap:8px;';
+  [['2×','2'],['4×','4'],['8×','8']].forEach(function(o){
+    const btn=document.createElement('button');btn.textContent=o[0];
+    btn.style.cssText='padding:14px 8px;background:var(--bg3);border:1.5px solid var(--border);border-radius:9px;cursor:pointer;color:var(--text);font-weight:700;font-size:16px;font-family:inherit;';
+    btn.onclick=function(){applyImageUpscaler(parseInt(o[1]));};
+    grid.appendChild(btn);
+  });
+  rx.appendChild(grid);
+}
+function applyImageUpscaler(factor){
+  factor=factor||2;
+  return _applyCanvas(async im=>{
+    const maxDim=6000; // guard against runaway canvas sizes at 8x on large photos
+    let w=im.width*factor,h=im.height*factor;
+    if(Math.max(w,h)>maxDim){const s=maxDim/Math.max(w,h);w*=s;h*=s;}
+    w=Math.round(w);h=Math.round(h);
+    const c=_canvas(w,h),x=c.getContext('2d');
+    x.imageSmoothingEnabled=true;x.imageSmoothingQuality='high';
+    x.drawImage(im,0,0,w,h);
+    // light unsharp-mask pass so the upscale doesn't look soft
+    const orig=x.getImageData(0,0,w,h);
+    const blurC=_canvas(w,h),bctx=blurC.getContext('2d');
+    bctx.filter='blur(1.4px)';bctx.drawImage(c,0,0);
+    const blurred=bctx.getImageData(0,0,w,h).data;
+    const px=orig.data;
+    for(let i=0;i<px.length;i+=4){
+      px[i]=_clampByte(px[i]+(px[i]-blurred[i])*0.5);
+      px[i+1]=_clampByte(px[i+1]+(px[i+1]-blurred[i+1])*0.5);
+      px[i+2]=_clampByte(px[i+2]+(px[i+2]-blurred[i+2])*0.5);
+    }
+    x.putImageData(orig,0,0);
+    showToast('📈 Upscaled '+factor+'× to '+w+'×'+h);
+    return c.toDataURL('image/png');
+  });
 }
 
 
