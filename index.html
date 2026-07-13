@@ -5218,16 +5218,29 @@ function doUndo(){
   window.__redoStack.push(imageData);
   imageData=window.__undoStack.pop();
   _refreshResultView();
+  _refreshActiveToolPanel();
   _updateUndoRedoButtons();
-  showToast('↶ Undone');
+  showToast('↶ Undone — tool controls reset, adjust and apply again');
 }
 function doRedo(){
   if(window.__redoStack.length===0){showToast('⚠️ Nothing to redo');return;}
   window.__undoStack.push(imageData);
   imageData=window.__redoStack.pop();
   _refreshResultView();
+  _refreshActiveToolPanel();
   _updateUndoRedoButtons();
-  showToast('↷ Redone');
+  showToast('↷ Redone — tool controls reset, adjust and apply again');
+}
+function _refreshActiveToolPanel(){
+  // After Undo/Redo, rebuild the currently-open tool's panel (fresh crop
+  // selector, fresh text box, fresh brush canvas, etc.) using the now-current
+  // imageData, so the user can re-adjust and re-apply instead of being stuck
+  // looking at a flattened result with no way to redo the selection/typing.
+  if(_panelToolsMap[selected]){
+    const rx=document.getElementById('resultText');
+    if(rx)rx.innerHTML='';
+    _panelToolsMap[selected]();
+  }
 }
 function _downloadReady(data,ext){
   _pushUndo(imageData);
