@@ -3657,15 +3657,17 @@ function _downloadReady(data,ext){
   const out=document.getElementById('output'),dl=document.getElementById('download'),sb=document.getElementById('share-bar');
   if(out){
     out.innerHTML='';
-    const beforeSrc=window.__originalUpload||data;
-    out.appendChild(_mkCompareSlider(beforeSrc,data));
+    const img=document.createElement('img');
+    img.id='outImg';img.alt='Edited photo result';img.src=data;
+    img.style.cssText='display:block;width:100%;max-height:420px;object-fit:contain;border-radius:16px;';
+    out.appendChild(img);
     out.style.display='block';out.style.opacity='1';out.style.transform='none';
   }
   if(dl){dl.href=imageData;dl.download='imageboostai-'+selected.toLowerCase().replace(/[^a-z0-9]+/g,'-')+'.'+(ext||'png');dl.style.display='inline-block';dl.textContent='⬇ Download Result';}
   if(sb)sb.style.display='flex';
   const rt=document.getElementById('resultTitle'),rx=document.getElementById('resultText');
   if(rt)rt.textContent='✅ Done!';
-  if(rx)rx.textContent=selected+' applied. Drag the slider to compare — your download is ready.';
+  if(rx)rx.textContent=selected+' applied. Your download is ready.';
   const closeBtn=document.getElementById('close-result-btn');if(closeBtn)closeBtn.style.display='flex';
   addHistory&&addHistory(selected);
   showToast&&showToast('✅ '+selected+' complete — download ready!');
@@ -5117,6 +5119,58 @@ function applyBlurBackground(){
     rx.appendChild(tip);
   };
 })();
+
+/* =========================================================
+   ROUND 8 — real bug fix: if a tool with a custom panel (Add Text, Crop,
+   Watermark, etc.) was opened BEFORE a photo was uploaded, the panel never
+   rebuilt itself after the upload — it stayed stuck showing "upload a photo
+   first" / a plain instruction line, with no color/size/position controls
+   visible at all. That's why Add Text looked completely broken. Fixing by
+   rebuilding the active tool's panel right after upload finishes.
+========================================================= */
+const _panelToolsMap={
+  'Add Text to Photo':showTextOverlayPanel,
+  'Background Changer':showBgChangerPanel,
+  'Crop Image':showCropToolPanel,
+  'Resize Image':showResizeToolPanel,
+  'Image Compressor':showCompressToolPanel,
+  'Convert Image':showConvertToolPanel,
+  'Brightness & Contrast':showBrightnessToolPanel,
+  'Watermark Maker':showWatermarkToolPanel,
+  'Object Remover':showObjectRemoverPanel,
+  'Object Replace':showObjectRecolorPanel,
+  'Blur Background':showBlurBackgroundPanel,
+  'Image Sharpener':showImageSharpenerPanel,
+  'Noise Remover':showNoiseRemoverPanel,
+  'Color Correction':showColorCorrectionPanel,
+  'Face Retouch':showFaceRetouchPanel,
+  'Teeth Whitening':showTeethWhiteningPanel,
+  'Eye Enhancer':showEyeEnhancerPanel,
+  'AI Outpainting':showAIOutpaintingPanel,
+  'Colorize Old Photo':showColorizeOldPhotoPanel,
+};
+function loadFile(f){
+  if(!f||!f.type.startsWith('image/')){showToast('⚠️ Please upload an image file');return;}
+  const r=new FileReader();
+  r.onload=()=>{
+    imageData=r.result;
+    window.__originalUpload=r.result;
+    document.getElementById('uploadContent').innerHTML='<img src="'+imageData+'" alt="Uploaded photo" style="max-width:100%;max-height:280px;border-radius:16px;object-fit:contain;">';
+    showToast('✅ Image uploaded');
+    trackEvent&&trackEvent('image_upload','Tool',selected);
+    const uxb=document.getElementById('upload-x-btn');if(uxb)uxb.style.display='flex';
+    const rt=document.getElementById('resultTitle'),rx=document.getElementById('resultText');
+    if(_panelToolsMap[selected]){
+      if(rx)rx.innerHTML='';
+      _panelToolsMap[selected]();
+      if(rt)rt.textContent='Ready — '+selected;
+    }else{
+      if(rt)rt.textContent='Image uploaded';
+      if(rx)rx.textContent='Now apply '+selected+'.';
+    }
+  };
+  r.readAsDataURL(f);
+}
 
 
 </script>
