@@ -1432,6 +1432,13 @@ function openTool(name){
     'AI Inpainting':showObjectRemoverPanel,
     'Image Upscaler':showImageUpscalerPanel,
   };
+  // Merge in the extra ROUND 11 panels (Object Add, Watermark Remover,
+  // AI Background Generator) so the upload handler below can also see them.
+  if(window.__ibaExtraPanels){ Object.assign(uiTools, window.__ibaExtraPanels); }
+  // Expose globally: iba_finishLoad() (upload handler) uses this to know
+  // whether the currently selected tool has a custom panel it must NOT
+  // overwrite/clobber once a photo is uploaded.
+  window.__ibaUiTools = uiTools;
   if(uiTools[t[0]]){
     // Show custom panel immediately (no need to upload first for these)
     if(rx)rx.innerHTML='';
@@ -1503,7 +1510,19 @@ function iba_finishLoad(dataUrl,noteHtml){
   window.__originalUpload=dataUrl;
   document.getElementById('uploadContent').innerHTML=`<img src="${dataUrl}" alt="Uploaded photo" style="max-width:100%;max-height:280px;border-radius:16px;object-fit:contain;">`;
   document.getElementById('resultTitle').textContent='Image uploaded';
-  document.getElementById('resultText').textContent='Now apply '+selected+'.';
+  // If the currently selected tool has a custom panel (sticker picker,
+  // brush painter, sliders, dropdowns, etc.), re-render that panel now
+  // that a photo is available instead of wiping it out with generic text
+  // — this was overwriting Object Add's sticker picker, Blur Background's
+  // amount slider, Face Retouch's brush canvas, etc. right after upload.
+  const panelFn = window.__ibaUiTools && window.__ibaUiTools[selected];
+  if(panelFn){
+    const rx=document.getElementById('resultText');
+    if(rx)rx.innerHTML='';
+    panelFn();
+  }else{
+    document.getElementById('resultText').textContent='Now apply '+selected+'.';
+  }
   showToast(noteHtml||'✅ Image uploaded');
   trackEvent('image_upload','Tool',selected);
   const uxb=document.getElementById('upload-x-btn');if(uxb)uxb.style.display='flex';
@@ -6014,15 +6033,16 @@ function applyObjectAdd(){
 }
 
 /* ---- Wire the new interactive panels into the tool-selection flow ---- */
+window.__ibaExtraPanels = {
+  'Object Add':showObjectAddPanel,
+  'Watermark Remover':showWatermarkRemoverPanel,
+  'AI Background Generator':showAIBGGeneratorPanel,
+};
 (function(){
   const _origOpenTool=window.openTool;
   window.openTool=function(name){
     _origOpenTool(name);
-    const extraPanels={
-      'Object Add':showObjectAddPanel,
-      'Watermark Remover':showWatermarkRemoverPanel,
-      'AI Background Generator':showAIBGGeneratorPanel,
-    };
+    const extraPanels=window.__ibaExtraPanels;
     if(extraPanels[name]){
       const rx=document.getElementById('resultText');
       if(rx)rx.innerHTML='';
