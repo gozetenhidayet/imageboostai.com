@@ -751,13 +751,13 @@ footer{background:var(--text);color:rgba(255,255,255,.85);padding:3.5rem 1rem 1.
       ImageBoost<span class="logo-ai">AI</span>
     </a>
     <!-- Category pills — center of nav bar -->
-    <div class="nav-cats">
-      <button type="button" class="cat-pill cp-all active" onclick="filterTools('all',this)">&#x2B50; All</button>
-      <button type="button" class="cat-pill cp-bg" onclick="filterTools('bg',this)">&#x1F3AD; Background</button>
-      <button type="button" class="cat-pill cp-fix" onclick="filterTools('fix',this)">&#x1F3DB;&#xFE0F; Restore</button>
-      <button type="button" class="cat-pill cp-face" onclick="filterTools('face',this)">&#x1F484; Face</button>
-      <button type="button" class="cat-pill cp-convert" onclick="filterTools('convert',this)">&#x1F504; Convert</button>
-      <button type="button" class="cat-pill cp-design" onclick="filterTools('design',this)">&#x1F3A8; Design</button>
+    <div class="nav-cats" id="nav-cats">
+      <button type="button" class="cat-pill cp-all active" data-cat="all" onclick="filterTools('all',this)">&#x2B50; All</button>
+      <button type="button" class="cat-pill cp-bg" data-cat="bg" onclick="filterTools('bg',this)">&#x1F3AD; Background</button>
+      <button type="button" class="cat-pill cp-fix" data-cat="fix" onclick="filterTools('fix',this)">&#x1F3DB;&#xFE0F; Restore</button>
+      <button type="button" class="cat-pill cp-face" data-cat="face" onclick="filterTools('face',this)">&#x1F484; Face</button>
+      <button type="button" class="cat-pill cp-convert" data-cat="convert" onclick="filterTools('convert',this)">&#x1F504; Convert</button>
+      <button type="button" class="cat-pill cp-design" data-cat="design" onclick="filterTools('design',this)">&#x1F3A8; Design</button>
     </div>
     <!-- Right: lang picker + theme toggle -->
     <div class="nav-links">
@@ -1367,16 +1367,14 @@ function filterTools(cat,btn){
   if(toolsSec)toolsSec.scrollIntoView({behavior:'smooth',block:'start'});
   trackEvent('filter_tools','UI',cat);
 }
-/* Defensive fallback: in case any inline onclick attribute fails to fire
-   (some hosting/CDN layers strip inline handlers), wire the same category
-   pills via addEventListener too — harmless no-op if onclick already works
-   since filterTools() is idempotent. */
+/* Category pills are wired via addEventListener + data-cat below (not
+   inline onclick) so filtering still works even if some hosting/CDN
+   layer strips inline event-handler attributes from the uploaded HTML. */
 document.addEventListener('DOMContentLoaded',()=>{
-  document.querySelectorAll('.nav-cats .cat-pill[onclick]').forEach(function(btn){
-    btn.type='button';
-    btn.addEventListener('click',function(e){
-      const m=(btn.getAttribute('onclick')||'').match(/filterTools\('([a-z]+)'/);
-      if(m){ /* already handled by inline onclick in normal cases; this is a silent safety net */ }
+  document.querySelectorAll('#nav-cats .cat-pill[data-cat]').forEach(function(btn){
+    btn.removeAttribute('onclick');
+    btn.addEventListener('click',function(){
+      filterTools(btn.getAttribute('data-cat'), btn);
     });
   });
 });
