@@ -168,6 +168,54 @@ function loadAds(){
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
 <style>
+/* ══ CATEGORY DESCRIPTION STICKER CARD ══ */
+@keyframes catCardGradient{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+@keyframes catCardFloat1{0%,100%{transform:translateY(0) rotate(-6deg)}50%{transform:translateY(-10px) rotate(4deg)}}
+@keyframes catCardFloat2{0%,100%{transform:translateY(0) rotate(5deg)}50%{transform:translateY(-8px) rotate(-5deg)}}
+@keyframes catCardFloat3{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-12px) rotate(6deg)}}
+@keyframes catCardFloat4{0%,100%{transform:translateY(0) rotate(6deg)}50%{transform:translateY(-9px) rotate(-4deg)}}
+@keyframes catCardBadgeBounce{0%,100%{transform:translate(-50%,0) rotate(-4deg)}50%{transform:translate(-50%,-7px) rotate(4deg)}}
+.cat-desc-card{
+  position:relative;
+  max-width:820px;margin:0 auto 32px;
+  padding:34px 28px 26px;
+  border-radius:26px;
+  background:linear-gradient(120deg,#c4b5fd,#f9a8d4,#fde68a,#67e8f9,#c4b5fd);
+  background-size:300% 300%;
+  animation:catCardGradient 10s ease infinite;
+  overflow:visible;
+  box-shadow:0 14px 34px rgba(91,76,232,.18);
+}
+.cat-desc-card .cd-emoji{position:absolute;font-size:26px;filter:drop-shadow(0 3px 6px rgba(0,0,0,.15));pointer-events:none;user-select:none;}
+.cat-desc-card .cd-e1{top:10px;left:18px;animation:catCardFloat1 3.1s ease-in-out infinite;}
+.cat-desc-card .cd-e2{top:10px;right:18px;animation:catCardFloat2 3.6s ease-in-out infinite .3s;}
+.cat-desc-card .cd-e3{bottom:10px;left:22px;animation:catCardFloat3 3.3s ease-in-out infinite .5s;}
+.cat-desc-card .cd-e4{bottom:10px;right:22px;animation:catCardFloat4 3.8s ease-in-out infinite .2s;}
+.cat-desc-card .cd-badge{
+  position:absolute;top:-18px;left:50%;
+  animation:catCardBadgeBounce 2.4s ease-in-out infinite;
+  background:#fff;border-radius:999px;padding:7px 16px;font-size:14px;font-weight:800;
+  box-shadow:0 6px 16px rgba(0,0,0,.18);white-space:nowrap;
+}
+.cat-desc-card .cd-inner{
+  background:#fff;border-radius:18px;padding:22px 26px;
+  box-shadow:0 4px 14px rgba(0,0,0,.06);
+  text-align:center;
+}
+.cat-desc-card .cd-inner h3{
+  font-size:19px;font-weight:800;color:#2e1065;margin-bottom:8px;
+  letter-spacing:-.01em;
+}
+.cat-desc-card .cd-inner p{
+  font-size:14.5px;line-height:1.65;color:#1e1b4b;font-weight:600;
+  max-width:600px;margin:0 auto;
+}
+@media(max-width:640px){
+  .cat-desc-card{padding:28px 16px 20px;border-radius:20px;}
+  .cat-desc-card .cd-emoji{font-size:20px;}
+  .cat-desc-card .cd-inner{padding:18px 16px;}
+}
+
 /* ══ RESET & TOKENS ══ */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 :root{
@@ -914,6 +962,8 @@ footer{background:var(--text);color:rgba(255,255,255,.85);padding:3.5rem 1rem 1.
     <p class="tools-main-p" data-i="tools_p">Click any tool, upload your photo in the editor, and download the result in seconds. <strong>No account required.</strong></p>
   </div>
 
+  <div id="cat-desc-card"></div>
+
   <!-- TOP AD SLOT — disabled until a real slot ID exists.
        "1234567890" was a placeholder test ID; shipping it as-is can get
        served as an invalid ad unit. To enable: AdSense → Ads → By ad
@@ -1360,6 +1410,7 @@ function filterTools(cat,btn){
     if(cls){document.querySelectorAll('.'+cls[0]).forEach(function(p){p.classList.add('active');});}
   }
   renderTools(cat==='all'?tools:tools.filter(t=>t[3]===cat));
+  renderCategoryDescCard(cat);
   // Scroll to the tools grid so the filtered result is actually visible
   // (fixes: clicking a category appeared to "do nothing" when the page
   // was scrolled somewhere else, e.g. down at the workspace).
@@ -1367,6 +1418,67 @@ function filterTools(cat,btn){
   if(toolsSec)toolsSec.scrollIntoView({behavior:'smooth',block:'start'});
   trackEvent('filter_tools','UI',cat);
 }
+/* ══ CATEGORY DESCRIPTION CARDS ══
+   Real, unique copy per category — not filler text — so each filtered
+   view of the tools grid has genuine on-page content (helps with content
+   quality signals, not just a decorative banner). */
+const CAT_DESCRIPTIONS={
+  all:{
+    badge:'✨ 35+ tools',
+    emojis:['🖼️','📸','🎨','⚡'],
+    title:'One toolbox for every photo problem',
+    text:'From a background that needs to disappear to an old family photo that needs bringing back to life — browse all 35 tools below, or use a category tab to narrow things down.'
+  },
+  bg:{
+    badge:'🎭 Background tools',
+    emojis:['🎭','🖼️','🌅','✂️'],
+    title:'Backgrounds: remove, replace, or generate',
+    text:'Cut a subject out cleanly, swap in a new scene, blur a busy background for a portrait look, or generate a studio backdrop — all processed locally, nothing uploaded to a server.'
+  },
+  fix:{
+    badge:'🏛️ Restore & fix',
+    emojis:['🏛️','🔧','📷','💎'],
+    title:'Bring faded, blurry, or noisy photos back',
+    text:'Repair old scanned photos, sharpen soft shots, strip out digital grain, balance color, or upscale a small image — real image-processing pipelines, not a single filter slapped on top.'
+  },
+  face:{
+    badge:'💄 Face & portrait',
+    emojis:['💄','😊','👁️','✨'],
+    title:'Portrait retouching that still looks like you',
+    text:'Smooth skin, brighten eyes, whiten teeth, or generate a clean studio-style headshot — brush-guided so you control exactly where the effect is applied, nothing done automatically to your whole face.'
+  },
+  convert:{
+    badge:'🔄 Convert & optimize',
+    emojis:['🔄','🗜️','📦','⚡'],
+    title:'Get the right format and the right size',
+    text:'Convert between JPG, PNG, WEBP and HEIC, shrink a file for faster uploads, or pull text straight out of a photo with real OCR — the boring-but-essential stuff, done properly.'
+  },
+  design:{
+    badge:'🎨 Design tools',
+    emojis:['🎨','✍️','🧩','🖌️'],
+    title:'Crop, caption, collage, and brand your photos',
+    text:'Resize for a specific platform, add a text overlay or your own watermark, build a collage from several photos, or clean up a product shot for a store listing.'
+  }
+};
+function renderCategoryDescCard(cat){
+  const holder=document.getElementById('cat-desc-card');
+  if(!holder)return;
+  const d=CAT_DESCRIPTIONS[cat]||CAT_DESCRIPTIONS.all;
+  holder.innerHTML=`
+    <div class="cat-desc-card">
+      <span class="cd-badge">${d.badge}</span>
+      <span class="cd-emoji cd-e1">${d.emojis[0]}</span>
+      <span class="cd-emoji cd-e2">${d.emojis[1]}</span>
+      <span class="cd-emoji cd-e3">${d.emojis[2]}</span>
+      <span class="cd-emoji cd-e4">${d.emojis[3]}</span>
+      <div class="cd-inner">
+        <h3>${d.title}</h3>
+        <p>${d.text}</p>
+      </div>
+    </div>`;
+}
+document.addEventListener('DOMContentLoaded',()=>{ renderCategoryDescCard('all'); });
+
 /* Category pills are wired via addEventListener + data-cat below (not
    inline onclick) so filtering still works even if some hosting/CDN
    layer strips inline event-handler attributes from the uploaded HTML. */
