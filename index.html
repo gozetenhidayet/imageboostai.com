@@ -161,8 +161,9 @@ function loadAds(){
 }
 </script>
 
-<!-- HEIC → JPEG conversion (Chrome/most browsers can't decode HEIC natively) -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/heic2any/0.0.4/heic2any.min.js" defer></script>
+<!-- HEIC → JPEG conversion library is now lazy-loaded on demand (see
+     _loadScriptOnce + loadFile()) instead of on every page visit — most
+     visitors never upload a HEIC file. -->
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -1613,88 +1614,11 @@ if(dropZone){
   }));
   dropZone.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' ')fileEl.click();});
 }
-/* Real, enforced limits (was previously claimed as "any size" with no check) */
-const IBA_MAX_FILE_MB=25;
-const IBA_MAX_MEGAPIXELS=40;
-
-function iba_finishLoad(dataUrl,noteHtml){
-  imageData=dataUrl;
-  window.__originalUpload=dataUrl;
-  document.getElementById('uploadContent').innerHTML=`<img src="${dataUrl}" alt="Uploaded photo" style="max-width:100%;max-height:280px;border-radius:16px;object-fit:contain;">`;
-  document.getElementById('resultTitle').textContent='Image uploaded';
-  // If the currently selected tool has a custom panel (sticker picker,
-  // brush painter, sliders, dropdowns, etc.), re-render that panel now
-  // that a photo is available instead of wiping it out with generic text
-  // — this was overwriting Object Add's sticker picker, Blur Background's
-  // amount slider, Face Retouch's brush canvas, etc. right after upload.
-  const panelFn = window.__ibaUiTools && window.__ibaUiTools[selected];
-  if(panelFn){
-    const rx=document.getElementById('resultText');
-    if(rx)rx.innerHTML='';
-    panelFn();
-  }else{
-    document.getElementById('resultText').textContent='Now apply '+selected+'.';
-  }
-  showToast(noteHtml||'✅ Image uploaded');
-  trackEvent('image_upload','Tool',selected);
-  const uxb=document.getElementById('upload-x-btn');if(uxb)uxb.style.display='flex';
-}
-
-function loadFile(f){
-  if(!f)return;
-  const isHeic=/\.(heic|heif)$/i.test(f.name)||f.type==='image/heic'||f.type==='image/heif';
-  const isGif=f.type==='image/gif'||/\.gif$/i.test(f.name);
-  if(!f.type.startsWith('image/')&&!isHeic){showToast('⚠️ Please upload an image file');return;}
-
-  // Hard file-size limit — large files can crash the tab, so we check before reading.
-  const maxBytes=IBA_MAX_FILE_MB*1024*1024;
-  if(f.size>maxBytes){
-    showToast('⚠️ File is too large ('+(f.size/1024/1024).toFixed(1)+'MB). Max size is '+IBA_MAX_FILE_MB+'MB.');
-    return;
-  }
-
-  if(isGif){
-    showToast('⚠️ GIF uploaded — only the first frame will be edited. Animation is not preserved.');
-  }
-
-  if(isHeic){
-    if(typeof heic2any==='undefined'){
-      showToast('⚠️ HEIC support is still loading, please try again in a second.');
-      return;
-    }
-    showToast('⏳ Converting HEIC photo…');
-    heic2any({blob:f,toType:'image/jpeg',quality:0.92}).then(convertedBlob=>{
-      iba_checkPixelsThenLoad(convertedBlob);
-    }).catch(()=>{
-      showToast('⚠️ Could not convert this HEIC file. Try exporting as JPG first.');
-    });
-    return;
-  }
-  iba_checkPixelsThenLoad(f);
-}
-
-function iba_checkPixelsThenLoad(fileOrBlob){
-  const url=URL.createObjectURL(fileOrBlob);
-  const img=new Image();
-  img.onload=()=>{
-    const mp=(img.naturalWidth*img.naturalHeight)/1000000;
-    URL.revokeObjectURL(url);
-    if(mp>IBA_MAX_MEGAPIXELS){
-      showToast('⚠️ Image is '+mp.toFixed(1)+'MP — max supported is '+IBA_MAX_MEGAPIXELS+'MP. Please downscale first.');
-      return;
-    }
-    const r=new FileReader();
-    r.onload=()=>iba_finishLoad(r.result);
-    r.onerror=()=>showToast('⚠️ Could not read this file.');
-    r.readAsDataURL(fileOrBlob);
-  };
-  img.onerror=()=>{
-    URL.revokeObjectURL(url);
-    showToast('⚠️ Could not read this image.');
-  };
-  img.src=url;
-}
-
+/* NOTE: the actual loadFile() implementation — with HEIC conversion,
+   25MB/40MP limits, GIF warning, and tool-panel preservation — lives
+   further down in this file (search "async function loadFile"). Having
+   it in one place (instead of two competing definitions) avoids the
+   silent "last one wins" bug that broke several of these checks before. */
 /* ══ APPLY TOOL ══ */
 
 function applyTool(){
@@ -3383,8 +3307,10 @@ async function _getCutoutImage(im){
   // Tries, in order: (1) DeepLab (classic <script> tag — works even on file://,
   // recognizes 20 real subject classes), (2) imgly (ES module — needs http/https
   // hosting), (3) local flood-fill (always works, no network needed, lower quality).
+  // Both AI paths are loaded LAZILY here (first real use), not on page load.
   try{
-    const model=window.__deeplabModelPromise?await window.__deeplabModelPromise:null;
+    showToast('🧠 Loading AI model (first use only)…');
+    const model=await _ensureDeeplab();
     if(model){
       showToast('🧠 AI modeli çalışıyor (DeepLab)…');
       return await _deeplabCutout(im);
@@ -3392,12 +3318,15 @@ async function _getCutoutImage(im){
   }catch(e){
     /* silent: expected fallback */
   }
-  if(location.protocol!=='file:'&&window.__imglyRemoveBackground){
+  if(location.protocol!=='file:'){
     try{
-      showToast('🧠 AI modeli çalışıyor (imgly, ilk çalıştırmada model indirilir)…');
-      const blob=await window.__imglyRemoveBackground(imageData);
-      const url=URL.createObjectURL(blob);
-      return await _img(url);
+      const ok=await _ensureImgly();
+      if(ok&&window.__imglyRemoveBackground){
+        showToast('🧠 AI modeli çalışıyor (imgly, ilk çalıştırmada model indirilir)…');
+        const blob=await window.__imglyRemoveBackground(imageData);
+        const url=URL.createObjectURL(blob);
+        return await _img(url);
+      }
     }catch(e){
       /* silent: expected fallback */
     }
@@ -4755,7 +4684,10 @@ async function applyOCRTool(){
   if(rt)rt.textContent='Reading text…';
   if(rx)rx.textContent='Running OCR ('+lang+')…';
   try{
+    if(rx)rx.textContent='Loading OCR engine (first use only)…';
+    await _ensureTesseract();
     if(typeof Tesseract==='undefined')throw new Error('OCR engine not loaded (needs internet — this downloads a language model on first use)');
+    if(rx)rx.textContent='Running OCR ('+lang+')…';
     const result=await Tesseract.recognize(imageData,lang);
     const text=(result&&result.data&&result.data.text||'').trim()||'(No text detected)';
     if(p)p.style.display='none';
@@ -5524,7 +5456,49 @@ const _panelToolsMap={
   'AI Inpainting':showObjectRemoverPanel,
   'Image Upscaler':showImageUpscalerPanel,
 };
-function loadFile(f){
+const IBA_MAX_FILE_MB=25;
+const IBA_MAX_MEGAPIXELS=40;
+async function loadFile(f){
+  if(!f)return;
+  const isHeic=/\.(heic|heif)$/i.test(f.name)||f.type==='image/heic'||f.type==='image/heif';
+  const isGif=f.type==='image/gif'||/\.gif$/i.test(f.name);
+  if(!f.type.startsWith('image/')&&!isHeic){showToast('⚠️ Please upload an image file');return;}
+
+  const maxBytes=IBA_MAX_FILE_MB*1024*1024;
+  if(f.size>maxBytes){
+    showToast('⚠️ File is too large ('+(f.size/1024/1024).toFixed(1)+'MB). Max size is '+IBA_MAX_FILE_MB+'MB.');
+    return;
+  }
+  if(isGif){
+    showToast('⚠️ GIF uploaded — only the first frame will be edited. Animation is not preserved.');
+  }
+  if(isHeic){
+    showToast('⏳ Loading HEIC converter…');
+    try{ await _loadScriptOnce('https://cdnjs.cloudflare.com/ajax/libs/heic2any/0.0.4/heic2any.min.js'); }
+    catch(e){ showToast('⚠️ Could not load HEIC support — check your connection and try again.'); return; }
+    if(typeof heic2any==='undefined'){ showToast('⚠️ HEIC support failed to load, please try again.'); return; }
+    showToast('⏳ Converting HEIC photo…');
+    try{ f=await heic2any({blob:f,toType:'image/jpeg',quality:0.92}); }
+    catch(e){ showToast('⚠️ Could not convert this HEIC file. Try exporting as JPG first.'); return; }
+  }
+  // Megapixel check (needs the decoded image dimensions)
+  const _mpUrl=URL.createObjectURL(f);
+  const _mpImg=new Image();
+  await new Promise((resolve)=>{
+    _mpImg.onload=()=>{
+      const mp=(_mpImg.naturalWidth*_mpImg.naturalHeight)/1000000;
+      URL.revokeObjectURL(_mpUrl);
+      if(mp>IBA_MAX_MEGAPIXELS){
+        showToast('⚠️ Image is '+mp.toFixed(1)+'MP — max supported is '+IBA_MAX_MEGAPIXELS+'MP. Please downscale first.');
+        f=null;
+      }
+      resolve();
+    };
+    _mpImg.onerror=()=>{ URL.revokeObjectURL(_mpUrl); resolve(); };
+    _mpImg.src=_mpUrl;
+  });
+  if(!f)return;
+
   if(!f||!f.type.startsWith('image/')){showToast('⚠️ Please upload an image file');return;}
   const r=new FileReader();
   r.onload=()=>{
@@ -5819,32 +5793,68 @@ function applyImageUpscaler(factor){
 </script>
 <!-- Real AI background removal (runs fully in the user's browser, WASM + ONNX model, no server).
      Loaded as a module so runBgRemove()/applyBgChange() can call window.__imglyRemoveBackground(). -->
-<script type="module">
-  import imglyRemoveBackground from "https://esm.sh/@imgly/background-removal@1.7.0";
-  window.__imglyRemoveBackground = (src) => imglyRemoveBackground(src, { model: 'small' });
-  window.__imglyReady = true;
-</script>
-<!-- Secondary/primary AI segmentation path: TensorFlow.js + DeepLab v3, loaded via CLASSIC
-     script tags (not ES modules). Classic scripts don't require CORS headers to execute,
-     so — unlike the imgly module above — this also works when the page is opened directly
-     via file:// (which is why we keep both: this one is the more reliable path). DeepLab
-     recognizes 20 common subject classes (person, cat, dog, bird, car, etc.) via real
-     semantic segmentation, not a color heuristic. -->
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/deeplab@0.2.2/dist/deeplab.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<!-- ═══════════════════════════════════════════════════════════════
+     PERFORMANCE FIX: AI models (imgly, TensorFlow.js + DeepLab,
+     Tesseract.js) used to load unconditionally on EVERY page visit —
+     several MB of JS + model weights competing with the actual page
+     content for bandwidth, which tanked mobile PageSpeed (LCP ~9.5s
+     on Slow 4G). They now load lazily: only the first time a visitor
+     actually opens a tool that needs them. See _ensureDeeplab(),
+     _ensureImgly(), _ensureTesseract() below — _getCutoutImage() and
+     the OCR tool call these on demand instead of assuming the
+     libraries are already present.
+════════════════════════════════════════════════════════════════ -->
 <script>
-  window.__deeplabModelPromise = (async () => {
-    try{
-      if(typeof deeplab === 'undefined' || typeof tf === 'undefined') return null;
-      const model = await deeplab.load({base:'pascal', quantizationBytes:2});
-      window.__deeplabReady = true;
-      return model;
-    }catch(e){
-      /* silent: expected fallback */
-      return null;
+function _loadScriptOnce(src){
+  return new Promise((resolve,reject)=>{
+    const existing=document.querySelector('script[data-lazy-src="'+src+'"]');
+    if(existing){
+      if(existing.dataset.loaded==='1')return resolve();
+      existing.addEventListener('load',()=>resolve());
+      existing.addEventListener('error',reject);
+      return;
     }
+    const s=document.createElement('script');
+    s.src=src; s.dataset.lazySrc=src;
+    s.onload=()=>{s.dataset.loaded='1';resolve();};
+    s.onerror=reject;
+    document.head.appendChild(s);
+  });
+}
+let _deeplabPromise=null;
+function _ensureDeeplab(){
+  if(_deeplabPromise)return _deeplabPromise;
+  _deeplabPromise=(async()=>{
+    try{
+      await _loadScriptOnce('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js');
+      await _loadScriptOnce('https://cdn.jsdelivr.net/npm/@tensorflow-models/deeplab@0.2.2/dist/deeplab.min.js');
+      if(typeof deeplab==='undefined'||typeof tf==='undefined')return null;
+      const model=await deeplab.load({base:'pascal',quantizationBytes:2});
+      window.__deeplabReady=true;
+      return model;
+    }catch(e){ return null; }
   })();
+  return _deeplabPromise;
+}
+let _imglyPromise=null;
+function _ensureImgly(){
+  if(_imglyPromise)return _imglyPromise;
+  _imglyPromise=(async()=>{
+    try{
+      const mod=await import('https://esm.sh/@imgly/background-removal@1.7.0');
+      window.__imglyRemoveBackground=(src)=>mod.default(src,{model:'small'});
+      window.__imglyReady=true;
+      return true;
+    }catch(e){ return false; }
+  })();
+  return _imglyPromise;
+}
+let _tesseractPromise=null;
+function _ensureTesseract(){
+  if(_tesseractPromise)return _tesseractPromise;
+  _tesseractPromise=_loadScriptOnce('https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js');
+  return _tesseractPromise;
+}
 </script>
 <!-- ═══════════════════════════════════════════════════════════════
      ROUND 11 — the last 8 tools that were still fake placeholders
@@ -6150,6 +6160,11 @@ window.__ibaExtraPanels = {
   'Watermark Remover':showWatermarkRemoverPanel,
   'AI Background Generator':showAIBGGeneratorPanel,
 };
+// _panelToolsMap (defined earlier) is the map actually used by loadFile()
+// and undo/redo's _refreshActiveToolPanel() — merge these 3 tools into it
+// too, or their panels would vanish after upload/undo just like Object
+// Add's sticker picker did before.
+if(typeof _panelToolsMap!=='undefined'){ Object.assign(_panelToolsMap, window.__ibaExtraPanels); }
 (function(){
   const _origOpenTool=window.openTool;
   window.openTool=function(name){
