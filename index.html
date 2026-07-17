@@ -166,7 +166,14 @@ function loadAds(){
      visitors never upload a HEIC file. -->
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Loaded non-blocking: browser fetches the stylesheet at low priority while
+     painting with the fallback font, then swaps to Inter once ready. This is
+     what removes the "Render-blocking requests" penalty (~1,690ms) from
+     PageSpeed — previously this was a normal blocking <link rel="stylesheet">. -->
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" media="print" onload="this.media='all';this.onload=null;">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"></noscript>
 
 <style>
 /* ══ CATEGORY DESCRIPTION STICKER CARD ══ */
@@ -183,7 +190,7 @@ function loadAds(){
   border-radius:26px;
   background:linear-gradient(120deg,#c4b5fd,#f9a8d4,#fde68a,#67e8f9,#c4b5fd);
   background-size:300% 300%;
-  animation:catCardGradient 10s ease infinite;
+  animation:catCardGradient 10s ease 3;
   overflow:visible;
   box-shadow:0 14px 34px rgba(91,76,232,.18);
 }
@@ -275,6 +282,9 @@ function loadAds(){
 }
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;line-height:1.6;transition:background .3s,color .3s;}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important;}
+}
 
 /* ══ ANIMATIONS ══ */
 @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
@@ -382,7 +392,7 @@ nav{position:sticky;top:0;z-index:100;background:var(--nav-bg);backdrop-filter:b
 @media(max-width:600px){.cat-pills{gap:5px;}.cat-pill{padding:7px 12px;font-size:11.5px;}}
 
 /* ══ DEAL BAR ══ */
-.deal-bar{background:linear-gradient(270deg,#5B4CE8,#EC4899,#06B6D4,#5B4CE8);background-size:400%;animation:gradShift 5s ease infinite;color:#fff;text-align:center;padding:.55rem 2.5rem;font-size:12.5px;font-weight:600;position:relative;}
+.deal-bar{background:linear-gradient(270deg,#5B4CE8,#EC4899,#06B6D4,#5B4CE8);background-size:400%;animation:gradShift 5s ease 6;color:#fff;text-align:center;padding:.55rem 2.5rem;font-size:12.5px;font-weight:600;position:relative;}
 .deal-bar a{color:#fff;font-weight:800;text-decoration:underline;cursor:pointer;text-underline-offset:2px;}
 .deal-x{position:absolute;right:.7rem;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.2);border:none;color:#fff;width:22px;height:22px;border-radius:50%;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;}
 .deal-x:hover{background:rgba(255,255,255,.35);}
@@ -393,7 +403,7 @@ nav{position:sticky;top:0;z-index:100;background:var(--nav-bg);backdrop-filter:b
 .h-badge{display:inline-flex;align-items:center;gap:7px;background:var(--bg3);border:1.5px solid var(--border2);border-radius:100px;padding:6px 16px;font-size:12px;color:var(--accent);font-weight:600;margin-bottom:1.5rem;animation:fadeUp .5s ease both;box-shadow:var(--shadow);}
 .bdot{width:7px;height:7px;background:var(--green);border-radius:50%;flex-shrink:0;animation:pulse 1.5s infinite;box-shadow:0 0 8px var(--green);}
 h1.htitle{font-size:clamp(2.4rem,6vw,4.2rem);font-weight:900;line-height:1.06;letter-spacing:-.045em;color:var(--text);margin-bottom:1.1rem;animation:fadeUp .5s ease .08s both;text-align:center;}
-.grad-text{background:var(--gp);background-size:200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shine 4s linear infinite;}
+.grad-text{background:var(--gp);background-size:200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shine 4s linear 3;}
 .h-sub{font-size:clamp(.9rem,2.5vw,1.05rem);color:var(--muted);line-height:1.78;max-width:600px;margin:0 auto 1.9rem;animation:fadeUp .5s ease .16s both;text-align:center;}
 .h-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:1.6rem;animation:fadeUp .5s ease .24s both;}
 .btn-primary{background:var(--gp);color:#fff;padding:13px 26px;border-radius:13px;font-size:14.5px;font-weight:800;border:none;cursor:pointer;box-shadow:0 6px 22px rgba(91,76,232,.32);transition:all .25s;position:relative;overflow:hidden;}
@@ -417,7 +427,7 @@ h1.htitle{font-size:clamp(2.4rem,6vw,4.2rem);font-weight:900;line-height:1.06;le
 .tools-free-badge-3{background:linear-gradient(135deg,#F59E0B,#FBBF24);color:#fff;box-shadow:0 4px 14px rgba(245,158,11,.3);animation-delay:.2s;}
 .tools-main-h2{font-size:clamp(2rem,5vw,3rem);font-weight:900;letter-spacing:-.045em;line-height:1.1;color:var(--text);margin-bottom:.65rem;}
 .tools-h2-line1{color:var(--text);}
-.tools-h2-gradient{background:linear-gradient(135deg,#5B4CE8,#EC4899,#06B6D4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;background-size:200%;animation:gradShift 4s ease infinite;}
+.tools-h2-gradient{background:linear-gradient(135deg,#5B4CE8,#EC4899,#06B6D4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;background-size:200%;animation:gradShift 4s ease 3;}
 .tools-main-p{font-size:1rem;color:var(--muted);max-width:560px;margin:0 auto;line-height:1.7;}
 .tools-main-p strong{color:var(--accent);}
 
@@ -641,17 +651,17 @@ footer{background:var(--text);color:rgba(255,255,255,.85);padding:3.5rem 1rem 1.
 .ft-top{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:2rem;margin-bottom:2.5rem;}
 .ft-logo{font-size:18px;font-weight:900;color:#fff;margin-bottom:.75rem;display:flex;align-items:center;gap:8px;}
 .ft-logo-ic{width:28px;height:28px;background:var(--gp);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;}
-.ft-desc{font-size:12.5px;color:rgba(255,255,255,.45);line-height:1.7;margin-bottom:14px;}
+.ft-desc{font-size:12.5px;color:rgba(255,255,255,.55);line-height:1.7;margin-bottom:14px;}
 .ft-socials{display:flex;gap:7px;}
-.ft-soc{width:30px;height:30px;border:1px solid rgba(255,255,255,.15);border-radius:8px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.4);font-size:12px;cursor:pointer;transition:all .2s;text-decoration:none;}
+.ft-soc{width:30px;height:30px;border:1px solid rgba(255,255,255,.15);border-radius:8px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.55);font-size:12px;cursor:pointer;transition:all .2s;text-decoration:none;}
 .ft-soc:hover{border-color:rgba(255,255,255,.4);color:#fff;}
 .ft-col h4{font-size:10.5px;font-weight:800;color:#fff;margin-bottom:.85rem;text-transform:uppercase;letter-spacing:.07em;}
-.ft-col a{display:block;font-size:12.5px;color:rgba(255,255,255,.4);margin-bottom:.45rem;cursor:pointer;transition:color .15s;text-decoration:none;}
+.ft-col a{display:block;font-size:12.5px;color:rgba(255,255,255,.55);margin-bottom:.45rem;cursor:pointer;transition:color .15s;text-decoration:none;}
 .ft-col a:hover{color:#fff;}
 .ft-bot{border-top:1px solid rgba(255,255,255,.08);padding-top:1.4rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;}
-.ft-bot p{font-size:11.5px;color:rgba(255,255,255,.3);}
+.ft-bot p{font-size:11.5px;color:rgba(255,255,255,.6);}
 .ft-badges{display:flex;gap:5px;flex-wrap:wrap;}
-.ft-badge{display:flex;align-items:center;gap:3px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:6px;padding:3px 8px;font-size:10.5px;color:rgba(255,255,255,.3);}
+.ft-badge{display:flex;align-items:center;gap:3px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:6px;padding:3px 8px;font-size:10.5px;color:rgba(255,255,255,.6);}
 
 /* ══ TOAST ══ */
 .toast{position:fixed;right:18px;bottom:80px;background:var(--surface);border:1.5px solid var(--border);color:var(--text);padding:13px 18px;border-radius:14px;box-shadow:var(--shadow2);display:none;z-index:600;font-size:13.5px;font-weight:600;animation:slideDown .2s ease;max-width:280px;}
@@ -1165,22 +1175,22 @@ footer{background:var(--text);color:rgba(255,255,255,.85);padding:3.5rem 1rem 1.
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:24px;">
     <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:20px;">
       <div style="font-size:20px;margin-bottom:8px;">💡</div>
-      <h4 style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;">Background Removal</h4>
+      <h3 style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;">Background Removal</h3>
       <p style="font-size:13px;color:var(--muted);line-height:1.65;">For best results, use photos with a solid, single-color background (white, blue, green). High contrast between subject and background produces the cleanest edges.</p>
     </div>
     <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:20px;">
       <div style="font-size:20px;margin-bottom:8px;">💡</div>
-      <h4 style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;">Image Enhancement</h4>
+      <h3 style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;">Image Enhancement</h3>
       <p style="font-size:13px;color:var(--muted);line-height:1.65;">Stack tools for dramatic improvements: start with Noise Remover, then apply Photo Enhancer, and finish with Image Sharpener for professional-grade results.</p>
     </div>
     <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:20px;">
       <div style="font-size:20px;margin-bottom:8px;">💡</div>
-      <h4 style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;">Portrait Retouching</h4>
+      <h3 style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;">Portrait Retouching</h3>
       <p style="font-size:13px;color:var(--muted);line-height:1.65;">Use Skin Smoothing first, then Brightness &amp; Contrast to add warmth, and Eye Enhancer last. Keep adjustments subtle — 10-20% changes look most natural.</p>
     </div>
     <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:20px;">
       <div style="font-size:20px;margin-bottom:8px;">💡</div>
-      <h4 style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;">File Format Tips</h4>
+      <h3 style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;">File Format Tips</h3>
       <p style="font-size:13px;color:var(--muted);line-height:1.65;">Use PNG for images with transparency or text. Use WEBP for web use (50% smaller than JPG). Use JPG for photos that don't need a transparent background.</p>
     </div>
   </div>
@@ -1194,27 +1204,27 @@ footer{background:var(--text);color:rgba(255,255,255,.85);padding:3.5rem 1rem 1.
   <h2 style="font-size:1.4rem;font-weight:900;color:var(--text);margin-bottom:20px;letter-spacing:-.03em;">More Frequently Asked Questions</h2>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;">
     <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:20px;">
-      <h4 style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:8px;">How large can my image file be?</h4>
+      <h3 style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:8px;">How large can my image file be?</h3>
       <p style="font-size:13px;color:var(--muted);line-height:1.65;">Since processing happens in your browser, the limit depends on your device memory. Most modern devices handle files up to 20MB comfortably. For very large files, use Image Compressor first.</p>
     </div>
     <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:20px;">
-      <h4 style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:8px;">Can I use ImageBoostAI offline?</h4>
+      <h3 style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:8px;">Can I use ImageBoostAI offline?</h3>
       <p style="font-size:13px;color:var(--muted);line-height:1.65;">Once the page loads, most tools work offline since processing is local. You need an internet connection only for the initial page load and to check for updates.</p>
     </div>
     <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:20px;">
-      <h4 style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:8px;">Is ImageBoostAI free forever?</h4>
+      <h3 style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:8px;">Is ImageBoostAI free forever?</h3>
       <p style="font-size:13px;color:var(--muted);line-height:1.65;">Yes. All 35 tools are permanently free. The service is supported by non-intrusive Google AdSense advertising. We do not plan to introduce mandatory paid plans.</p>
     </div>
     <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:20px;">
-      <h4 style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:8px;">What browsers are supported?</h4>
+      <h3 style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:8px;">What browsers are supported?</h3>
       <p style="font-size:13px;color:var(--muted);line-height:1.65;">Chrome, Firefox, Safari, Edge, and Opera. Mobile browsers on iOS and Android are fully supported. We recommend Chrome for the best performance with large images.</p>
     </div>
     <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:20px;">
-      <h4 style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:8px;">Can I edit RAW camera files?</h4>
+      <h3 style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:8px;">Can I edit RAW camera files?</h3>
       <p style="font-size:13px;color:var(--muted);line-height:1.65;">RAW files (CR2, NEF, ARW) are not supported as browsers cannot decode them natively. Convert your RAW file to JPEG or PNG first using your camera's software, then upload here.</p>
     </div>
     <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:20px;">
-      <h4 style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:8px;">Will the results have a watermark?</h4>
+      <h3 style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:8px;">Will the results have a watermark?</h3>
       <p style="font-size:13px;color:var(--muted);line-height:1.65;">Never. All downloaded results are completely clean with no watermarks, no ImageBoostAI branding overlaid, and full resolution. What you edit is exactly what you download.</p>
     </div>
   </div>
@@ -1267,7 +1277,7 @@ footer{background:var(--text);color:rgba(255,255,255,.85);padding:3.5rem 1rem 1.
       <a href="/" data-i="ft_home">🏠 Home</a>
     </div>
   </div>
-  <p style="max-width:780px;margin:0 auto 20px;font-size:12.5px;color:rgba(255,255,255,.28);line-height:1.75;text-align:center;" data-i="ft_seo">Free AI photo editor: remove background, restore old photos, retouch faces, upscale images, image to text OCR, watermark remover and 35+ more tools. Works in any browser. No login required. Trusted in 150+ countries.</p>
+  <p style="max-width:780px;margin:0 auto 20px;font-size:12.5px;color:rgba(255,255,255,.6);line-height:1.75;text-align:center;" data-i="ft_seo">Free AI photo editor: remove background, restore old photos, retouch faces, upscale images, image to text OCR, watermark remover and 35+ more tools. Works in any browser. No login required. Trusted in 150+ countries.</p>
   <div class="ft-bot">
     <p data-i="ft_copy">© 2026 ImageBoostAI · No data stored · All processing runs in your browser</p>
     <div class="ft-badges">
@@ -6191,7 +6201,7 @@ function googleTranslateElementInit(){
   },'google_translate_element');
 }
 </script>
-<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" async></script>
 
 </body>
 </html>
