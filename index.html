@@ -1490,14 +1490,7 @@ filterTools(btn.getAttribute('data-cat'), btn);
 });
 });
 });
-function navFilter(cat,btn){
-document.querySelectorAll('.ncp').forEach(b=>b.classList.remove('active'));
-if(btn)btn.classList.add('active');
-const catPill=document.querySelector('.cp-'+(cat==='all'?'all':cat==='bg'?'bg':cat==='fix'?'fix':cat==='face'?'face':cat==='convert'?'convert':'design'));
-if(catPill){document.querySelectorAll('.cat-pill').forEach(b=>b.classList.remove('active'));catPill.classList.add('active');}
-renderTools(cat==='all'?tools:tools.filter(t=>t[3]===cat));
-trackEvent('nav_filter','UI',cat);
-}
+
 function openTool(name){
 const t=tools.find(x=>x[0]===name)||tools[0];
 if(!t)return;
@@ -1985,24 +1978,7 @@ showToast('⚠️ Could not send right now — please try again in a moment.');
 if(btn){btn.disabled=false;btn.textContent='Send Message →';}
 });
 }
-function subscribeNL(){
-const el=document.getElementById('nl-email');
-if(!el)return;
-const email=el.value.trim();
-if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){showToast('⚠️ Please enter a valid email.');return;}
-fetch('https://formsubmit.co/ajax/'+encodeURIComponent(IBA_CONTACT_EMAIL),{
-method:'POST',
-headers:{'Content-Type':'application/json','Accept':'application/json'},
-body:JSON.stringify({email:email,_subject:'New ImageBoostAI newsletter signup'})
-}).then(r=>{
-if(!r.ok)throw new Error('bad status');
-showToast('✅ Subscribed! Thank you for joining ImageBoostAI.');
-el.value='';
-trackEvent('newsletter_subscribe','Revenue','email');
-}).catch(()=>{
-showToast('⚠️ Could not subscribe right now, please try again shortly.');
-});
-}
+
 if('scrollRestoration' in history){ history.scrollRestoration='manual'; }
 document.addEventListener('DOMContentLoaded',()=>{
 try{
@@ -2054,16 +2030,7 @@ showToast('Applied (basic mode)');
 finishWithProgress();
 });
 }
-function cssFilterOp(f){
-withImage(function(img){
-var c=document.createElement('canvas');c.width=img.width;c.height=img.height;
-var ctx=c.getContext('2d');
-try{ctx.filter=f;ctx.drawImage(img,0,0);ctx.filter='none';}
-catch(e){ctx.drawImage(img,0,0);}
-imageData=c.toDataURL('image/png');
-finishWithProgress();
-});
-}
+
 function runBgRemove(){
 if(!imageData){
 showToast('Please upload a photo first');
@@ -2794,10 +2761,7 @@ var ctx=c.getContext('2d');ctx.drawImage(img,sx,sy,sw,sh,0,0,sw,sh);
 imageData=c.toDataURL('image/png');finishWithProgress();
 };img.src=imageData;
 }
-function setRzPreset(w,h){
-var wEl=document.getElementById('rz-w'),hEl=document.getElementById('rz-h');
-if(wEl)wEl.value=w;if(hEl)hEl.value=h;
-}
+
 function applyResize(){
 var w=parseInt(document.getElementById('rz-w')?.value)||800;
 var h=parseInt(document.getElementById('rz-h')?.value)||600;
@@ -2916,7 +2880,7 @@ catch(e){end(); console.error(e); showToast('⚠️ Tool error. Try another imag
 }
 function _filter(f,ext='png'){return _applyCanvas(async im=>{const c=_canvas(im.width,im.height),x=c.getContext('2d'); x.filter=f; x.drawImage(im,0,0,c.width,c.height); return c.toDataURL('image/'+ext,0.92);},ext);}
 function _fxPixels(mutator){return _applyCanvas(async im=>{const c=_canvas(im.width,im.height),x=c.getContext('2d'); x.drawImage(im,0,0); const d=x.getImageData(0,0,c.width,c.height); mutator(d.data,c.width,c.height); x.putImageData(d,0,0); return c.toDataURL('image/png');});}
-function _roundRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
+
 function applyTool(){
 if(!imageData){document.getElementById('file')?.click();showToast('⚠️ Upload an image first');return;}
 const out=document.getElementById('output'),dl=document.getElementById('download'),sb=document.getElementById('share-bar');
@@ -3004,13 +2968,7 @@ for(let i=0;i<FN;i++){fpx[i*4+3]=255-fullMask[i*4];}
 fctx.putImageData(fd,0,0);
 return fullC;
 }
-function _slog(){
-try{
-if(typeof console!=='undefined'&&console&&typeof console.log==='function'){
-console.log.apply(console,arguments);
-}
-}catch(e){}
-}
+
 async function _deeplabCutout(im){
 const model=await window.__deeplabModelPromise;
 if(!model)throw new Error('DeepLab unavailable');
@@ -3103,7 +3061,7 @@ function applyPortraitEnhancer(){return _filter('brightness(1.12) contrast(1.06)
 function applyAIHeadshot(){return _applyCanvas(async im=>{const c=_canvas(im.width,im.height),x=c.getContext('2d'); let g=x.createLinearGradient(0,0,c.width,c.height);g.addColorStop(0,'#eef2ff');g.addColorStop(1,'#dbeafe');x.fillStyle=g;x.fillRect(0,0,c.width,c.height);x.filter='brightness(1.08) contrast(1.1)';x.drawImage(im,0,0);x.filter='none';return c.toDataURL('image/png');});}
 function applyBlurBackground(){return _applyCanvas(async im=>{const c=_canvas(im.width,im.height),x=c.getContext('2d'); x.filter='blur(10px)'; x.drawImage(im,0,0); x.filter='none'; x.save(); x.beginPath(); x.ellipse(c.width/2,c.height/2,c.width*.32,c.height*.36,0,0,Math.PI*2); x.clip(); x.drawImage(im,0,0); x.restore(); return c.toDataURL('image/png');});}
 function applyWatermarkRemover(){return _filter('brightness(1.06) contrast(1.04) saturate(1.04)');}
-function applyWatermarkMaker(){return applyWatermark();}
+
 function applyTextToPhoto(){return _applyCanvas(async im=>{const c=_canvas(im.width,im.height),x=c.getContext('2d'); x.drawImage(im,0,0); const text=document.getElementById('txt-input')?.value||'ImageBoostAI'; const size=Math.max(28,Math.round(c.width/12)); x.font='900 '+size+'px Inter, Arial'; x.textAlign='center'; x.lineWidth=Math.max(3,size/12); x.strokeStyle='rgba(0,0,0,.65)'; x.fillStyle=document.getElementById('txt-color')?.value||'#ffffff'; x.strokeText(text,c.width/2,c.height/2); x.fillText(text,c.width/2,c.height/2); return c.toDataURL('image/png');});}
 function applyCrop(rw=1,rh=1){return _applyCanvas(async im=>{let sw=im.width,sh=im.height,sx=0,sy=0,tr=rw/rh,ir=im.width/im.height; if(ir>tr){sw=Math.round(im.height*tr);sx=Math.round((im.width-sw)/2);}else{sh=Math.round(im.width/tr);sy=Math.round((im.height-sh)/2);} const c=_canvas(sw,sh); c.getContext('2d').drawImage(im,sx,sy,sw,sh,0,0,sw,sh); return c.toDataURL('image/png');});}
 function applyResize(){return _applyCanvas(async im=>{let w=parseInt(document.getElementById('rz-w')?.value)||1200; let h=parseInt(document.getElementById('rz-h')?.value)||Math.round(im.height*w/im.width); const c=_canvas(w,h),x=c.getContext('2d'); x.imageSmoothingEnabled=true;x.imageSmoothingQuality='high';x.drawImage(im,0,0,w,h); return c.toDataURL('image/png');});}
