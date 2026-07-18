@@ -1964,6 +1964,10 @@ document.getElementById('modal-overlay').classList.remove('open');
 document.body.style.overflow='';
 }
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+// Web3Forms access key — get yours free in ~30 seconds at https://web3forms.com
+// (enter hynngozeten@gmail.com, the key appears immediately, no confirmation link needed)
+// then paste it here in place of the placeholder below.
+const IBA_WEB3FORMS_KEY='YOUR_WEB3FORMS_ACCESS_KEY_HERE';
 const IBA_CONTACT_EMAIL='hynngozeten@gmail.com';
 function selectCfSubject(btn){
 document.querySelectorAll('.cf-subject-card').forEach(b=>b.classList.remove('active'));
@@ -1978,15 +1982,26 @@ const subject=document.getElementById('cf-subject')?.value.trim();
 const msg=document.getElementById('cf-msg')?.value.trim();
 if(!name||!email||!msg){showToast('⚠️ Please fill in all fields.');return;}
 if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){showToast('⚠️ Please enter a valid email.');return;}
+if(!IBA_WEB3FORMS_KEY||IBA_WEB3FORMS_KEY==='YOUR_WEB3FORMS_ACCESS_KEY_HERE'){
+showToast('⚠️ Contact form not set up yet — see setup note in the code.');
+return;
+}
 const btn=document.querySelector('.cf-form .btn-primary');
 const originalBtnText=btn?btn.textContent:'Send message →';
 if(btn){btn.disabled=true;btn.textContent='Sending…';}
-fetch('https://formsubmit.co/ajax/'+encodeURIComponent(IBA_CONTACT_EMAIL),{
+fetch('https://api.web3forms.com/submit',{
 method:'POST',
 headers:{'Content-Type':'application/json','Accept':'application/json'},
-body:JSON.stringify({name:name,email:email,subject:subject||'ImageBoostAI contact form',message:msg,_subject:'New ImageBoostAI contact: '+(subject||'General')})
-}).then(r=>{
-if(!r.ok)throw new Error('bad status');
+body:JSON.stringify({
+access_key:IBA_WEB3FORMS_KEY,
+name:name,
+email:email,
+subject:'New ImageBoostAI contact: '+(subject||'General'),
+message:msg,
+from_name:'ImageBoostAI Contact Form'
+})
+}).then(r=>r.json().then(data=>({ok:r.ok,data:data}))).then(res=>{
+if(!res.ok||!res.data||res.data.success===false)throw new Error('bad status');
 showToast('✅ Message sent!');
 trackEvent('contact_submit','Engagement','contact_form');
 const body=document.getElementById('modal-body');
