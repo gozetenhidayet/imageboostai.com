@@ -639,6 +639,15 @@ section{padding:56px 0;}
 .cf-form input,.cf-form textarea,.cf-form select{padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:inherit;font-size:14px;background:var(--bg3);color:var(--text);outline:none;transition:border-color .18s;}
 .cf-form input:focus,.cf-form textarea:focus{border-color:var(--accent);}
 .cf-form textarea{min-height:110px;resize:vertical;}
+.cf-form label{font-size:12.5px;font-weight:700;color:var(--text);margin-bottom:-4px;}
+.cf-subject-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.cf-subject-card{display:flex;flex-direction:column;align-items:center;gap:4px;padding:14px 8px;border:1.5px solid var(--border);border-radius:12px;background:var(--bg3);cursor:pointer;font-family:inherit;font-size:12px;font-weight:700;color:var(--muted);transition:all .18s;}
+.cf-subject-card:hover{border-color:var(--accent);color:var(--text);}
+.cf-subject-card.active{border-color:#B91C1C;background:rgba(239,68,68,.08);color:#B91C1C;}
+.cf-subject-card[data-subject="Suggestion"].active{border-color:var(--accent);background:rgba(91,76,232,.08);color:var(--accent);}
+.cf-subject-card[data-subject="Compliment"].active{border-color:#B45309;background:rgba(245,158,11,.1);color:#B45309;}
+.cf-subject-card .csc-icon{font-size:22px;}
+.cf-trust-note{display:flex;gap:8px;align-items:flex-start;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);border-radius:10px;padding:12px 14px;font-size:12.5px;color:var(--muted);line-height:1.55;margin-top:4px;}
 
 
 /* ══ FOOTER LANG BUTTONS ══ */
@@ -1921,27 +1930,25 @@ body:`<p><strong>Last updated: July 1, 2025</strong></p>
 <p>These terms are governed by applicable law in the jurisdiction of operation.</p>`
 },
 contact:{
-title:'✉️ Contact Us',
-body:`<p>Got a complaint, a suggestion, something that's not working, or just want to say thanks? We read every message and reply within 24 hours.</p>
+title:'✉️ Get in Touch',
+body:`<p style="margin-bottom:18px;">Got a complaint, a suggestion, or just something nice to say? Pick a reason below and send us a message — we read every single one.</p>
 <div class="cf-form">
-  <input type="text" id="cf-name" placeholder="Your name" autocomplete="name" aria-label="Your name">
-  <input type="email" id="cf-email" placeholder="your@email.com" autocomplete="email" aria-label="Your email">
-  <select id="cf-subject" aria-label="Subject">
-    <option value="">Select subject...</option>
-    <option>Something's not working</option>
-    <option>Complaint</option>
-    <option>Suggestion / Feature request</option>
-    <option>Compliment / Positive feedback</option>
-    <option>Bug report</option>
-    <option>Tool suggestion</option>
-    <option>Partnership / Business</option>
-    <option>API inquiry</option>
-    <option>Other</option>
-  </select>
-  <textarea id="cf-msg" placeholder="Your message..."></textarea>
-  <button class="btn-primary" onclick="submitContact()" style="width:100%;padding:13px;">Send Message →</button>
-</div>
-<p style="margin-top:16px;font-size:13px;color:var(--muted);">We'll get back to you within 24 hours.</p>`
+  <label>What's this about?</label>
+  <div class="cf-subject-grid" role="group" aria-label="Message subject">
+    <button type="button" class="cf-subject-card" data-subject="Complaint" onclick="selectCfSubject(this)"><span class="csc-icon">😕</span>Complaint</button>
+    <button type="button" class="cf-subject-card" data-subject="Suggestion" onclick="selectCfSubject(this)"><span class="csc-icon">💡</span>Suggestion</button>
+    <button type="button" class="cf-subject-card" data-subject="Compliment" onclick="selectCfSubject(this)"><span class="csc-icon">❤️</span>Compliment</button>
+  </div>
+  <input type="hidden" id="cf-subject" value="">
+  <label>Your name</label>
+  <input type="text" id="cf-name" placeholder="Jane Doe" autocomplete="name" aria-label="Your name">
+  <label>Your email <span style="font-weight:400;color:var(--muted);">(so we can reply)</span></label>
+  <input type="email" id="cf-email" placeholder="you@example.com" autocomplete="email" aria-label="Your email">
+  <label>Your message</label>
+  <textarea id="cf-msg" placeholder="Tell us what's on your mind..." aria-label="Your message"></textarea>
+  <button class="btn-primary" onclick="submitContact()" style="width:100%;padding:13px;">Send message →</button>
+  <div class="cf-trust-note">🔒 Your message goes straight to our inbox for review. We don't display or share your email with anyone, and we never store it beyond replying to you.</div>
+</div>`
 }
 };
 function openModal(key){
@@ -1958,6 +1965,12 @@ document.body.style.overflow='';
 }
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
 const IBA_CONTACT_EMAIL='hynngozeten@gmail.com';
+function selectCfSubject(btn){
+document.querySelectorAll('.cf-subject-card').forEach(b=>b.classList.remove('active'));
+btn.classList.add('active');
+const inp=document.getElementById('cf-subject');
+if(inp)inp.value=btn.dataset.subject;
+}
 function submitContact(){
 const name=document.getElementById('cf-name')?.value.trim();
 const email=document.getElementById('cf-email')?.value.trim();
