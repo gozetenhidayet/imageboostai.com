@@ -1500,10 +1500,31 @@ filterTools(btn.getAttribute('data-cat'), btn);
 });
 });
 
+const IBA_DEFAULT_TITLE=document.title;
+const IBA_DEFAULT_DESC=document.querySelector('meta[name="description"]')?.getAttribute('content')||'';
+function updateSeoForTool(name,desc){
+try{
+document.title=name+' — Free Online Tool | ImageBoostAI';
+const m=document.querySelector('meta[name="description"]');
+if(m)m.setAttribute('content',(desc||name)+" Free, instant, 100% browser-based — no login, no watermark. Part of ImageBoostAI's 35+ free AI photo editing tools.");
+const c=document.querySelector('link[rel="canonical"]');
+if(c)c.setAttribute('href','https://imageboostai.com/?tool='+encodeURIComponent(name));
+}catch(e){}
+}
+function resetSeoDefault(){
+try{
+document.title=IBA_DEFAULT_TITLE;
+const m=document.querySelector('meta[name="description"]');
+if(m)m.setAttribute('content',IBA_DEFAULT_DESC);
+const c=document.querySelector('link[rel="canonical"]');
+if(c)c.setAttribute('href','https://imageboostai.com/');
+}catch(e){}
+}
 function openTool(name){
 const t=tools.find(x=>x[0]===name)||tools[0];
 if(!t)return;
 selected=t[0]; selectedDesc=t[1];
+updateSeoForTool(t[0],t[1]);
 const st=document.getElementById('selectedTitle');
 const ss=document.getElementById('selectedSmall');
 const rt=document.getElementById('resultTitle');
@@ -1672,6 +1693,7 @@ if(baBefore)baBefore.innerHTML='<div class="ba-placeholder"><div style="font-siz
 if(baAfter)baAfter.innerHTML='<div class="ba-placeholder"><div style="font-size:48px;margin-bottom:12px;opacity:.4;">✨</div><div style="font-weight:700;font-size:15px;color:var(--text2);margin-bottom:6px;">AI Result</div><div style="font-size:13px;color:var(--muted);">Apply a tool to see the result here</div></div>';
 if(baLabel)baLabel.style.display='none';
 try{if(history.pushState&&window.self===window.top)history.pushState(null,'','/');}catch(e){}
+resetSeoDefault();
 }
 function copyLink(){
 navigator.clipboard&&navigator.clipboard.writeText('https://imageboostai.com/?tool='+encodeURIComponent(selected)).then(()=>showToast('✅ Link copied!'));
