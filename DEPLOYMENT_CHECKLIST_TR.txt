@@ -1,0 +1,55 @@
+IMAGEBOOSTAI YAYINLAMA KONTROL LİSTESİ — 21 TEMMUZ 2026
+
+1) Bu klasördeki bütün dosyaları domain kök dizinine yükleyin:
+   index.html, ads.txt, robots.txt, sitemap.xml, site.webmanifest,
+   icon-192.png, icon-512.png ve og-image.png.
+
+2) Google Search Console:
+   - imageboostai.com alan adını ekleyin.
+   - DNS doğrulaması veya gerçek HTML doğrulama kodunu kullanın.
+   - sitemap.xml gönderin.
+   - Ana sayfada URL Denetimi yapıp dizine ekleme isteyin.
+   - Search Console'un “90 puan” ölçümü yoktur. 90+ hedefi Lighthouse/PageSpeed içindir.
+
+3) Google AdSense:
+   - Yayıncı kimliği HTML ve ads.txt içinde ca-pub-3359266836868361 olarak hazırdır.
+   - AdSense > Gizlilik ve mesajlaşma bölümünde Google sertifikalı CMP'yi etkinleştirin.
+   - Otomatik Reklamlar'ı açın ve sayfa deneyimini bozacak aşırı reklam yoğunluğundan kaçının.
+   - Reklamların indirme, uygula, dil ve navigasyon düğmelerine benzemediğini kontrol edin.
+   - ads.txt dosyasının https://imageboostai.com/ads.txt adresinde açıldığını doğrulayın.
+
+4) İletişim formu:
+   - Şu anda Web3Forms anahtarı eklenmediyse form kullanıcının e-posta uygulamasını açar.
+   - Sunucudan form göndermek için index.html içindeki
+     YOUR_WEB3FORMS_ACCESS_KEY_HERE değerini gerçek anahtarla değiştirin.
+
+5) Microsoft Clarity isteğe bağlıdır:
+   - Kullanacaksanız PASTE_CLARITY_ID değerini gerçek proje kimliğiyle değiştirin.
+   - Kullanmayacaksanız olduğu gibi bırakabilirsiniz; yüklenmez.
+
+6) Çok dilli yapı:
+   - Ziyaretçinin tarayıcı dili otomatik algılanır; Türkçe ve İngilizce yerel,
+     diğer diller bütün sayfa otomatik çeviri iş akışını kullanır.
+   - En güçlü uluslararası SEO için daha sonra /tr/, /es/, /de/ gibi ayrı,
+     sunucudan oluşturulmuş ve insan tarafından kontrol edilmiş dil sayfaları hazırlayın.
+     O sayfalar hazır olmadan sahte hreflang URL'leri eklemeyin.
+
+7) SEO ve performans testi:
+   - Rich Results Test ile Schema.org verisini doğrulayın.
+   - PageSpeed Insights'ta mobil ve masaüstünü ayrı test edin.
+   - Hedefler: LCP 2,5 sn altı, INP 200 ms altı, CLS 0,1 altı.
+   - Reklam yüklenmesi, hosting, CDN, görsel boyutları ve gerçek cihazlar puanı etkiler;
+     bu nedenle yayın öncesi koddan tek başına 90+ garanti edilemez.
+
+8) İçerik ve güven:
+   - Gerçek kullanıcı sayısı, ülke sayısı veya doğrulanmış değerlendirme verisi oluşmadan
+     bu rakamları sayfaya ya da Schema.org içine eklemeyin.
+   - Araç sonuçlarını “garantili”, “kusursuz” veya “kayıpsız” olarak tanımlamayın.
+   - Filigran kaldırma aracının yalnızca kullanıcının hak sahibi olduğu görsellerde
+     kullanılabileceği açıklamasını koruyun.
+
+9) Yeni araç sayfaları:
+   - Uzun vadeli SEO için her önemli araç için benzersiz içerikli gerçek sayfalar oluşturun:
+     /remove-background/, /image-compressor/, /image-to-text/ vb.
+   - Her sayfada benzersiz başlık, açıklama, H1, kullanım rehberi, SSS, canonical ve schema olsun.
+   - Şu an sitemap yalnızca gerçekten var olan ana sayfayı içerir; bu bilinçli bir seçimdir.
