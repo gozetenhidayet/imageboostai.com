@@ -342,6 +342,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overf
 .ncp-face{background:linear-gradient(135deg,#BE185D,#9D174D);}
 .ncp-conv{background:linear-gradient(135deg,#B45309,#92400E);}
 .ncp-des{background:linear-gradient(135deg,#6D28D9,#5B21B6);}
+.ncp-fav{background:linear-gradient(135deg,#BE185D,#831843);}
 .ncp.active{transform:translateY(-2px);box-shadow:0 5px 16px rgba(0,0,0,.25);filter:brightness(1.08);}
 @media(max-width:900px){.nav-cat-pills{display:none;}}
 
@@ -472,6 +473,7 @@ section{padding:56px 0;}
 .cp-face{background:linear-gradient(135deg,#BE185D,#9D174D);}
 .cp-convert{background:linear-gradient(135deg,#B45309,#92400E);}
 .cp-design{background:linear-gradient(135deg,#6D28D9,#5B21B6);}
+.cp-favorites{background:linear-gradient(135deg,#BE185D,#831843);}
 /* Chip row */
 .chip-row{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;}
 .chip{padding:5px 13px;border-radius:100px;font-size:11.5px;font-weight:600;cursor:pointer;border:none;background:var(--bg3);color:var(--accent);border:1.5px solid var(--border2);transition:all .2s;}
@@ -820,6 +822,7 @@ footer{background:var(--text);color:rgba(255,255,255,.85);padding:3.5rem 1rem 1.
       <button type="button" class="cat-pill cp-face" data-cat="face" onclick="filterTools('face',this)">&#x1F484; Face</button>
       <button type="button" class="cat-pill cp-convert" data-cat="convert" onclick="filterTools('convert',this)">&#x1F504; Convert</button>
       <button type="button" class="cat-pill cp-design" data-cat="design" onclick="filterTools('design',this)">&#x1F3A8; Design</button>
+      <button type="button" class="cat-pill cp-favorites" data-cat="favorites" onclick="filterTools('favorites',this)">&#x2764;&#xFE0F; Favorites</button>
     </div>
     <!-- Right: lang picker + theme toggle -->
     <div class="nav-links">
@@ -1249,27 +1252,27 @@ footer{background:var(--text);color:rgba(255,255,255,.85);padding:3.5rem 1rem 1.
     </div>
     <div class="ft-col">
       <h4 data-i="ft_bg">Background Tools</h4>
-      <a href="/remove-background/" onclick="event.preventDefault();openTool('Remove Background')">Remove Background</a>
-      <a href="/background-changer/" onclick="event.preventDefault();openTool('Background Changer')">Change Background</a>
-      <a href="/ai-background-generator/" onclick="event.preventDefault();openTool('AI Background Generator')">AI Background</a>
-      <a href="/object-remover/" onclick="event.preventDefault();openTool('Object Remover')">Object Remover</a>
-      <a href="/magic-eraser/" onclick="event.preventDefault();openTool('Magic Eraser')">Magic Eraser</a>
+      <a href="/?tool=Remove%20Background" onclick="event.preventDefault();openTool('Remove Background')">Remove Background</a>
+      <a href="/?tool=Background%20Changer" onclick="event.preventDefault();openTool('Background Changer')">Change Background</a>
+      <a href="/?tool=AI%20Background%20Generator" onclick="event.preventDefault();openTool('AI Background Generator')">AI Background</a>
+      <a href="/?tool=Object%20Remover" onclick="event.preventDefault();openTool('Object Remover')">Object Remover</a>
+      <a href="/?tool=Magic%20Eraser" onclick="event.preventDefault();openTool('Magic Eraser')">Magic Eraser</a>
     </div>
     <div class="ft-col">
       <h4 data-i="ft_fix">Restore &amp; Fix</h4>
-      <a href="/ai-photo-restore/" onclick="event.preventDefault();openTool('AI Photo Restore')">Photo Restore</a>
-      <a href="/image-upscaler/" onclick="event.preventDefault();openTool('Image Upscaler')">Image Upscaler</a>
-      <a href="/photo-enhancer/" onclick="event.preventDefault();openTool('Photo Enhancer')">Photo Enhancer</a>
-      <a href="/noise-remover/" onclick="event.preventDefault();openTool('Noise Remover')">Noise Remover</a>
-      <a href="/colorize-old-photo/" onclick="event.preventDefault();openTool('Colorize Old Photo')">Colorize Photo</a>
+      <a href="/?tool=AI%20Photo%20Restore" onclick="event.preventDefault();openTool('AI Photo Restore')">Photo Restore</a>
+      <a href="/?tool=Image%20Upscaler" onclick="event.preventDefault();openTool('Image Upscaler')">Image Upscaler</a>
+      <a href="/?tool=Photo%20Enhancer" onclick="event.preventDefault();openTool('Photo Enhancer')">Photo Enhancer</a>
+      <a href="/?tool=Noise%20Remover" onclick="event.preventDefault();openTool('Noise Remover')">Noise Remover</a>
+      <a href="/?tool=Colorize%20Old%20Photo" onclick="event.preventDefault();openTool('Colorize Old Photo')">Colorize Photo</a>
     </div>
     <div class="ft-col">
       <h4 data-i="ft_face">Face &amp; Design</h4>
-      <a href="/face-retouch/" onclick="event.preventDefault();openTool('Face Retouch')">Face Retouch</a>
-      <a href="/ai-headshot/" onclick="event.preventDefault();openTool('AI Headshot')">AI Headshot</a>
-      <a href="/add-text-to-photo/" onclick="event.preventDefault();openTool('Add Text to Photo')">Add Text</a>
-      <a href="/watermark-remover/" onclick="event.preventDefault();openTool('Watermark Remover')">Remove Watermark</a>
-      <a href="/image-to-text-ocr/" onclick="event.preventDefault();openTool('Image to Text OCR')">Image to Text</a>
+      <a href="/?tool=Face%20Retouch" onclick="event.preventDefault();openTool('Face Retouch')">Face Retouch</a>
+      <a href="/?tool=AI%20Headshot" onclick="event.preventDefault();openTool('AI Headshot')">AI Headshot</a>
+      <a href="/?tool=Add%20Text%20to%20Photo" onclick="event.preventDefault();openTool('Add Text to Photo')">Add Text</a>
+      <a href="/?tool=Watermark%20Remover" onclick="event.preventDefault();openTool('Watermark Remover')">Remove Watermark</a>
+      <a href="/?tool=Image%20to%20Text%20OCR" onclick="event.preventDefault();openTool('Image to Text OCR')">Image to Text</a>
     </div>
     <div class="ft-col">
       <h4 data-i="ft_co">Company</h4>
@@ -1406,6 +1409,7 @@ let LANG='en', detectedLang=null;
 function renderTools(list=tools){
 const grid=document.getElementById('toolGrid');
 if(!grid)return;
+const favs=getFavorites();
 grid.innerHTML=list.map((t,i)=>`
     <div class="tool-card" data-cat="${t[3]}"
          onclick="openTool('${t[0].replace(/'/g,"\\'")}');trackEvent('tool_click','Tool','${t[0]}')"
@@ -1413,13 +1417,34 @@ grid.innerHTML=list.map((t,i)=>`
          tabindex="0"
          role="listitem" aria-label="${t[0]}: ${t[1]}"
          style="animation-delay:${Math.min(i*.03,.4)}s">
-      <button class="fav-btn" onclick="event.stopPropagation();this.classList.toggle('on');showToast(this.classList.contains('on')?'❤️ Added to favorites':'Removed from favorites')" aria-label="Add to favorites">♡</button>
+      <button class="fav-btn${favs.indexOf(t[0])>-1?' on':''}" data-tool="${t[0].replace(/"/g,'&quot;')}" onclick="event.stopPropagation();toggleFavorite(this)" aria-label="Add to favorites">${favs.indexOf(t[0])>-1?'❤':'♡'}</button>
       ${t[4]==='hot'?'<span class="tool-badge tb-hot">🔥 Hot</span>':''}
       ${t[4]==='new'?'<span class="tool-badge tb-new">✨ New</span>':''}
       <div class="tool-ic anim-${t[3]}" aria-hidden="true"><span class="ic-emoji">${t[2]}</span></div>
       <div class="tool-name">${t[0]}</div>
       <div class="tool-desc">${t[1]}</div>
     </div>`).join('');
+if(list.length===0){
+grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:50px 20px;">'
++'<div style="font-size:44px;margin-bottom:12px;">🤍</div>'
++'<div style="font-weight:800;font-size:16px;color:var(--text);margin-bottom:6px;">No favorites yet</div>'
++'<div style="font-size:13.5px;color:var(--muted);">Tap the heart on any tool card to save it here.</div>'
++'</div>';
+}
+}
+function getFavorites(){
+try{return JSON.parse(localStorage.getItem('iba_favorites')||'[]');}catch(e){return [];}
+}
+function toggleFavorite(btn){
+const name=btn.getAttribute('data-tool');
+let favs=getFavorites();
+const idx=favs.indexOf(name);
+if(idx>-1){favs.splice(idx,1);btn.classList.remove('on');btn.textContent='♡';showToast('Removed from favorites');}
+else{favs.push(name);btn.classList.add('on');btn.textContent='❤';showToast('❤️ Added to favorites');}
+try{localStorage.setItem('iba_favorites',JSON.stringify(favs));}catch(e){}
+const activePill=document.querySelector('.cat-pill.cp-favorites.active');
+if(activePill)filterTools('favorites',activePill);
+trackEvent('toggle_favorite','UX',name);
 }
 renderTools();
 function filterTools(cat,btn){
@@ -1429,13 +1454,19 @@ btn.classList.add('active');
 var cls=btn.className.match(/cp-\w+/);
 if(cls){document.querySelectorAll('.'+cls[0]).forEach(function(p){p.classList.add('active');});}
 }
-renderTools(cat==='all'?tools:tools.filter(t=>t[3]===cat));
+renderTools(cat==='all'?tools:cat==='favorites'?tools.filter(t=>getFavorites().indexOf(t[0])>-1):tools.filter(t=>t[3]===cat));
 renderCategoryDescCard(cat);
 const toolsSec=document.getElementById('tools');
 if(toolsSec)toolsSec.scrollIntoView({behavior:'smooth',block:'start'});
 trackEvent('filter_tools','UI',cat);
 }
 const CAT_DESCRIPTIONS={
+favorites:{
+badge:'❤️ Your favorites',
+emojis:['❤️','⭐','✨','🖼️'],
+title:'Your saved tools, all in one place',
+text:'Tap the heart on any tool card to save it here for quick access next time — your picks are saved right in this browser.'
+},
 all:{
 badge:'✨ 35+ tools',
 emojis:['🖼️','📸','🎨','⚡'],
@@ -1500,7 +1531,6 @@ filterTools(btn.getAttribute('data-cat'), btn);
 });
 });
 
-const IBA_TOOL_SLUGS={"Remove Background": "remove-background", "Background Changer": "background-changer", "AI Background Generator": "ai-background-generator", "Object Remover": "object-remover", "Object Replace": "object-replace", "Object Add": "object-add", "AI Inpainting": "ai-inpainting", "AI Outpainting": "ai-outpainting", "Magic Eraser": "magic-eraser", "AI Photo Restore": "ai-photo-restore", "Colorize Old Photo": "colorize-old-photo", "Image Upscaler": "image-upscaler", "Image Sharpener": "image-sharpener", "Noise Remover": "noise-remover", "Photo Enhancer": "photo-enhancer", "Color Correction": "color-correction", "Brightness & Contrast": "brightness-and-contrast", "Remove Blur": "remove-blur", "Face Retouch": "face-retouch", "Skin Smoothing": "skin-smoothing", "Teeth Whitening": "teeth-whitening", "Eye Enhancer": "eye-enhancer", "AI Headshot": "ai-headshot", "Portrait Enhancer": "portrait-enhancer", "Blur Background": "blur-background", "Crop Image": "crop-image", "Resize Image": "resize-image", "Image Compressor": "image-compressor", "Convert Image": "convert-image", "Watermark Remover": "watermark-remover", "Watermark Maker": "watermark-maker", "Add Text to Photo": "add-text-to-photo", "Image to Text OCR": "image-to-text-ocr", "Product Photo Editor": "product-photo-editor", "Photo Collage Maker": "photo-collage-maker"};
 const IBA_DEFAULT_TITLE=document.title;
 const IBA_DEFAULT_DESC=document.querySelector('meta[name="description"]')?.getAttribute('content')||'';
 function updateSeoForTool(name,desc){
@@ -1509,10 +1539,7 @@ document.title=name+' — Free Online Tool | ImageBoostAI';
 const m=document.querySelector('meta[name="description"]');
 if(m)m.setAttribute('content',(desc||name)+" Free, instant, 100% browser-based — no login, no watermark. Part of ImageBoostAI's 35+ free AI photo editing tools.");
 const c=document.querySelector('link[rel="canonical"]');
-if(c){
-const slug=IBA_TOOL_SLUGS[name];
-c.setAttribute('href',slug?('https://imageboostai.com/'+slug+'/'):('https://imageboostai.com/?tool='+encodeURIComponent(name)));
-}
+if(c)c.setAttribute('href','https://imageboostai.com/?tool='+encodeURIComponent(name));
 }catch(e){}
 }
 function resetSeoDefault(){
