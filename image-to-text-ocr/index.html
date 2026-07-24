@@ -70,5 +70,27 @@
 <footer style="padding:24px 5vw;border-top:1px solid var(--border,#e5e7f5);text-align:center;font-size:12.5px;color:var(--muted,#9498ab);">
   © 2026 ImageBoostAI · <a href="/" style="color:inherit;">Home</a> · <a href="/sitemap.xml" style="color:inherit;">Sitemap</a>
 </footer>
+<div id="google_translate_element" style="position:absolute;left:-9999px;top:-9999px;height:0;overflow:hidden;"></div>
+<script>
+(function(){
+try{
+var navLang=((navigator.language||navigator.userLanguage||'en').split('-')[0]||'en').toLowerCase();
+if(navLang==='en')return;
+var supported=['tr','es','fr','de','pt','it','ru','ja','zh','ko','ar','hi','bn','ur','fa','nl','pl','sv','id','vi','th','uk','no','da','fi','el','cs','sk','hu','ro','bg','hr','sr','sl','lt','lv','et','he','ms','tl','sw','af','am','az','ka','hy','kk','uz','mn','ne','si','ta','te','ml','kn','mr','gu','pa','ca','eu','ga','is','mt'];
+if(supported.indexOf(navLang)===-1)return;
+var target=navLang==='zh'?'zh-CN':navLang;
+document.cookie='googtrans=/en/'+target+';path=/';
+document.cookie='googtrans=/en/'+target+';domain='+location.hostname+';path=/';
+window.googleTranslateElementInit=function(){
+new google.translate.TranslateElement({pageLanguage:'en',autoDisplay:false,layout:google.translate.TranslateElement.InlineLayout.SIMPLE},'google_translate_element');
+};
+var s=document.createElement('script');
+s.src='//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+s.async=true;
+document.body.appendChild(s);
+}catch(e){}
+})();
+</script>
+
 </body>
 </html>

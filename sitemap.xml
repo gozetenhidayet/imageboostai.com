@@ -1,9 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://imageboostai.com/</loc>
-    <lastmod>2026-07-21</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-  </url>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url><loc>https://imageboostai.com/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://imageboostai.com/remove-background/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://imageboostai.com/background-changer/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://imageboostai.com/ai-background-generator/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://imageboostai.com/object-remover/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://imageboostai.com/object-replace/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://imageboostai.com/object-add/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://imageboostai.com/ai-inpainting/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://imageboostai.com/ai-outpainting/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://imageboostai.com/magic-eraser/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://imageboostai.com/ai-photo-restore/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://imageboostai.com/colorize-old-photo/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://imageboostai.com/image-upscaler/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://imageboostai.com/image-sharpener/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://imageboostai.com/noise-remover/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://imageboostai.com/photo-enhancer/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://imageboostai.com/color-correction/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://imageboostai.com/brightness-and-contrast/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://imageboostai.com/remove-blur/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://imageboostai.com/face-retouch/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://imageboostai.com/skin-smoothing/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://imageboostai.com/teeth-whitening/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://imageboostai.com/eye-enhancer/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://imageboostai.com/ai-headshot/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://imageboostai.com/portrait-enhancer/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://imageboostai.com/blur-background/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://imageboostai.com/crop-image/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://imageboostai.com/resize-image/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://imageboostai.com/image-compressor/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://imageboostai.com/convert-image/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://imageboostai.com/watermark-remover/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://imageboostai.com/watermark-maker/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://imageboostai.com/add-text-to-photo/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://imageboostai.com/image-to-text-ocr/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://imageboostai.com/product-photo-editor/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://imageboostai.com/photo-collage-maker/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
 </urlset>
