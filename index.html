@@ -474,6 +474,7 @@ section{padding:56px 0;}
 .cp-convert{background:linear-gradient(135deg,#B45309,#92400E);}
 .cp-design{background:linear-gradient(135deg,#6D28D9,#5B21B6);}
 .cp-favorites{background:linear-gradient(135deg,#BE185D,#831843);}
+.fav-count-badge{display:inline-flex;align-items:center;justify-content:center;min-width:17px;height:17px;padding:0 4px;margin-left:4px;background:rgba(255,255,255,.28);border-radius:100px;font-size:10px;font-weight:800;}
 /* Chip row */
 .chip-row{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;}
 .chip{padding:5px 13px;border-radius:100px;font-size:11.5px;font-weight:600;cursor:pointer;border:none;background:var(--bg3);color:var(--accent);border:1.5px solid var(--border2);transition:all .2s;}
@@ -822,7 +823,7 @@ footer{background:var(--text);color:rgba(255,255,255,.85);padding:3.5rem 1rem 1.
       <button type="button" class="cat-pill cp-face" data-cat="face" onclick="filterTools('face',this)">&#x1F484; Face</button>
       <button type="button" class="cat-pill cp-convert" data-cat="convert" onclick="filterTools('convert',this)">&#x1F504; Convert</button>
       <button type="button" class="cat-pill cp-design" data-cat="design" onclick="filterTools('design',this)">&#x1F3A8; Design</button>
-      <button type="button" class="cat-pill cp-favorites" data-cat="favorites" onclick="filterTools('favorites',this)">&#x2764;&#xFE0F; Favorites</button>
+      <button type="button" class="cat-pill cp-favorites" data-cat="favorites" onclick="filterTools('favorites',this)">&#x2764;&#xFE0F; Favorites<span id="favCount" class="fav-count-badge" style="display:none;"></span></button>
     </div>
     <!-- Right: lang picker + theme toggle -->
     <div class="nav-links">
@@ -1417,7 +1418,7 @@ grid.innerHTML=list.map((t,i)=>`
          tabindex="0"
          role="listitem" aria-label="${t[0]}: ${t[1]}"
          style="animation-delay:${Math.min(i*.03,.4)}s">
-      <button class="fav-btn${favs.indexOf(t[0])>-1?' on':''}" data-tool="${t[0].replace(/"/g,'&quot;')}" onclick="event.stopPropagation();toggleFavorite(this)" aria-label="Add to favorites">${favs.indexOf(t[0])>-1?'❤':'♡'}</button>
+      <button class="fav-btn${favs.indexOf(t[0])>-1?' on':''}" data-tool="${t[0].replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" onclick="event.stopPropagation();toggleFavorite(this)" aria-label="Add to favorites">${favs.indexOf(t[0])>-1?'❤':'♡'}</button>
       ${t[4]==='hot'?'<span class="tool-badge tb-hot">🔥 Hot</span>':''}
       ${t[4]==='new'?'<span class="tool-badge tb-new">✨ New</span>':''}
       <div class="tool-ic anim-${t[3]}" aria-hidden="true"><span class="ic-emoji">${t[2]}</span></div>
@@ -1435,6 +1436,13 @@ grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:50px 20px
 function getFavorites(){
 try{return JSON.parse(localStorage.getItem('iba_favorites')||'[]');}catch(e){return [];}
 }
+function updateFavCount(){
+const el=document.getElementById('favCount');
+if(!el)return;
+const n=getFavorites().length;
+if(n>0){el.textContent=n;el.style.display='inline-flex';}
+else{el.style.display='none';}
+}
 function toggleFavorite(btn){
 const name=btn.getAttribute('data-tool');
 let favs=getFavorites();
@@ -1442,11 +1450,13 @@ const idx=favs.indexOf(name);
 if(idx>-1){favs.splice(idx,1);btn.classList.remove('on');btn.textContent='♡';showToast('Removed from favorites');}
 else{favs.push(name);btn.classList.add('on');btn.textContent='❤';showToast('❤️ Added to favorites');}
 try{localStorage.setItem('iba_favorites',JSON.stringify(favs));}catch(e){}
+updateFavCount();
 const activePill=document.querySelector('.cat-pill.cp-favorites.active');
 if(activePill)filterTools('favorites',activePill);
 trackEvent('toggle_favorite','UX',name);
 }
 renderTools();
+updateFavCount();
 function filterTools(cat,btn){
 document.querySelectorAll('.cat-pill').forEach(b=>b.classList.remove('active'));
 if(btn){
