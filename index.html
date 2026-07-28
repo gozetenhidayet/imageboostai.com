@@ -400,9 +400,17 @@ nav{position:sticky;top:0;z-index:100;background:var(--nav-bg);backdrop-filter:b
 .deal-x:hover{background:rgba(255,255,255,.35);}
 
 /* ══ HERO ══ */
-.hero{padding:70px 0 50px;text-align:center;position:relative;z-index:1;overflow:hidden;}
+.hero{padding:78px 0 54px;text-align:center;position:relative;z-index:1;overflow:hidden;}
+.hero::before{content:'';position:absolute;inset:0;z-index:-2;
+  background-image:linear-gradient(var(--border2) 1px,transparent 1px),linear-gradient(90deg,var(--border2) 1px,transparent 1px);
+  background-size:42px 42px;opacity:.35;
+  -webkit-mask-image:radial-gradient(ellipse 70% 60% at 50% 0%,#000 40%,transparent 100%);
+  mask-image:radial-gradient(ellipse 70% 60% at 50% 0%,#000 40%,transparent 100%);}
+.hero::after{content:'';position:absolute;top:-180px;left:50%;transform:translateX(-50%);width:900px;height:520px;z-index:-1;
+  background:radial-gradient(circle,rgba(91,76,232,.22) 0%,rgba(236,72,153,.12) 45%,transparent 72%);
+  filter:blur(10px);pointer-events:none;}
 .hero-inner{width:min(1200px,94%);margin:0 auto;}
-.h-badge{display:inline-flex;align-items:center;gap:7px;background:var(--bg3);border:1.5px solid var(--border2);border-radius:100px;padding:6px 16px;font-size:12px;color:var(--accent);font-weight:600;margin-bottom:1.5rem;animation:fadeUp .5s ease both;box-shadow:var(--shadow);}
+.h-badge{display:inline-flex;align-items:center;gap:7px;background:var(--surface);border:1.5px solid var(--border2);border-radius:100px;padding:7px 18px;font-size:12.5px;color:var(--accent);font-weight:700;letter-spacing:.01em;margin-bottom:1.6rem;animation:fadeUp .5s ease both;box-shadow:0 4px 16px rgba(91,76,232,.14);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);}
 .bdot{width:7px;height:7px;background:var(--green);border-radius:50%;flex-shrink:0;animation:pulse 1.5s infinite;box-shadow:0 0 8px var(--green);}
 h1.htitle{font-size:clamp(2.4rem,6vw,4.2rem);font-weight:900;line-height:1.06;letter-spacing:-.045em;color:var(--text);margin-bottom:1.1rem;animation:fadeUp .5s ease .08s both;text-align:center;}
 .grad-text{background:var(--gp);background-size:200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shine 4s linear 3;}
@@ -434,10 +442,24 @@ h1.htitle{font-size:clamp(2.4rem,6vw,4.2rem);font-weight:900;line-height:1.06;le
 .tools-main-p strong{color:var(--accent);}
 
 /* ══ HERO CHIPS ══ */
-.h-chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:1.4rem;animation:fadeUp .5s ease .4s both;}
+.h-chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:1.8rem;animation:fadeUp .5s ease .4s both;}
 .h-chip{display:inline-flex;align-items:center;gap:5px;background:var(--surface);border:1.5px solid var(--border);border-radius:100px;padding:8px 16px;font-size:12.5px;color:var(--text2);font-weight:600;cursor:pointer;transition:all .25s cubic-bezier(.34,1.56,.64,1);box-shadow:0 2px 8px rgba(0,0,0,.06);}
 .h-chip:hover{background:var(--accent);border-color:var(--accent);color:#fff;transform:translateY(-3px);box-shadow:0 6px 18px rgba(91,76,232,.25);}
 @media(max-width:600px){.h-chip{font-size:11.5px;padding:7px 12px;}}
+
+/* ══ HERO BEFORE/AFTER DEMO ══ */
+.ba-demo{position:relative;width:min(560px,100%);height:220px;margin:2rem auto 0;border-radius:20px;overflow:hidden;box-shadow:0 20px 60px rgba(91,76,232,.22),0 2px 8px rgba(0,0,0,.08);border:1px solid var(--border2);animation:fadeUp .5s ease .3s both;cursor:ew-resize;user-select:none;}
+.ba-demo-after,.ba-demo-before{position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:flex-start;padding:16px;}
+.ba-demo-after{background:linear-gradient(135deg,#7C3AED 0%,#EC4899 45%,#06B6D4 100%);}
+.ba-demo-after::before{content:'';position:absolute;inset:0;background:
+  radial-gradient(circle at 30% 30%,rgba(255,255,255,.25),transparent 45%),
+  radial-gradient(circle at 75% 65%,rgba(255,255,255,.18),transparent 40%);}
+.ba-demo-before{width:50%;background:linear-gradient(135deg,#94A3B8 0%,#64748B 45%,#475569 100%);filter:grayscale(.5) brightness(.85);border-right:2px solid #fff;}
+.ba-demo-before::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(0,0,0,.06) 0 2px,transparent 2px 8px);}
+.ba-demo-tag{position:relative;z-index:2;background:rgba(15,15,25,.55);backdrop-filter:blur(6px);color:#fff;font-size:12px;font-weight:700;padding:6px 14px;border-radius:100px;letter-spacing:.02em;}
+.ba-demo-handle{position:absolute;top:50%;left:50%;width:38px;height:38px;background:#fff;border-radius:50%;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.25);font-size:14px;color:var(--accent);font-weight:900;pointer-events:none;z-index:3;}
+.ba-demo-caption{text-align:center;font-size:12.5px;color:var(--muted);margin-top:12px;font-weight:600;animation:fadeUp .5s ease .35s both;}
+@media(max-width:600px){.ba-demo{height:170px;border-radius:16px;}}
 
 /* ══ STATS ══ */
 .stats-bar{background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:1.3rem 1rem;}
@@ -492,12 +514,11 @@ section{padding:56px 0;}
 .filters{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:26px;}
 
 /* ══ TOOL GRID ══ */
-.tools-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;}
-@media(max-width:1100px){.tools-grid{grid-template-columns:repeat(4,1fr);}}
-@media(max-width:860px){.tools-grid{grid-template-columns:repeat(3,1fr);}}
-@media(max-width:580px){.tools-grid{grid-template-columns:repeat(2,1fr);}}
-@media(max-width:360px){.tools-grid{grid-template-columns:1fr;}}
-.tool-card{display:block;text-decoration:none;color:inherit;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--rL);padding:20px 16px;cursor:pointer;transition:all .3s cubic-bezier(.34,1.56,.64,1);text-align:center;position:relative;overflow:hidden;animation:cardIn .5s ease both;}
+.tools-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;}
+@media(max-width:1180px){.tools-grid{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:760px){.tools-grid{grid-template-columns:repeat(2,1fr);gap:14px;}}
+@media(max-width:420px){.tools-grid{grid-template-columns:1fr;}}
+.tool-card{display:flex;flex-direction:column;align-items:center;text-decoration:none;color:inherit;background:var(--surface);border:1.5px solid var(--border);border-radius:20px;padding:30px 22px 26px;min-height:190px;justify-content:center;cursor:pointer;transition:all .3s cubic-bezier(.34,1.56,.64,1);text-align:center;position:relative;overflow:hidden;animation:cardIn .5s ease both;}
 /* Category-colored card left border */
 .tool-card[data-cat="bg"]{border-left:3px solid #06B6D4;background:linear-gradient(to right,rgba(6,182,212,.04),var(--surface));}
 .tool-card[data-cat="fix"]{border-left:3px solid #10B981;background:linear-gradient(to right,rgba(16,185,129,.04),var(--surface));}
@@ -521,7 +542,7 @@ section{padding:56px 0;}
 .tool-card:hover::before{opacity:.06;}
 .tool-card:hover::after{transform:scaleX(1);}
 .tool-card:active{transform:translateY(-4px) scale(.99);}
-.tool-ic{width:54px;height:54px;border-radius:15px;background:linear-gradient(135deg,#EEF2FF,#E0E7FF);display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 12px;transition:transform .35s cubic-bezier(.34,1.56,.64,1),box-shadow .3s;position:relative;z-index:1;box-shadow:0 2px 10px rgba(91,76,232,.1);}
+.tool-ic{width:68px;height:68px;border-radius:18px;background:linear-gradient(135deg,#EEF2FF,#E0E7FF);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 16px;transition:transform .35s cubic-bezier(.34,1.56,.64,1),box-shadow .3s;position:relative;z-index:1;box-shadow:0 4px 14px rgba(91,76,232,.14);}
 .tool-card[data-cat="bg"] .tool-ic{background:linear-gradient(135deg,#E0F7FA,#B2EBF2);box-shadow:0 2px 10px rgba(6,182,212,.15);}
 .tool-card[data-cat="fix"] .tool-ic{background:linear-gradient(135deg,#E8F5E9,#C8E6C9);box-shadow:0 2px 10px rgba(16,185,129,.15);}
 .tool-card[data-cat="face"] .tool-ic{background:linear-gradient(135deg,#FCE4EC,#F8BBD0);box-shadow:0 2px 10px rgba(236,72,153,.15);}
@@ -529,9 +550,9 @@ section{padding:56px 0;}
 .tool-card[data-cat="design"] .tool-ic{background:linear-gradient(135deg,#EDE7F6,#D1C4E9);box-shadow:0 2px 10px rgba(139,92,246,.15);}
 .tool-card:hover .tool-ic{transform:scale(1.22) rotate(-10deg);box-shadow:0 8px 24px rgba(91,76,232,.2);}
 .tool-card:hover .tool-ic{transform:scale(1.25) rotate(-10deg);}
-.tool-name{font-size:13px;font-weight:800;color:var(--text);margin-bottom:5px;position:relative;z-index:1;transition:color .2s;line-height:1.3;}
+.tool-name{font-size:15.5px;font-weight:800;color:var(--text);margin-bottom:6px;position:relative;z-index:1;transition:color .2s;line-height:1.3;}
 .tool-card:hover .tool-name{color:var(--accent);}
-.tool-desc{font-size:11.5px;color:var(--muted);line-height:1.45;position:relative;z-index:1;margin-top:4px;}
+.tool-desc{font-size:12.5px;color:var(--muted);line-height:1.5;position:relative;z-index:1;margin-top:4px;}
 .fav-btn{position:absolute;right:12px;top:12px;background:var(--bg3);border:1.5px solid var(--border);color:var(--muted);border-radius:50%;width:30px;height:30px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .2s;z-index:2;}
 .fav-btn.on{background:linear-gradient(135deg,#B45309,#BE185D);color:#fff;border:none;}
 .tool-badge{position:absolute;top:10px;left:10px;font-size:9.5px;padding:2px 8px;border-radius:100px;font-weight:700;z-index:2;}
@@ -770,9 +791,11 @@ footer{background:var(--text);color:rgba(255,255,255,.85);padding:3.5rem 1rem 1.
   .ws-panel{padding:14px;}
   .upload-zone{min-height:220px;}
   .result-box{padding:14px;}
-  .tools-grid{grid-template-columns:repeat(2,1fr);gap:10px;}
-  .tool-card{padding:16px 12px;}
-  .tool-ic{width:44px;height:44px;font-size:22px;}
+  .tools-grid{grid-template-columns:repeat(2,1fr);gap:12px;}
+  .tool-card{padding:20px 14px;min-height:160px;}
+  .tool-ic{width:52px;height:52px;font-size:24px;margin-bottom:10px;}
+  .tool-name{font-size:14px;}
+  .tool-desc{font-size:11.5px;}
   .ba-compare-grid{grid-template-columns:1fr;grid-template-rows:auto 44px auto;}
   .ba-center-divider{height:44px;border:none;border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
   footer{padding:2.5rem .75rem 1.5rem;}
@@ -916,6 +939,19 @@ footer{background:var(--text);color:rgba(255,255,255,.85);padding:3.5rem 1rem 1.
       <button class="btn-primary" onclick="document.getElementById('workspace').scrollIntoView({behavior:'smooth'})">📤 Upload &amp; Start Editing</button>
       <button class="btn-secondary" onclick="document.getElementById('tools').scrollIntoView({behavior:'smooth'})">✨ Browse 35 Tools</button>
     </div>
+
+    <!-- Illustrative before/after mockup (no real photos needed, pure CSS/gradient) -->
+    <div class="ba-demo" id="ba-demo" aria-hidden="true">
+      <div class="ba-demo-after">
+        <div class="ba-demo-tag ba-tag-after">✨ AI Enhanced</div>
+      </div>
+      <div class="ba-demo-before" id="ba-demo-before">
+        <div class="ba-demo-tag ba-tag-before">Original</div>
+      </div>
+      <div class="ba-demo-handle" id="ba-demo-handle"><span>⟷</span></div>
+    </div>
+    <div class="ba-demo-caption"><span data-i="ba_caption">👆 Drag the slider — this is the kind of difference our AI makes</span></div>
+
     <!-- Quick tool chips -->
     <div class="h-chips" id="h-chip-row">
       <span class="h-chip" onclick="openTool('Remove Background')">🎭 Remove BG</span>
@@ -1044,6 +1080,19 @@ footer{background:var(--text);color:rgba(255,255,255,.85);padding:3.5rem 1rem 1.
         </div>
         <div class="out-img-wrap" id="output"><img id="outImg" alt="Edited photo result"></div>
         <a class="btn-primary dl-btn" id="download" href="/" download="imageboostai-result.png" data-i="dl_btn">⬇ Download Result</a>
+
+        <!-- RESULT AD SLOT — highest-attention placement (user just got their result).
+             Disabled until a REAL ad-slot ID is created in AdSense → Ads → By ad unit.
+             Do not ship "REPLACE_WITH_REAL_SLOT_ID" live — invalid units can trigger
+             policy issues. Auto Ads (loadAds(), already active site-wide) will still
+             place ads automatically without this. Uncomment once you have a real ID. -->
+        <!--
+        <div id="result-ad-slot" style="max-width:500px;margin:18px auto 0;text-align:center;min-height:0;">
+          <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3359266836868361" data-ad-slot="REPLACE_WITH_REAL_SLOT_ID" data-ad-format="auto" data-full-width-responsive="true"></ins>
+          <script>(adsbygoogle=window.adsbygoogle||[]).push({});</script>
+        </div>
+        -->
+
         <!-- Share bar (shown after result) -->
         <div class="share-bar" id="share-bar" style="display:none;">
           <span>Share:</span>
@@ -5753,6 +5802,65 @@ extraPanels[name]();
      <script> block above (loadGoogleTranslateIfNeeded / googleTranslateElementInit),
      so it's guaranteed to be defined before anything can call it. -->
 <div id="google_translate_element" style="position:absolute;left:-9999px;top:-9999px;height:0;overflow:hidden;"></div>
+
+<script>
+/* ══ Hero before/after demo — drag/touch slider ══ */
+(function(){
+  const demo=document.getElementById('ba-demo');
+  const before=document.getElementById('ba-demo-before');
+  const handle=document.getElementById('ba-demo-handle');
+  if(!demo||!before||!handle)return;
+  let dragging=false;
+  function setPos(pct){
+    pct=Math.max(6,Math.min(94,pct));
+    before.style.width=pct+'%';
+    handle.style.left=pct+'%';
+  }
+  function posFromEvent(e){
+    const rect=demo.getBoundingClientRect();
+    const x=(e.touches?e.touches[0].clientX:e.clientX)-rect.left;
+    return (x/rect.width)*100;
+  }
+  demo.addEventListener('mousedown',e=>{dragging=true;setPos(posFromEvent(e));});
+  demo.addEventListener('touchstart',e=>{dragging=true;setPos(posFromEvent(e));},{passive:true});
+  window.addEventListener('mousemove',e=>{if(dragging)setPos(posFromEvent(e));});
+  window.addEventListener('touchmove',e=>{if(dragging)setPos(posFromEvent(e));},{passive:true});
+  window.addEventListener('mouseup',()=>dragging=false);
+  window.addEventListener('touchend',()=>dragging=false);
+  // gentle auto-demo sweep once on load so users notice it's interactive
+  let t=0;
+  const sweep=setInterval(()=>{
+    if(dragging){clearInterval(sweep);return;}
+    t+=2;
+    setPos(50+Math.sin(t/12)*22);
+    if(t>90)clearInterval(sweep);
+  },40);
+})();
+
+/* ══ SEO: keep canonical + og:url in sync with the active tool query param ══
+   Query-param "pages" (?tool=X) are not equivalent to real static routes for
+   indexing purposes, but pointing canonical at the homepage for every tool
+   view actively tells Google to ignore tool-specific content. This keeps
+   canonical/og:url accurate for whatever is currently on screen. */
+(function(){
+  const BASE='https://imageboostai.com/';
+  function syncCanonical(){
+    const params=new URLSearchParams(window.location.search);
+    const tool=params.get('tool');
+    const url=tool?BASE+'?tool='+encodeURIComponent(tool):BASE;
+    let link=document.querySelector('link[rel="canonical"]');
+    if(link)link.setAttribute('href',url);
+    const og=document.querySelector('meta[property="og:url"]');
+    if(og)og.setAttribute('content',url);
+  }
+  const _origOpenTool2=window.openTool;
+  if(typeof _origOpenTool2==='function'){
+    window.openTool=function(name){ _origOpenTool2(name); syncCanonical(); };
+  }
+  window.addEventListener('popstate',syncCanonical);
+  document.addEventListener('DOMContentLoaded',syncCanonical);
+})();
+</script>
 
 </body>
 </html>
