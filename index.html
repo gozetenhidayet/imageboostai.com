@@ -1657,6 +1657,8 @@ const uiTools={
 'Magic Eraser':showObjectRemoverPanel,
 'AI Inpainting':showObjectRemoverPanel,
 'Image Upscaler':showImageUpscalerPanel,
+'Skin Smoothing':showSkinSmoothingPanel,
+'AI Headshot':showAIHeadshotPanel,
 };
 if(window.__ibaExtraPanels){ Object.assign(uiTools, window.__ibaExtraPanels); }
 window.__ibaUiTools = uiTools;
@@ -2704,6 +2706,118 @@ px[i+2]=Math.min(255,Math.round(b));
 });
 }
 function applySkinSmoothing(){applyNoiseRemover();}
+function showSkinSmoothingPanel(){
+const rt=document.getElementById('resultTitle'),rx=document.getElementById('resultText');
+const p=document.getElementById('progress');if(p)p.style.display='none';
+if(rt)rt.textContent='🩹 Skin Smoothing';
+if(!rx)return;
+if(!imageData){rx.textContent='Upload a photo first, then click ⚡ Apply Tool.';return;}
+rx.innerHTML='';
+const smoothBtn=document.createElement('button');smoothBtn.textContent='✨ Quick Smooth (whole face)';
+smoothBtn.style.cssText='width:100%;padding:12px;background:var(--gp);color:#fff;border:none;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;margin-bottom:14px;';
+smoothBtn.onclick=applySkinSmoothing;
+rx.appendChild(smoothBtn);
+const divider=document.createElement('div');divider.style.cssText='border-top:1.5px dashed var(--border);margin:4px 0 14px;';
+rx.appendChild(divider);
+const hint=document.createElement('p');hint.style.cssText='font-size:12px;color:var(--muted);margin-bottom:8px;';
+hint.textContent='🩹 Spot removal: drag a small box over a blemish or pimple below, then tap Heal Spot. Repeat for each spot.';
+rx.appendChild(hint);
+window.__selRect=null;
+const sel=_mkRectSelector({maxW:340,onChange:r=>{window.__selRect=r;}});
+rx.appendChild(sel.element);
+const healBtn=document.createElement('button');healBtn.textContent='🩹 Heal Spot';
+healBtn.style.cssText='width:100%;padding:12px;background:var(--gp);color:#fff;border:none;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;margin-top:10px;';
+healBtn.onclick=applyBlemishHeal;
+rx.appendChild(healBtn);
+}
+function applyBlemishHeal(){
+const r=window.__selRect;
+if(!r){showToast('⚠️ Drag a small box over the blemish first');return;}
+_applyCanvas(async im=>{
+const c=_canvas(im.width,im.height),x=c.getContext('2d');
+x.drawImage(im,0,0);
+const rx0=Math.round(r.x*im.width),ry0=Math.round(r.y*im.height);
+const rw=Math.max(4,Math.round(r.w*im.width)),rh=Math.max(4,Math.round(r.h*im.height));
+const pad=Math.round(Math.max(rw,rh)*1.4)+16;
+const sx=Math.max(0,rx0-pad),sy=Math.max(0,ry0-pad);
+const sw=Math.min(im.width-sx,rw+pad*2),sh=Math.min(im.height-sy,rh+pad*2);
+x.save();
+x.beginPath();
+const cx=rx0+rw/2,cy=ry0+rh/2,rrx=rw/2+2,rry=rh/2+2;
+x.ellipse(cx,cy,rrx,rry,0,0,Math.PI*2);
+x.clip();
+x.filter='blur(9px)';
+x.drawImage(c,sx,sy,sw,sh,rx0,ry0,rw,rh);
+x.filter='none';
+x.restore();
+return c.toDataURL('image/png');
+});
+setTimeout(function(){window.__selRect=null;showSkinSmoothingPanel();},650);
+}
+function applyAIHeadshot(){applyPhotoEnhancer();}
+function showAIHeadshotPanel(){
+const rt=document.getElementById('resultTitle'),rx=document.getElementById('resultText');
+const p=document.getElementById('progress');if(p)p.style.display='none';
+if(rt)rt.textContent='👔 AI Headshot';
+if(!rx)return;
+if(!imageData){rx.textContent='Upload a photo first, then click ⚡ Apply Tool.';return;}
+rx.innerHTML='';
+const hint=document.createElement('p');hint.style.cssText='font-size:12px;color:var(--muted);margin-bottom:12px;';
+hint.textContent='Enhances lighting and adds professional attire to the bottom of your photo — great for LinkedIn and professional profiles.';
+rx.appendChild(hint);
+const lbl=document.createElement('label');lbl.style.cssText='font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:6px;';
+lbl.textContent='Attire style';
+rx.appendChild(lbl);
+const styleGrid=document.createElement('div');styleGrid.style.cssText='display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;';
+const styleDefs=[['navy','Navy Suit'],['black','Black Blazer'],['charcoal','Business Casual']];
+let selectedStyle='navy';
+styleDefs.forEach(function(s){
+const b=document.createElement('button');b.textContent=s[1];b.dataset.style=s[0];
+b.style.cssText='padding:10px 6px;border-radius:10px;border:1.5px solid '+(s[0]===selectedStyle?'var(--accent)':'var(--border)')+';background:'+(s[0]===selectedStyle?'rgba(91,76,232,.08)':'var(--bg3)')+';color:var(--text);font-size:11.5px;font-weight:700;cursor:pointer;font-family:inherit;';
+b.onclick=function(){
+selectedStyle=s[0];
+Array.prototype.forEach.call(styleGrid.querySelectorAll('button'),function(x){x.style.borderColor='var(--border)';x.style.background='var(--bg3)';});
+b.style.borderColor='var(--accent)';b.style.background='rgba(91,76,232,.08)';
+};
+styleGrid.appendChild(b);
+});
+rx.appendChild(styleGrid);
+const posLbl=document.createElement('label');posLbl.style.cssText='font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:6px;';
+posLbl.innerHTML='Shoulder position: <span id="ah-pos-val">70</span>%';
+rx.appendChild(posLbl);
+const posSlider=document.createElement('input');posSlider.type='range';posSlider.id='ah-pos';posSlider.min=50;posSlider.max=90;posSlider.value=70;
+posSlider.style.cssText='width:100%;accent-color:var(--accent);margin-bottom:14px;';
+posSlider.oninput=function(){document.getElementById('ah-pos-val').textContent=posSlider.value;};
+rx.appendChild(posSlider);
+const btn=document.createElement('button');btn.textContent='👔 Apply Professional Attire';
+btn.style.cssText='width:100%;padding:12px;background:var(--gp);color:#fff;border:none;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;';
+btn.onclick=function(){applyAddAttire(selectedStyle,parseInt(posSlider.value,10));};
+rx.appendChild(btn);
+}
+function applyAddAttire(style,posPct){
+const palette={navy:['#1E293B','#334155'],black:['#0B0F19','#1F2937'],charcoal:['#374151','#4B5563']};
+const c=palette[style]||palette.navy;
+_applyCanvas(async im=>{
+const canvas=_canvas(im.width,im.height),ctx=canvas.getContext('2d');
+ctx.drawImage(im,0,0);
+const w=im.width,h=im.height;
+const topY=h*((posPct||70)/100);
+ctx.save();
+const grad=ctx.createLinearGradient(0,topY,0,h);
+grad.addColorStop(0,c[1]);grad.addColorStop(1,c[0]);
+ctx.fillStyle=grad;
+ctx.beginPath();ctx.moveTo(w*0.5,topY);ctx.lineTo(w*0.08,h);ctx.lineTo(w*0.92,h);ctx.closePath();ctx.fill();
+ctx.fillStyle=c[0];
+ctx.beginPath();ctx.moveTo(w*0.5,topY);ctx.lineTo(w*0.32,topY+h*0.09);ctx.lineTo(w*0.42,h);ctx.lineTo(w*0.5,h*0.86);ctx.closePath();ctx.fill();
+ctx.beginPath();ctx.moveTo(w*0.5,topY);ctx.lineTo(w*0.68,topY+h*0.09);ctx.lineTo(w*0.58,h);ctx.lineTo(w*0.5,h*0.86);ctx.closePath();ctx.fill();
+ctx.fillStyle='#F8FAFC';
+ctx.beginPath();ctx.moveTo(w*0.5,topY);ctx.lineTo(w*0.44,topY+h*0.14);ctx.lineTo(w*0.5,h*0.94);ctx.lineTo(w*0.56,topY+h*0.14);ctx.closePath();ctx.fill();
+ctx.fillStyle='#7C2D12';
+ctx.beginPath();ctx.moveTo(w*0.485,topY+h*0.03);ctx.lineTo(w*0.515,topY+h*0.03);ctx.lineTo(w*0.505,h*0.99);ctx.lineTo(w*0.5,h);ctx.lineTo(w*0.495,h*0.99);ctx.closePath();ctx.fill();
+ctx.restore();
+return canvas.toDataURL('image/png');
+});
+}
 function applyTeethWhitening(){
 pixelOp(function(px){
 for(var i=0;i<px.length;i+=4){
@@ -3434,6 +3548,60 @@ btn.onclick=function(){document.getElementById('rz-w').value=pr[0];document.getE
 pgrid.appendChild(btn);
 });
 rx.appendChild(pgrid);
+const passLbl=document.createElement('label');passLbl.style.cssText='font-size:12px;font-weight:700;color:var(--muted);display:block;margin:14px 0 4px;';passLbl.textContent='🛂 Passport / ID Photo (300 DPI print-ready)';
+rx.appendChild(passLbl);
+const passRow=document.createElement('div');passRow.style.cssText='display:flex;gap:8px;';
+const passSel=document.createElement('select');passSel.id='rz-passport-country';
+passSel.style.cssText='flex:1;padding:9px 10px;border:1.5px solid var(--border);border-radius:9px;background:var(--bg3);color:var(--text);font-family:inherit;font-size:13px;';
+const PASSPORT_SIZES=[
+['','Select country...',0,0],
+['us','United States (2×2 in)',600,600],
+['uk','United Kingdom (35×45mm)',413,531],
+['eu','Schengen / EU (35×45mm)',413,531],
+['ca','Canada (50×70mm)',591,827],
+['in','India (2×2 in)',600,600],
+['cn','China (33×48mm)',390,567],
+['au','Australia (35×45mm)',413,531],
+['jp','Japan (35×45mm)',413,531],
+['ng','Nigeria (38×38mm)',449,449],
+['ru','Russia (35×45mm)',413,531],
+['br','Brazil (50×70mm)',591,827],
+['sa','Saudi Arabia (40×60mm)',472,709]
+];
+PASSPORT_SIZES.forEach(function(c){const o=document.createElement('option');o.value=c[0];o.textContent=c[1];o.dataset.w=c[2];o.dataset.h=c[3];passSel.appendChild(o);});
+passRow.appendChild(passSel);
+const passBtn=document.createElement('button');passBtn.textContent='Apply';
+passBtn.style.cssText='padding:9px 18px;background:var(--gp);color:#fff;border:none;border-radius:9px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;white-space:nowrap;';
+passBtn.onclick=applyPassportPhoto;
+passRow.appendChild(passBtn);
+rx.appendChild(passRow);
+const passNote=document.createElement('div');passNote.style.cssText='font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5;';
+passNote.textContent='Center-crops to the correct aspect ratio first (keeps your face proportions correct), then scales to the exact print size at 300 DPI.';
+rx.appendChild(passNote);
+function applyPassportPhoto(){
+if(!imageData){showToast('Please upload an image first');return;}
+const sel=document.getElementById('rz-passport-country');
+const opt=sel&&sel.options[sel.selectedIndex];
+if(!opt||!opt.value){showToast('⚠️ Please select a country first');return;}
+const tw=parseInt(opt.dataset.w),th=parseInt(opt.dataset.h);
+withImage(function(img){
+const targetRatio=tw/th;
+const srcRatio=img.width/img.height;
+let cropW,cropH,cropX,cropY;
+if(srcRatio>targetRatio){
+cropH=img.height;cropW=cropH*targetRatio;cropX=(img.width-cropW)/2;cropY=0;
+}else{
+cropW=img.width;cropH=cropW/targetRatio;cropX=0;cropY=(img.height-cropH)/2;
+}
+const c=document.createElement('canvas');c.width=tw;c.height=th;
+const ctx=c.getContext('2d');
+ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
+ctx.drawImage(img,cropX,cropY,cropW,cropH,0,0,tw,th);
+imageData=c.toDataURL('image/png');
+showToast('✅ '+opt.textContent.split(' (')[0]+' passport photo ready ('+tw+'×'+th+'px @300 DPI)');
+finishWithProgress();
+});
+}
 const btn=document.createElement('button');btn.textContent='📐 Resize';
 btn.style.cssText='width:100%;padding:12px;background:var(--gp);color:#fff;border:none;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;';
 btn.onclick=applyResize;
@@ -4165,8 +4333,30 @@ const boldBtn=mkToggle('txt-bold','B');boldBtn.style.fontWeight='900';
 const italicBtn=mkToggle('txt-italic','I');italicBtn.style.fontStyle='italic';
 const underlineBtn=mkToggle('txt-underline','U');underlineBtn.style.textDecoration='underline';
 styleRow.appendChild(boldBtn);styleRow.appendChild(italicBtn);styleRow.appendChild(underlineBtn);
+const styleLbl=mkLbl('Style');
+const styleGrid=document.createElement('div');styleGrid.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;';
+let txtStyle='solid';
+const styleBtns=[['solid','🎨 Solid Color'],['photofill','🖼️ Photo Fill']];
+styleBtns.forEach(function(s){
+const b=document.createElement('button');b.type='button';b.textContent=s[1];b.dataset.style=s[0];
+b.style.cssText='padding:9px 6px;border-radius:9px;border:1.5px solid '+(s[0]===txtStyle?'var(--accent)':'var(--border)')+';background:'+(s[0]===txtStyle?'rgba(91,76,232,.08)':'var(--bg3)')+';color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;';
+b.onclick=function(){
+txtStyle=s[0];
+Array.prototype.forEach.call(styleGrid.querySelectorAll('button'),function(x){x.style.borderColor='var(--border)';x.style.background='var(--bg3)';});
+b.style.borderColor='var(--accent)';b.style.background='rgba(91,76,232,.08)';
+colorWrap.style.display=(txtStyle==='photofill')?'none':'block';
+photoFillNote.style.display=(txtStyle==='photofill')?'block':'none';
+};
+styleGrid.appendChild(b);
+});
 rx.appendChild(mkLbl('Text'));rx.appendChild(textIn);
-rx.appendChild(mkLbl('Color'));rx.appendChild(colorIn);
+rx.appendChild(styleLbl);rx.appendChild(styleGrid);
+const colorWrap=document.createElement('div');colorWrap.appendChild(mkLbl('Color'));colorWrap.appendChild(colorIn);
+rx.appendChild(colorWrap);
+const photoFillNote=document.createElement('p');photoFillNote.style.cssText='display:none;font-size:11.5px;color:var(--muted);margin:-4px 0 10px;line-height:1.5;';
+photoFillNote.textContent='📸 Photo Fill: your uploaded photo will show through the letters — try big, bold text for the best effect.';
+rx.appendChild(photoFillNote);
+window.__txtStyleGetter=function(){return txtStyle;};
 rx.appendChild(sizeLbl);rx.appendChild(sizeSl);
 rx.appendChild(mkLbl('Font'));rx.appendChild(fontSel);
 rx.appendChild(styleRow);
@@ -4187,10 +4377,23 @@ rx.appendChild(btn);
 function applyTextToPhoto(){
 return _applyCanvas(async im=>{
 const c=_canvas(im.width,im.height),x=c.getContext('2d');
-x.drawImage(im,0,0);
 const o=getTextOpts();
 const pos=window.__textPositioner?window.__textPositioner.getPos():{x:0.5,y:0.5};
 let fs='';if(o.italic)fs+='italic ';fs+=(o.bold?'900 ':'700 ')+o.size+'px "'+o.font+'"';
+const style=(window.__txtStyleGetter&&window.__txtStyleGetter())||'solid';
+if(style==='photofill'){
+x.font=fs;x.textAlign='center';x.textBaseline='middle';
+const tx=pos.x*c.width,ty=pos.y*c.height;
+x.fillText(o.text,tx,ty);
+x.globalCompositeOperation='source-in';
+x.drawImage(im,0,0,c.width,c.height);
+x.globalCompositeOperation='destination-over';
+x.fillStyle='#0B0F19';
+x.fillRect(0,0,c.width,c.height);
+x.globalCompositeOperation='source-over';
+return c.toDataURL('image/png');
+}
+x.drawImage(im,0,0);
 x.font=fs;x.textAlign='center';x.textBaseline='middle';
 const tx=pos.x*c.width,ty=pos.y*c.height;
 x.lineWidth=Math.max(2,o.size/14);x.strokeStyle='rgba(0,0,0,.55)';x.fillStyle=o.color;
@@ -5166,6 +5369,8 @@ const _panelToolsMap={
 'Magic Eraser':showObjectRemoverPanel,
 'AI Inpainting':showObjectRemoverPanel,
 'Image Upscaler':showImageUpscalerPanel,
+'Skin Smoothing':showSkinSmoothingPanel,
+'AI Headshot':showAIHeadshotPanel,
 };
 const IBA_MAX_FILE_MB=25;
 const IBA_MAX_MEGAPIXELS=40;
