@@ -1,0 +1,176 @@
+<!--
+  Toolnova.tools — Sticky corner promo widget
+  =============================================
+  NASIL KULLANILIR:
+  1) Bu bloğun tamamını kopyalayın.
+  2) Sitenizin HER sayfasında </body> etiketinden hemen önce yapıştırın.
+     (Eğer ortak bir header/footer include dosyanız varsa oraya eklemeniz
+     yeterli — tek yerden tüm sayfalara yayılır, her HTML dosyasını tek
+     tek düzenlemenize gerek kalmaz.)
+  3) Aşağıdaki "AYARLAR" bölümünden link, metin ve konumu (sol alt /
+     sağ alt) kolayca değiştirebilirsiniz.
+
+  NOT: Kart üzerindeki "SPONSOR" etiketini olduğu gibi bıraktım çünkü
+  ekran görüntünüzde öyleydi, fakat bu kendi sitenizin kendi kendini
+  tanıttığı bir kutu — gerçek bir üçüncü taraf reklamı değil. "SPONSOR"
+  yazması ziyaretçiye ve Google'a "bu ücretli bir reklam" izlenimi
+  verip yanıltıcı bulunabilir; özellikle AdSense incelemesi sürerken
+  bunun yerine "ÖNERİLEN" / "TIP" gibi nötr bir etiket kullanmanızı,
+  ya da etiketi tamamen kaldırmanızı öneririm. Değiştirmek için en
+  alttaki `data-badge` değerini güncelleyin.
+-->
+
+<style>
+  #tn-sticky-widget {
+    --tn-accent: #dc2626;      /* ikon arka planı */
+    --tn-link: #2563eb;        /* "Explore Free Tools" rengi */
+    --tn-offset: 20px;         /* kenarlara mesafe */
+
+    position: fixed;
+    left: var(--tn-offset);
+    bottom: var(--tn-offset);
+    z-index: 2147483000;       /* çoğu içeriğin üstünde kalsın, ama tam max değil */
+    width: 260px;
+    max-width: calc(100vw - (var(--tn-offset) * 2));
+    background: #ffffff;
+    border-radius: 14px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.25), 0 2px 6px rgba(15, 23, 42, 0.12);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    padding: 14px 16px 10px;
+    box-sizing: border-box;
+    animation: tn-slide-in 0.4s ease-out;
+  }
+
+  #tn-sticky-widget[hidden] { display: none !important; }
+
+  @keyframes tn-slide-in {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  #tn-sticky-widget .tn-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  #tn-sticky-widget .tn-icon {
+    flex: none;
+    width: 26px;
+    height: 26px;
+    border-radius: 7px;
+    background: var(--tn-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+  }
+
+  #tn-sticky-widget .tn-title {
+    font-weight: 700;
+    font-size: 15px;
+    color: #0f172a;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  #tn-sticky-widget .tn-close {
+    flex: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #94a3b8;
+    font-size: 16px;
+    line-height: 1;
+    padding: 4px;
+    margin: -4px -4px -4px 0;
+  }
+  #tn-sticky-widget .tn-close:hover { color: #475569; }
+
+  #tn-sticky-widget .tn-desc {
+    margin: 8px 0 10px;
+    font-size: 12.5px;
+    color: #475569;
+    line-height: 1.4;
+  }
+
+  #tn-sticky-widget .tn-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--tn-link);
+    text-decoration: none;
+  }
+  #tn-sticky-widget .tn-cta:hover { text-decoration: underline; }
+
+  #tn-sticky-widget .tn-badge {
+    position: absolute;
+    right: 12px;
+    bottom: 6px;
+    font-size: 9px;
+    letter-spacing: 0.04em;
+    color: #cbd5e1;
+    text-transform: uppercase;
+  }
+
+  /* --- Mobil: köşede küçük kart yerine alt kenara yaslı, tam genişlik bar --- */
+  @media (max-width: 480px) {
+    #tn-sticky-widget {
+      left: 10px;
+      right: 10px;
+      bottom: 10px;
+      width: auto;
+      max-width: none;
+      padding: 12px 14px 8px;
+    }
+    #tn-sticky-widget .tn-title { font-size: 14px; }
+    #tn-sticky-widget .tn-desc { font-size: 12px; }
+  }
+</style>
+
+<div id="tn-sticky-widget" role="complementary" aria-label="Toolnova.tools tanıtım kutusu">
+  <div class="tn-row">
+    <span class="tn-icon" aria-hidden="true">💼</span>
+    <span class="tn-title">Toolnova.tools</span>
+    <button type="button" class="tn-close" id="tn-sticky-close" aria-label="Kapat">✕</button>
+  </div>
+  <p class="tn-desc">PDF &bull; Calculators &bull; Converters &bull; More</p>
+  <a class="tn-cta" href="https://toolnova.tools/" id="tn-sticky-link">
+    Explore Free Tools <span aria-hidden="true">&rarr;</span>
+  </a>
+  <span class="tn-badge" data-badge>SPONSOR</span>
+</div>
+
+<script>
+  (function () {
+    var STORAGE_KEY = "tnStickyWidgetDismissedUntil";
+    var DISMISS_DAYS = 7; // kapatınca kaç gün tekrar göstermesin
+
+    var widget = document.getElementById("tn-sticky-widget");
+    if (!widget) return;
+
+    try {
+      var until = localStorage.getItem(STORAGE_KEY);
+      if (until && Date.now() < parseInt(until, 10)) {
+        widget.hidden = true;
+      }
+    } catch (e) {
+      /* localStorage kapalıysa sessizce yoksay, widget normal görünsün */
+    }
+
+    var closeBtn = document.getElementById("tn-sticky-close");
+    if (closeBtn) {
+      closeBtn.addEventListener("click", function () {
+        widget.hidden = true;
+        try {
+          var expires = Date.now() + DISMISS_DAYS * 24 * 60 * 60 * 1000;
+          localStorage.setItem(STORAGE_KEY, String(expires));
+        } catch (e) {}
+      });
+    }
+  })();
+</script>
