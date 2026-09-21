@@ -1038,7 +1038,7 @@ footer{background:var(--text);color:rgba(255,255,255,.85);padding:3.5rem 1rem 1.
           <button class="btn-secondary" id="redo-btn" onclick="doRedo()" disabled title="Redo">↷ Redo</button>
           <button class="btn-secondary" id="fullscreen-btn" onclick="toggleFullscreen()" title="Fullscreen editor">⛶ Fullscreen</button>
         </div>
-        <div class="out-img-wrap" id="output"><img id="outImg" alt="Edited photo result"></div>
+        <div class="out-img-wrap" id="output"><img id="outImg" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBTAA7" alt="Edited photo result"></div>
         <a class="btn-primary dl-btn" id="download" href="/" download="imageboostai-result.png" data-i="dl_btn">⬇ Download Result</a>
         <!-- Share bar (shown after result) -->
         <div class="share-bar" id="share-bar" style="display:none;">
@@ -6163,6 +6163,22 @@ extraPanels[name]();
           localStorage.setItem(STORAGE_KEY, String(expires));
         } catch (e) {}
       });
+    }
+
+    /* Avoid overlapping the site's cookie consent bar (also fixed to the
+       bottom of the screen, full width) — sit above it while it's shown,
+       then settle back to the default corner spot once it's dismissed. */
+    var cookieBar = document.getElementById("cookie-bar");
+    function adjustForCookieBar() {
+      if (cookieBar && window.getComputedStyle(cookieBar).display !== "none") {
+        widget.style.bottom = (cookieBar.offsetHeight + 16) + "px";
+      } else {
+        widget.style.bottom = "";
+      }
+    }
+    adjustForCookieBar();
+    if (cookieBar && window.MutationObserver) {
+      new MutationObserver(adjustForCookieBar).observe(cookieBar, { attributes: true, attributeFilter: ["style"] });
     }
   })();
 </script>
