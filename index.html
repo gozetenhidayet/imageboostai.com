@@ -1576,6 +1576,8 @@ if(c){
 const slug=IBA_TOOL_SLUGS[name];
 c.setAttribute('href',slug?('https://imageboostai.com/'+slug+'/'):('https://imageboostai.com/?tool='+encodeURIComponent(name)));
 }
+const rm=document.querySelector('meta[name="robots"]');
+if(rm)rm.setAttribute('content','noindex,follow');
 }catch(e){}
 }
 function resetSeoDefault(){
@@ -1585,6 +1587,8 @@ const m=document.querySelector('meta[name="description"]');
 if(m)m.setAttribute('content',IBA_DEFAULT_DESC);
 const c=document.querySelector('link[rel="canonical"]');
 if(c)c.setAttribute('href','https://imageboostai.com/');
+const rm=document.querySelector('meta[name="robots"]');
+if(rm)rm.setAttribute('content','index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1');
 }catch(e){}
 }
 function openTool(name){
