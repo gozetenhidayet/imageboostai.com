@@ -1,0 +1,317 @@
+[
+  {
+    "name": "Remove Background",
+    "slug": "remove-background",
+    "kind": "Foreground cutout",
+    "method": "Uses a local DeepLab segmentation model when available. If the model cannot run, edge-color removal is used and the result identifies the fallback.",
+    "steps": "Upload a clearly separated subject, apply removal, inspect hair and thin edges, then export PNG to retain transparency.",
+    "limit": "Busy backgrounds, transparent objects and unknown object classes may need manual cleanup. No model can guarantee perfect edges.",
+    "example": "A product against a plain wall is easier to isolate than the same product in a crowded display."
+  },
+  {
+    "name": "Background Changer",
+    "slug": "background-changer",
+    "kind": "Background replacement",
+    "method": "Separates the foreground and composites it over a selected color, gradient or uploaded background image.",
+    "steps": "Choose a background in the controls and apply it. Match the light direction of the new background to the subject.",
+    "limit": "Subject cutout quality limits the result. This does not generate a scene from a prompt.",
+    "example": "For a catalog photo, choose a neutral white or pale gray background before adding a watermark."
+  },
+  {
+    "name": "AI Background Generator",
+    "slug": "ai-background-generator",
+    "kind": "Background presets",
+    "method": "Combines a foreground cutout with a preset radial color gradient.",
+    "steps": "Select a preset and review the outline against both dark and light areas before downloading.",
+    "limit": "Despite the legacy name, this is a preset background studio, not text-to-image generation.",
+    "example": "A cool gradient can separate a warm-colored product; a dark preset exposes unwanted light halos."
+  },
+  {
+    "name": "Object Remover",
+    "slug": "object-remover",
+    "kind": "Local area repair",
+    "method": "Fills a brushed or lasso-selected area by propagating nearby unselected colors into the selection.",
+    "steps": "Paint only the unwanted area, leave surrounding pixels available, then apply. Undo and use a smaller selection if needed.",
+    "limit": "This is deterministic boundary repair, not semantic AI reconstruction. It works best on small marks and simple backgrounds.",
+    "example": "A small speck on a plain wall is suitable; removing a person in front of detailed lettering is not."
+  },
+  {
+    "name": "Object Replace",
+    "slug": "object-replace",
+    "kind": "Selected-area recoloring",
+    "method": "Blends a chosen color into the selected region while retaining some original shading.",
+    "steps": "Select the object with the brush or lasso, choose a color and start with a moderate intensity.",
+    "limit": "This changes color; it does not replace the object with a different generated object.",
+    "example": "Recolor a fabric panel without changing the surrounding room, then inspect the selection boundary."
+  },
+  {
+    "name": "Object Add",
+    "slug": "object-add",
+    "kind": "Sticker placement",
+    "method": "Places a selected emoji sticker at percentage-based coordinates on the current image.",
+    "steps": "Choose a sticker, adjust horizontal and vertical position, set size and apply. Apply again to add another sticker.",
+    "limit": "Emoji appearance depends on device fonts. This does not synthesize photorealistic objects.",
+    "example": "Place a celebration sticker near a corner, keeping it clear of faces and important text."
+  },
+  {
+    "name": "AI Inpainting",
+    "slug": "ai-inpainting",
+    "kind": "Selected-area fill",
+    "method": "Uses the same local boundary-repair engine as Object Remover to fill a selected area.",
+    "steps": "Brush the damaged region, keep the mask small and apply. Inspect the repaired texture at full size.",
+    "limit": "The legacy AI name does not imply generative inpainting. Large missing objects cannot be reconstructed reliably.",
+    "example": "Use a narrow mask for a small scan defect rather than covering an entire face."
+  },
+  {
+    "name": "AI Outpainting",
+    "slug": "ai-outpainting",
+    "kind": "Canvas extension",
+    "method": "Extends the canvas with mirrored and blurred edge pixels while preserving the central image.",
+    "steps": "Set the extension percentage and apply. The extension is added on both sides of each dimension.",
+    "limit": "No new scene content is generated. Reflections can repeat recognizable objects near the edges.",
+    "example": "A 1000 × 800 image extended by 20% becomes 1400 × 1120 pixels."
+  },
+  {
+    "name": "Magic Eraser",
+    "slug": "magic-eraser",
+    "kind": "Brush repair",
+    "method": "Repairs brushed areas using neighboring image colors, sharing the local Object Remover engine.",
+    "steps": "Use short strokes over a small mark and compare the result before making a second pass.",
+    "limit": "Complex textures may smear. Keep the original and use Undo when the repair loses detail.",
+    "example": "Remove a tiny dust mark from a studio backdrop while leaving the product outline untouched."
+  },
+  {
+    "name": "AI Photo Restore",
+    "slug": "ai-photo-restore",
+    "kind": "Photo cleanup",
+    "method": "Combines light noise reduction, channel-level adjustment and sharpening for faded photos.",
+    "steps": "Start with a high-quality scan, apply once and compare faces, shadows and paper texture against the original.",
+    "limit": "This is classical photo processing. It cannot recreate missing facial detail or automatically reconstruct major damage.",
+    "example": "A faded scan may gain contrast; torn areas still require careful selected-area repair."
+  },
+  {
+    "name": "Colorize Old Photo",
+    "slug": "colorize-old-photo",
+    "kind": "Manual tint",
+    "method": "Applies a chosen tint using color blending at an adjustable intensity.",
+    "steps": "Choose a preset or custom color, lower intensity for a subtle result, then apply.",
+    "limit": "This is global tinting, not automatic object-aware colorization or historical color recovery.",
+    "example": "A sepia tint gives a monochrome photo a warm tone without claiming the original clothing colors."
+  },
+  {
+    "name": "Image Upscaler",
+    "slug": "image-upscaler",
+    "kind": "Image enlargement",
+    "method": "Enlarges pixels using high-quality interpolation and the available sharpening controls.",
+    "steps": "Choose an enlargement factor, check the output dimensions and apply. Inspect edges at 100% zoom.",
+    "limit": "Interpolation does not recover detail that was never captured. The output is limited to 40 megapixels.",
+    "example": "A 1200 × 800 source at 2× becomes 2400 × 1600; it is larger, not a newly detailed photograph."
+  },
+  {
+    "name": "Image Sharpener",
+    "slug": "image-sharpener",
+    "kind": "Edge enhancement",
+    "method": "Applies adjustable sharpening to increase local edge contrast.",
+    "steps": "Start with a low strength, then inspect high-contrast borders for halos before increasing it.",
+    "limit": "Sharpening cannot correct severe motion blur or a badly missed focus point.",
+    "example": "Text edges may become easier to read, but strong settings can create bright outlines."
+  },
+  {
+    "name": "Noise Remover",
+    "slug": "noise-remover",
+    "kind": "Noise reduction",
+    "method": "Smooths pixel-level variation with an adjustable local filter.",
+    "steps": "Choose a moderate amount and compare both flat areas and fine texture.",
+    "limit": "Noise reduction can soften hair, fabric and small writing. It does not distinguish every detail from noise.",
+    "example": "Use a low setting for a slightly grainy portrait and inspect eyebrows before exporting."
+  },
+  {
+    "name": "Photo Enhancer",
+    "slug": "photo-enhancer",
+    "kind": "Automatic tonal adjustment",
+    "method": "Uses percentile-based channel levels and a restrained blend with the original colors; transparent pixels do not skew the calculation.",
+    "steps": "Apply once, compare the original and output, and use Undo if contrast is already strong.",
+    "limit": "This is a tonal adjustment, not a trained enhancement model. Flat-color graphics are intentionally preserved.",
+    "example": "A low-contrast photograph can gain separation without turning a uniform colored logo black."
+  },
+  {
+    "name": "Color Correction",
+    "slug": "color-correction",
+    "kind": "Color adjustment",
+    "method": "Adjusts color balance and saturation using the controls in the editor.",
+    "steps": "Correct the overall cast first and then refine saturation. Check neutral whites and skin tones.",
+    "limit": "The result is a visual adjustment, not calibrated color management or a replacement for an embedded ICC workflow.",
+    "example": "Reduce a warm indoor cast while keeping a neutral wall close to gray."
+  },
+  {
+    "name": "Brightness & Contrast",
+    "slug": "brightness-and-contrast",
+    "kind": "Exposure and tone",
+    "method": "Adjusts brightness, contrast and saturation independently; zero is a valid setting.",
+    "steps": "Use 100% for a neutral control. Set saturation to 0% for grayscale or lower brightness for a darker result.",
+    "limit": "Overly high settings clip highlights and shadows. The tool cannot restore already clipped image data.",
+    "example": "Keep brightness and contrast at 100%, set saturation to 0%, then compare the grayscale output."
+  },
+  {
+    "name": "Remove Blur",
+    "slug": "remove-blur",
+    "kind": "Clarity sharpening",
+    "method": "Uses local contrast sharpening to improve the appearance of soft edges.",
+    "steps": "Apply to a mildly soft image and compare at original size.",
+    "limit": "This is sharpening, not deconvolution or generative detail recovery. Severe blur remains a limitation.",
+    "example": "A slightly soft scan may improve; a moving subject with a long smear will not become a sharp portrait."
+  },
+  {
+    "name": "Face Retouch",
+    "slug": "face-retouch",
+    "kind": "Selected skin retouch",
+    "method": "Applies a softening and tonal filter only where you paint.",
+    "steps": "Paint over skin while avoiding eyes, eyebrows and lips. Apply lightly and compare.",
+    "limit": "There is no automatic face landmark detection. The selection determines which pixels change.",
+    "example": "Retouch a cheek without softening the eyelashes or hairline."
+  },
+  {
+    "name": "Skin Smoothing",
+    "slug": "skin-smoothing",
+    "kind": "Skin and blemish controls",
+    "method": "Provides smoothing and manual blemish selection controls in the portrait workspace.",
+    "steps": "Use the smallest practical selection and inspect texture before adding another pass.",
+    "limit": "Heavy smoothing produces a plastic appearance. This is photo editing, not a diagnosis or treatment tool.",
+    "example": "Reduce a small distracting spot while preserving freckles and natural skin texture."
+  },
+  {
+    "name": "Teeth Whitening",
+    "slug": "teeth-whitening",
+    "kind": "Selected brightening",
+    "method": "Brightens and reduces saturation within the painted teeth region.",
+    "steps": "Paint only the teeth, avoid gums and lips, then compare the smile at normal viewing size.",
+    "limit": "The tool does not detect teeth automatically. Overpainting changes surrounding colors.",
+    "example": "A careful mask can reduce a yellow cast without making the lips pale."
+  },
+  {
+    "name": "Eye Enhancer",
+    "slug": "eye-enhancer",
+    "kind": "Selected eye adjustment",
+    "method": "Increases contrast, saturation and brightness in the area you paint.",
+    "steps": "Use a small brush over the iris and eye detail, then review both eyes together.",
+    "limit": "The filter does not understand eye anatomy or restore missing focus. Avoid painting the skin around the eye.",
+    "example": "Enhance an iris slightly while retaining a natural pupil and reflection."
+  },
+  {
+    "name": "AI Headshot",
+    "slug": "ai-headshot",
+    "kind": "Portrait styling",
+    "method": "Offers local portrait styling, a studio background operation and an optional illustrated attire overlay.",
+    "steps": "Upload a front-facing portrait, review the cutout and choose only the styling options that suit your image.",
+    "limit": "It does not generate a new identity, realistic clothing or a professional photoshoot from a prompt.",
+    "example": "Use a simple studio background for a profile image; the attire overlay remains visibly illustrated."
+  },
+  {
+    "name": "Portrait Enhancer",
+    "slug": "portrait-enhancer",
+    "kind": "Portrait tone and texture",
+    "method": "Combines a simple skin-color heuristic with gentle smoothing and tonal adjustment.",
+    "steps": "Apply once and inspect skin, background and clothing for unintended changes.",
+    "limit": "Color-based skin heuristics are imperfect across lighting and skin tones; compare the entire image.",
+    "example": "A warm indoor portrait may benefit from a small adjustment, but matching background colors can also be affected."
+  },
+  {
+    "name": "Blur Background",
+    "slug": "blur-background",
+    "kind": "Depth effect",
+    "method": "Blurs the image behind a foreground cutout using Gaussian, lens-style or directional effects.",
+    "steps": "Choose blur type and strength, apply, then inspect the boundary around the subject.",
+    "limit": "Cutout quality limits the effect. Directional blur is an approximation, not a physical lens simulation.",
+    "example": "A moderate Gaussian blur can separate a portrait from a busy background without an exaggerated halo."
+  },
+  {
+    "name": "Crop Image",
+    "slug": "crop-image",
+    "kind": "Crop, rotate and flip",
+    "method": "Supports aspect-ratio crops, a draggable custom rectangle, rotation and flipping.",
+    "steps": "Choose a ratio or drag a rectangle, then use the corresponding crop button. Preview coordinates scale to the displayed image.",
+    "limit": "Cropping removes pixels; it does not resize or reconstruct content outside the selection.",
+    "example": "Use 1:1 for a square avatar or 9:16 for a vertical social image, keeping the face inside the crop."
+  },
+  {
+    "name": "Resize Image",
+    "slug": "resize-image",
+    "kind": "Exact dimensions",
+    "method": "Resamples the image to the requested width and height with optional aspect-ratio locking.",
+    "steps": "Enter positive whole-number pixel dimensions and keep the aspect lock on to avoid stretching.",
+    "limit": "Both dimensions are limited to 16,384 pixels and the total output to 40 megapixels.",
+    "example": "A 2400 × 1600 image resized proportionally to width 1200 becomes 1200 × 800."
+  },
+  {
+    "name": "Image Compressor",
+    "slug": "image-compressor",
+    "kind": "JPEG compression",
+    "method": "Encodes the current image as JPEG at a chosen quality, with an optional maximum-size target search.",
+    "steps": "Choose quality or enter a KB target. If the target is unreachable at these dimensions, resize first.",
+    "limit": "JPEG is lossy and fills transparency with white. A smaller file is not guaranteed for an already optimized source.",
+    "example": "For a 500 KB limit, try a moderate quality; if even the minimum quality is too large, reduce dimensions."
+  },
+  {
+    "name": "Convert Image",
+    "slug": "convert-image",
+    "kind": "PNG, JPEG and WebP export",
+    "method": "Exports the current image in PNG, JPEG or WebP. HEIC is supported as an input through a separately loaded decoder.",
+    "steps": "Click the desired output format. For JPEG, choose the background color used beneath transparent areas.",
+    "limit": "HEIC output is not supported. Browser support can cause WebP encoding to fall back; the download extension follows the actual encoded type.",
+    "example": "Choose PNG for a transparent cutout, JPEG for an opaque photo or WebP for supported web delivery."
+  },
+  {
+    "name": "Watermark Remover",
+    "slug": "watermark-remover",
+    "kind": "Selected mark repair",
+    "method": "Uses local selected-area repair on marks in images you own or are authorized to edit.",
+    "steps": "Paint the mark narrowly and inspect surrounding edges after processing.",
+    "limit": "This cannot recover original pixels hidden beneath a large mark. Do not remove ownership notices without permission.",
+    "example": "A small accidental date stamp on your own plain-background photo is more suitable than a large logo over a face."
+  },
+  {
+    "name": "Watermark Maker",
+    "slug": "watermark-maker",
+    "kind": "Text or logo watermark",
+    "method": "Composites text or a logo image with adjustable opacity, placement and optional tiling.",
+    "steps": "Enter text or choose a logo, set opacity and location, then apply.",
+    "limit": "A watermark is a visible deterrent, not copy protection. Transparent PNG logos usually give cleaner edges.",
+    "example": "Place a low-opacity logo in the bottom-right corner and confirm it remains legible at the final display size."
+  },
+  {
+    "name": "Add Text to Photo",
+    "slug": "add-text-to-photo",
+    "kind": "Text overlay",
+    "method": "Draws text using your chosen browser font, color, size, style and draggable position.",
+    "steps": "Enter the text, place it in the preview and apply. Repeat to add another independent text element to the image.",
+    "limit": "Text becomes pixels in the image. Fonts vary by device and applied text is edited through Undo, not a saved text layer.",
+    "example": "Place a short white caption over a dark area, leaving enough margin that it will survive later cropping."
+  },
+  {
+    "name": "Image to Text OCR",
+    "slug": "image-to-text-ocr",
+    "kind": "Local text recognition",
+    "method": "Runs Tesseract in the browser with the selected language model and returns editable text.",
+    "steps": "Upload a sharp text image, choose the language, extract, correct recognition errors and download TXT.",
+    "limit": "The first run downloads the engine and language data. Handwriting, complex layouts and low-resolution scans may not be recognized accurately.",
+    "example": "Extract a printed paragraph, then verify names, dates, decimal points and accented characters before reusing it."
+  },
+  {
+    "name": "Product Photo Editor",
+    "slug": "product-photo-editor",
+    "kind": "Product presentation",
+    "method": "Adds a white presentation canvas, padding, a soft shadow and a fading reflection around the current image.",
+    "steps": "Start with a clean cutout or neutral-background product photo, apply, and inspect the reflection.",
+    "limit": "This presentation effect does not automatically remove the original background. Use Remove Background first when appropriate.",
+    "example": "A transparent product cutout can become a simple catalog card with consistent white space."
+  },
+  {
+    "name": "Photo Collage Maker",
+    "slug": "photo-collage-maker",
+    "kind": "Multi-image collage",
+    "method": "Combines the current image with up to eight additional images in a two- or three-column grid.",
+    "steps": "Add extra files, reorder them, choose output size, gaps, background and fit mode, then create the collage.",
+    "limit": "Fill mode crops edges; Fit mode retains the whole image and may leave margins. An incomplete final row keeps the background visible.",
+    "example": "Combine four product angles in a 1600 × 1600 two-column grid with 16-pixel gaps."
+  }
+]
