@@ -1332,7 +1332,7 @@ if(rt)rt.textContent='🩹 Skin Smoothing';
 if(!rx)return;
 if(!imageData){rx.textContent='Upload a photo first, then click ⚡ Apply Tool.';return;}
 rx.innerHTML='';
-const smoothBtn=document.createElement('button');smoothBtn.textContent='✨ Quick Smooth (whole face)';
+const smoothBtn=document.createElement('button');smoothBtn.textContent='✨ Quick Smooth (all skin tones)';
 smoothBtn.style.cssText='width:100%;padding:12px;background:var(--gp);color:#fff;border:none;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;margin-bottom:14px;';
 smoothBtn.onclick=applySkinSmoothing;
 rx.appendChild(smoothBtn);

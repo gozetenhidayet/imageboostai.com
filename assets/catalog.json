@@ -104,7 +104,7 @@
     "kind": "Image enlargement",
     "method": "Enlarges pixels using high-quality interpolation and the available sharpening controls.",
     "steps": "Choose an enlargement factor, check the output dimensions and apply. Inspect edges at 100% zoom.",
-    "limit": "Interpolation does not recover detail that was never captured. The output is limited to 40 megapixels.",
+    "limit": "Interpolation does not recover detail that was never captured. The longest side of the output is limited to 6,000 pixels.",
     "example": "A 1200 × 800 source at 2× becomes 2400 × 1600; it is larger, not a newly detailed photograph."
   },
   {
